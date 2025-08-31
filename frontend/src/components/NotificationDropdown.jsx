@@ -25,7 +25,7 @@ const NotificationDropdown = () => {
       progress: '📈',
       recommendation: '💡',
       reminder: '⏰',
-      homework: '📚'
+      homework: '📖'
     };
     return iconMap[type] || '🔔';
   };

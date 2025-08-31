@@ -915,19 +915,7 @@ function StudentDash() {
         </Button> */}
       </div>
       
-      <small className="text-muted mt-1 d-block">
-        {/* <strong>{selectedChapters.length}</strong> of <strong>{chapters.length}</strong> chapters selected */}
-        {chapters.length === 13 && (
-          <span className="text-success ms-2">
-            {/* ✅ All chapters loaded */}
-          </span>
-        )}
-        {chapters.length !== 13 && chapters.length > 0 && (
-          <span className="text-warning ms-2">
-            {/* ⚠ Expected 13 chapters, found {chapters.length} */}
-          </span>
-        )}
-      </small>
+      
     </Form.Group>
   </Col>
 

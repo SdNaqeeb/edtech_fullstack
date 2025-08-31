@@ -1,4 +1,4 @@
-// EnhancedTeacherDash.jsx - Refactored Main Component
+// EnhancedTeacherDash.jsx - Updated with UploadHomework component
 
 import React, { useState, useEffect } from 'react';
 import './EnhancedTeacherDash.css';
@@ -10,6 +10,7 @@ import QuickExerciseComponent from './QuickExerciseComponent';
 // Import the separated components
 import ClassAnalysis from './ClassAnalysis';
 import StudentAnalysis from './StudentAnalysis';
+import UploadHomework from './UploadHomework';
 
 // Mock data for different classes (6th to 12th)
 const classesData = {
@@ -262,7 +263,12 @@ const renderMainSidebar = () => {
         >
           📝 Homework
         </button>
-        
+        <button 
+          onClick={() => setActiveTab('upload-homework')}
+          className={`main-sidebar-button tab-exercise ${activeTab === 'upload-homework' ? 'active' : ''}`}
+        >
+          📑Upload Homework
+        </button>
         {/* 2. Classwork - Second */}
         <button 
           onClick={() => setActiveTab('classwork')}
@@ -342,6 +348,8 @@ const renderMainSidebar = () => {
                 classesData={classesData}
                 onClassChange={handleClassChange}
               />
+            ): activeTab === 'upload-homework' ? (
+              <UploadHomework />
             ) : activeTab === 'classwork' ? (
               <div style={{ padding: '20px' }}>
                 <QuickExerciseComponent onCreateHomework={(assignment) => handleAssignmentSubmit(assignment, "classwork")} mode="classwork" />
@@ -356,8 +364,8 @@ const renderMainSidebar = () => {
                 />
               </div>
             ) : activeTab === 'exercise' ? (
-              <div style={{ padding: '20px' }}>
-                <QuickExerciseComponent onCreateHomework={(assignment) => handleAssignmentSubmit(assignment, "quiz")} />
+              <div  style={{ padding: '20px' }}>
+                <QuickExerciseComponent onCreateHomework={(assignment) => handleAssignmentSubmit(assignment, "homework")} />
               </div>
             ) : null}
           </div>

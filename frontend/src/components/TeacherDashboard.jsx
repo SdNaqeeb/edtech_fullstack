@@ -774,7 +774,7 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
       </div>
 
       {/* Assignments List */}
-      <div className="dashboard-card assignments-list-card">
+      {/* <div className="dashboard-card assignments-list-card">
         <div className="card-header">
           <div className="header-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -836,7 +836,7 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
             )}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Question Preview Modal */}
       <QuestionListModal

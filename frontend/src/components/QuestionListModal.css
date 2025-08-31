@@ -1,3 +1,6 @@
+/* QuestionListModal.css - Fixed Layout Issues */
+
+/* Modal base styling */
 .question-modal .modal-content {
   border-radius: 15px;
   border: none;
@@ -5,17 +8,129 @@
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   border: 1px solid rgba(255, 255, 255, 0.18);
+  max-width: 90vw; /* Prevent modal from being too wide */
+  max-height: 90vh; /* Prevent modal from being too tall */
 }
 
 .question-list-container {
   max-height: 70vh;
   overflow-y: auto;
+  overflow-x: hidden; /* FIXED: Prevent horizontal scroll */
   padding: 15px;
 }
-.question-content {
-  position: relative;
-  padding-bottom: 2em; /* for bottom spacing if needed */
+
+.question-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
+
+/* FIXED: Question item layout with proper overflow handling */
+.question-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 15px;
+  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: skewX(-2deg);
+  position: relative; /* FIXED: For absolute positioning of level badge */
+  width: 100%; /* FIXED: Full width */
+  box-sizing: border-box; /* FIXED: Include padding in width calculation */
+}
+
+.question-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: skewX(-2deg) translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.question-item.selected {
+  background: rgba(0, 193, 212, 0.2);
+  border: 1px solid rgba(0, 193, 212, 0.4);
+}
+
+/* Checkbox styling */
+.question-item input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 193, 212, 0.5);
+  border-radius: 4px;
+  margin-right: 15px;
+  margin-top: 5px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  transform: skewX(2deg);
+  flex-shrink: 0; /* FIXED: Prevent checkbox from shrinking */
+}
+
+.question-item input[type="checkbox"]:checked {
+  background: linear-gradient(to right, #00c1d4, #001b6c);
+  border-color: transparent;
+}
+
+.question-item input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* FIXED: Question number styling */
+.question-item{.question-number {
+  background: linear-gradient(135deg, #00c1d4, #001b6c);
+  color: #ffffff;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  flex-shrink: 0; /* FIXED: Prevent number from shrinking */
+  transform: skewX(2deg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  font-size: 14px;
+}}
+
+/* FIXED: Question content with proper overflow handling */
+.question-content {
+  flex: 1;
+  transform: skewX(2deg);
+  position: relative;
+  padding-right: 100px; /* FIXED: Make space for level badge */
+  min-width: 0; /* FIXED: Allow flex item to shrink */
+  overflow: hidden; /* FIXED: Prevent content overflow */
+}
+
+/* FIXED: Question text with proper word wrapping */
+.question-text {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 16px;
+  line-height: 1.5;
+  word-wrap: break-word; /* FIXED: Break long words */
+  overflow-wrap: break-word; /* FIXED: Better word breaking */
+  white-space: pre-wrap; /* FIXED: Preserve formatting but allow wrapping */
+  max-width: 100%; /* FIXED: Constrain to container width */
+  hyphens: auto; /* FIXED: Add hyphenation for better breaking */
+}
+
+/* FIXED: Priority level badge positioning */
+
+
+
+
 
 .question-level {
   position: absolute;
@@ -43,93 +158,7 @@
   color: #c62828; /* red */
 }
 
-.question-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.question-item {
-  display: flex;
-  align-items: flex-start;
-  padding: 15px;
-  margin-bottom: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: skewX(-2deg);
-}
-
-.question-item:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: skewX(-2deg) translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.question-item.selected {
-  background: rgba(0, 193, 212, 0.2);
-  border: 1px solid rgba(0, 193, 212, 0.4);
-}
-
-.question-item input[type="checkbox"] {
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(0, 193, 212, 0.5);
-  border-radius: 4px;
-  margin-right: 15px;
-  margin-top: 5px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  transform: skewX(2deg);
-}
-
-.question-item input[type="checkbox"]:checked {
-  background: linear-gradient(to right, #00c1d4, #001b6c);
-  border-color: transparent;
-}
-
-.question-item input[type="checkbox"]:checked::after {
-  content: "✓";
-  position: absolute;
-  color: white;
-  font-size: 14px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.question-item{
-.question-number {
-  background: linear-gradient(135deg, #00c1d4, #001b6c);
-  color: white;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 15px;
-  flex-shrink: 0;
-  transform: skewX(2deg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-}
-.question-content {
-  flex: 1;
-  transform: skewX(2deg);
-}
-
-.question-text {
-  margin-bottom: 10px;
-  color: #333;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
+/* Image preview styling */
 .question-image-preview {
   max-width: 200px;
   margin-top: 10px;
@@ -141,7 +170,7 @@
 .preview-image {
   width: 100%;
   height: auto;
-  object-fit:contain;
+  object-fit: contain;
   border-radius: 8px;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -150,11 +179,16 @@
   transform: scale(1.05);
 }
 
+/* Modal footer */
 .modal-footer {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(5px);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* FIXED: Allow wrapping on small screens */
 }
 
 .modal-footer .btn {
@@ -162,6 +196,7 @@
   padding: 8px 20px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: skewX(-2deg);
+  margin: 2px; /* FIXED: Small margin for wrapped buttons */
 }
 
 .modal-footer .btn:hover {
@@ -178,6 +213,16 @@
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #333;
+}
+
+/* Selection counter styling */
+.modal-footer .text-muted {
+  font-weight: 600;
+  color: #2196f3 !important;
+  background: #e3f2fd;
+  padding: 5px 15px;
+  border-radius: 20px;
+  white-space: nowrap; /* FIXED: Prevent wrapping */
 }
 
 /* Custom scrollbar */
@@ -199,225 +244,45 @@
   background: linear-gradient(to bottom, #001b6c, #00c1d4);
 }
 
-/* Add this to frontend/src/components/QuestionListModal.css */
-/* QUESTION LIST MODAL - DARK MODE ENHANCEMENTS */
-
-/* Question List Modal Container */
-.dark-mode .question-modal .modal-content {
-  background: rgba(15, 23, 42, 0.95) !important;
-  border: 2px solid rgba(51, 65, 85, 0.8) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6) !important;
+/* FIXED: Mathematical expressions styling */
+.question-text .math-display,
+.question-text .math-inline,
+.question-text code,
+.question-text pre {
+  font-family: 'Computer Modern', 'Times New Roman', serif;
+  font-size: 14px;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: pre-wrap;
+  word-break: break-all;
+  padding: 2px 4px;
+  background: rgba(240, 240, 240, 0.5);
+  border-radius: 4px;
+  display: inline-block;
+  margin: 2px 0;
 }
 
-/* Question List Container */
-.dark-mode .question-list-container {
-  background: transparent !important;
+/* FIXED: LaTeX expressions specific styling */
+.question-text .katex,
+.question-text .katex-display {
+  font-size: 0.9em !important;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-/* Question Items */
-.dark-mode .question-item {
-  background: rgba(30, 41, 59, 0.8) !important;
-  border: 1px solid rgba(51, 65, 85, 0.6) !important;
-  color: #f8fafc !important;
+.question-text .katex-display {
+  margin: 8px 0;
+  text-align: center;
 }
 
-.dark-mode .question-item:hover {
-  background: rgba(0, 188, 212, 0.2) !important;
-  border-color: rgba(0, 188, 212, 0.4) !important;
-  transform: skewX(-2deg) translateY(-3px) !important;
-  box-shadow: 0 12px 25px rgba(0, 188, 212, 0.3) !important;
-}
-
-.dark-mode .question-item.selected {
-  background: rgba(0, 188, 212, 0.3) !important;
-  border: 1px solid rgba(0, 188, 212, 0.6) !important;
-}
-
-/* Question Text */
-.dark-mode .question-text {
-  color: #cbd5e1 !important;
-}
-
-/* Question Number */
-.dark-mode .question-number {
-  background: linear-gradient(135deg, #00BCD4, #001B6C) !important;
-  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.4) !important;
-}
-
-/* Modal Footer */
-.dark-mode .modal-footer {
-  background: rgba(15, 23, 42, 0.9) !important;
-  border-top: 1px solid rgba(51, 65, 85, 0.5) !important;
-}
-
-/* Modal Footer Buttons */
-.dark-mode .modal-footer .btn-primary {
-  background: linear-gradient(135deg, #00BCD4, #001B6C) !important;
-  border: none !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3) !important;
-}
-
-.dark-mode .modal-footer .btn-primary:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 20px rgba(0, 188, 212, 0.5) !important;
-}
-
-.dark-mode .modal-footer .btn-secondary {
-  background: rgba(51, 65, 85, 0.8) !important;
-  border: 1px solid rgba(71, 85, 105, 0.6) !important;
-  color: #cbd5e1 !important;
-}
-
-.dark-mode .modal-footer .btn-secondary:hover {
-  background: rgba(71, 85, 105, 0.9) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* Question Level Badges */
-.dark-mode .question-level.easy {
-  background-color: rgba(76, 175, 80, 0.2) !important;
-  color: #81C784 !important;
-  border: 1px solid rgba(76, 175, 80, 0.4) !important;
-}
-
-.dark-mode .question-level.medium {
-  background-color: rgba(33, 150, 243, 0.2) !important;
-  color: #64B5F6 !important;
-  border: 1px solid rgba(33, 150, 243, 0.4) !important;
-}
-
-.dark-mode .question-level.tough {
-  background-color: rgba(244, 67, 54, 0.2) !important;
-  color: #E57373 !important;
-  border: 1px solid rgba(244, 67, 54, 0.4) !important;
-}
-
-/* Checkbox Styling */
-.dark-mode .question-item input[type="checkbox"] {
-  border-color: rgba(0, 188, 212, 0.8) !important;
-  background: rgba(30, 41, 59, 0.8) !important;
-}
-
-.dark-mode .question-item input[type="checkbox"]:checked {
-  background: linear-gradient(135deg, #00BCD4, #001B6C) !important;
-  border-color: transparent !important;
-}
-
-/* Image Preview */
-.dark-mode .question-image-preview {
-  border: 2px solid rgba(51, 65, 85, 0.8) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* Add these styles to your existing QuestionListModal.css */
-
-/* Radio button styling for single question selection */
-.question-item input[type="radio"] {
-  width: 20px;
-  height: 20px;
-  margin-right: 12px;
-  accent-color: #007bff;
-  cursor: pointer;
-  transform: scale(1.2);
-}
-
-/* Enhanced question item styling */
-.question-item {
-  padding: 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: white;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.question-item:hover {
-  border-color: #007bff;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
-  transform: translateY(-2px);
-}
-
-.question-item.selected {
-  border-color: #007bff;
-  background: linear-gradient(135deg, #e3f2fd 0%, #f8f9ff 100%);
-  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.25);
-}
-
-/* Question content layout */
-.question-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.question-number {
-  background: #007bff;
-  color: white;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
+/* Modal title enhancement */
+.question-modal .modal-title {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.question-text {
-  font-size: 16px;
-  line-height: 1.5;
-  color: #333;
-}
-
-.question-level {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  align-self: flex-start;
-}
-
-.question-level.easy {
-  background: #d4edda;
-  color: #155724;
-}
-
-.question-level.medium {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.question-level.hard {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-/* Image preview styling */
-.question-image-preview {
-  margin-top: 12px;
-}
-
-.preview-image {
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-}
-
-/* Modal styling enhancements */
-.question-modal .modal-title {
+  gap: 10px;
+  font-size: 1.3rem;
   color: #007bff;
   font-weight: 600;
 }
@@ -427,118 +292,70 @@
   background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
 }
 
-.question-modal .modal-footer {
-  border-top: 2px solid #e9ecef;
-  background: #f8f9fa;
-}
-
-/* Instruction text styling */
-.text-muted {
-  font-style: italic;
-  color: #6c757d !important;
-  text-align: center;
-  padding: 8px 16px;
-  background: #f8f9fa;
-  border-radius: 6px;
-  border: 1px dashed #dee2e6;
-}
-
-/* Responsive design */
+/* Responsive design fixes */
 @media (max-width: 768px) {
-  .question-item {
-    flex-direction: column;
-    text-align: center;
+  .question-modal .modal-content {
+    max-width: 95vw;
+    margin: 10px auto;
   }
   
-  .question-item input[type="radio"] {
-    align-self: center;
+  .question-item {
+    flex-direction: column;
+    padding: 12px;
+  }
+  
+  .question-content {
+    padding-right: 0;
+    margin-top: 10px;
+    transform: none;
+  }
+  
+  .question-level {
+    position: static;
+    align-self: flex-start;
+    margin-top: 10px;
+  }
+  
+  .question-item input[type="checkbox"] {
+    align-self: flex-start;
     margin-bottom: 8px;
+    margin-right: 0;
+    transform: none;
   }
   
   .question-number {
-    align-self: center;
+    align-self: flex-start;
+    margin-right: 0;
+    margin-bottom: 8px;
+    transform: none;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  
+  .modal-footer .btn {
+    transform: none;
+    width: 100%;
+  }
+  
+  .modal-footer .btn:hover {
+    transform: translateY(-2px);
   }
 }
 
-/* Add these styles to your existing QuestionListModal.css */
-
-/* Selected question indicator */
-.question-item {
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.question-item.selected {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  border-left: 4px solid #2196f3;
-  transform: translateX(5px);
-}
-
-.question-item input[type="checkbox"] {
-  margin-right: 15px;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
-
-.selected-icon {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 24px;
-}
-
-/* Footer styling for selection count */
-.modal-footer .text-muted {
-  font-weight: 600;
-  color: #2196f3 !important;
-  background: #e3f2fd;
-  padding: 5px 15px;
-  border-radius: 20px;
-}
-
-/* Hover effect for question items */
-.question-item:hover:not(.selected) {
-  background: #f5f5f5;
-  cursor: pointer;
-  transform: translateX(2px);
-}
-
-/* Disabled state for max selection */
-.question-item.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Submit button states */
-.modal-footer .btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.modal-footer .btn-primary {
-  min-width: 200px;
-  font-weight: 600;
-  padding: 10px 20px;
-}
-
-/* Question level badges enhanced */
-.question-level {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Modal title enhancement */
-.question-modal .modal-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.3rem;
+@media (max-width: 480px) {
+  .question-text {
+    font-size: 14px;
+  }
+  
+  .question-text .math-display,
+  .question-text .math-inline,
+  .question-text code {
+    font-size: 12px;
+  }
 }
 
 /* Animation for selection */
@@ -547,7 +364,7 @@
     transform: scale(1);
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.02);
   }
   100% {
     transform: scale(1);
@@ -556,4 +373,32 @@
 
 .question-item.selected {
   animation: selectPulse 0.3s ease-out;
+}
+
+/* DARK MODE SUPPORT */
+.dark-mode .question-modal .modal-content {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 2px solid rgba(51, 65, 85, 0.8) !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark-mode .question-item {
+  background: rgba(30, 41, 59, 0.8) !important;
+  border: 1px solid rgba(51, 65, 85, 0.6) !important;
+  color: #f8fafc !important;
+}
+
+.dark-mode .question-item:hover {
+  background: rgba(0, 188, 212, 0.2) !important;
+  border-color: rgba(0, 188, 212, 0.4) !important;
+}
+
+.dark-mode .question-text {
+  color: #cbd5e1 !important;
+}
+
+.dark-mode .modal-footer {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-top: 1px solid rgba(51, 65, 85, 0.5) !important;
 }

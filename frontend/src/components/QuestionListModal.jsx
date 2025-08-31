@@ -84,7 +84,7 @@ const handleQuestionClick = (questionData, index) => {
         : JSON.stringify(questionData.question),
       questionImage: imageUrl,
       questionNumber: index + 1,
-      level: questionData.level || 'Medium',
+      level: questionData.level || '',
       worksheet_name: worksheetName || ''
     };
 
@@ -222,13 +222,7 @@ const handleQuestionClick = (questionData, index) => {
                       </div>
                     )}
                   </div>
-                  {selectedQuestions.includes(index) && (
-                    <FontAwesomeIcon 
-                      icon={faCheckCircle} 
-                      className="selected-icon"
-                      color="#28a745"
-                    />
-                  )}
+                 
                 </li>
               ))}
             </ul>

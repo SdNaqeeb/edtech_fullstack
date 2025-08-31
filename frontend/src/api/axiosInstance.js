@@ -24,7 +24,7 @@ const clearTokens = () => {
 
 // Create axios instance
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8000/",
+  baseURL: "https://autogen.aieducator.com/",
   headers: {
     "Content-Type": "application/json",
   },
