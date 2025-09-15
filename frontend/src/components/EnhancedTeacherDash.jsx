@@ -11,6 +11,7 @@ import QuickExerciseComponent from './QuickExerciseComponent';
 import ClassAnalysis from './ClassAnalysis';
 import StudentAnalysis from './StudentAnalysis';
 import UploadHomework from './UploadHomework';
+import UploadClasswork from './UploadClasswork';
 
 // Mock data for different classes (6th to 12th)
 const classesData = {
@@ -276,6 +277,12 @@ const renderMainSidebar = () => {
         >
           ✏️ Classwork
         </button>
+        <button 
+          onClick={() => setActiveTab('upload-classwork')}
+          className={`main-sidebar-button tab-classwork ${activeTab === 'upload-classwork' ? 'active' : ''}`}
+        >
+          📑Upload Classwork
+        </button>
 
         {/* 3. Worksheets -  Third*/}
         <button 
@@ -350,6 +357,8 @@ const renderMainSidebar = () => {
               />
             ): activeTab === 'upload-homework' ? (
               <UploadHomework />
+            ): activeTab === 'upload-classwork' ? (
+              <UploadClasswork />
             ) : activeTab === 'classwork' ? (
               <div style={{ padding: '20px' }}>
                 <QuickExerciseComponent onCreateHomework={(assignment) => handleAssignmentSubmit(assignment, "classwork")} mode="classwork" />

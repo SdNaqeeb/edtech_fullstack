@@ -310,6 +310,7 @@ const ResultPage = () => {
           } else {
             return (
               <div key={index} className="solution-step-container">
+                <div className="step-title">Step {index+1}:</div>
                 <div className="question-step">
                   <MarkdownWithMath content={step} />
                 </div>

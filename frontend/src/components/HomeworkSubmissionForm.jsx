@@ -194,6 +194,10 @@ const HomeworkSubmissionForm = () => {
             type: 'success'
           }
         });
+
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 100);
       }, 2000);
 
     } catch (error) {

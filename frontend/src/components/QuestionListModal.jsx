@@ -33,10 +33,10 @@ const handleQuestionClick = (questionData, index) => {
       if (isSelected) {
         return prev.filter((i) => i !== index);
       } else {
-        if (prev.length < 5) {
+        if (prev.length < 20) {
           return [...prev, index];
         } else {
-          alert("You can select up to 5 questions only");
+          alert("You can select up to 20 questions only");
         }
         return prev;
       }
@@ -57,12 +57,12 @@ const handleQuestionClick = (questionData, index) => {
   // Update the modal title
   const getModalTitle = () => {
     if (setName) {
-      return `🎯 ${setName} - Select up to 5 Questions`;
+      return `🎯 ${setName} - Select up to 20 Questions`;
     }
     if (worksheetName) {
-      return `📄 ${worksheetName} - Select up to 5 Questions`;
+      return `📄 ${worksheetName} - Select up to 20 Questions`;
     }
-    return isMultipleSelect ? "Select up to 5 Questions" : "Question List";
+    return isMultipleSelect ? "Select up to 20 Questions" : "Question List";
   };
 
   // Handle single question submission (for students)
@@ -232,11 +232,11 @@ const handleQuestionClick = (questionData, index) => {
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <div className="d-flex justify-content-between w-100">
+        <div className="d-flex justify-content-between w-200">
           <div>
             {selectedQuestions.length > 0 && (
               <span className="text-muted">
-                {selectedQuestions.length}/5 questions selected
+                {selectedQuestions.length}/20 questions selected
               </span>
             )}
           </div>
@@ -258,7 +258,7 @@ const handleQuestionClick = (questionData, index) => {
                 disabled={selectedQuestions.length === 0}
                 className="me-2"
               >
-                Submit Selected Questions ({selectedQuestions.length}/5)
+                Submit Selected Questions ({selectedQuestions.length}/20)
               </Button>
             )}
             <Button variant="secondary" onClick={handleModalClose}>

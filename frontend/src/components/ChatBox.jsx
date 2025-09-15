@@ -9,6 +9,8 @@ import {
   faUpload,
   faTrash,
   faLanguage,
+  faMicrophone,
+  faStop,
 } from "@fortawesome/free-solid-svg-icons";
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
@@ -90,6 +92,11 @@ const ChatBox = () => {
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+
+  // Audio recording
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const recordedChunksRef = useRef([]);
 
   // Image action modal (Solve / Correct)
   const [showImageModal, setShowImageModal] = useState(false);
@@ -236,6 +243,112 @@ const ChatBox = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  // ====== Audio handlers ======
+  const startRecording = async () => {
+    if (isRecording || connectionStatus !== "connected" || !sessionId) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+      recordedChunksRef.current = [];
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) recordedChunksRef.current.push(e.data);
+      };
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(recordedChunksRef.current, { type: "audio/webm" });
+        await processAudioBlob(audioBlob);
+        // stop all tracks
+        stream.getTracks().forEach((t) => t.stop());
+      };
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Failed to start recording:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    if (!isRecording || !mediaRecorderRef.current) return;
+    try {
+      mediaRecorderRef.current.stop();
+    } catch (err) {
+      console.error("Failed to stop recording:", err);
+    } finally {
+      setIsRecording(false);
+    }
+  };
+
+  const toggleRecording = async () => {
+    if (isRecording) stopRecording();
+    else await startRecording();
+  };
+
+  const processAudioBlob = async (audioBlob) => {
+    if (!sessionId) return;
+    const id = Date.now();
+    setIsTyping(true);
+    // Show processing placeholder
+    setMessages((prev) => [
+      ...prev,
+      {
+        id,
+        text: "🎙️ Processing audio...",
+        sender: "user",
+        timestamp: new Date(),
+      },
+    ]);
+
+    try {
+      const fd = new FormData();
+      fd.append("session_id", sessionId);
+      fd.append("language", language);
+      fd.append("audio", audioBlob, `recording_${id}.webm`);
+
+      const res = await api.post("/process-audio", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      const transcription = res?.data?.transcription || "(no transcription)";
+      const aiText = res?.data?.response || res?.data?.content || "";
+      const audioBase64 = res?.data?.audio || res?.data?.audio_bytes;
+      const aiAudioUrl = audioBase64 ? `data:audio/mp3;base64,${audioBase64}` : null;
+
+      // Replace placeholder with actual transcription
+      setMessages((prev) => {
+        const withoutPlaceholder = prev.filter((m) => m.id !== id);
+        return [
+          ...withoutPlaceholder,
+          {
+            id,
+            text: transcription,
+            sender: "user",
+            timestamp: new Date(),
+          },
+          {
+            id: id + 1,
+            text: aiText,
+            sender: "ai",
+            timestamp: new Date(),
+            audioUrl: aiAudioUrl,
+          },
+        ];
+      });
+    } catch (e) {
+      console.error("processAudio error:", e);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: id + 1,
+          text: "❌ Sorry, I couldn't process the audio. Please try again.",
+          sender: "ai",
+          timestamp: new Date(),
+        },
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
   // ====== Message senders ======
   const sendImageWithCommand = async (command) => {
     setShowImageModal(false);
@@ -295,7 +408,9 @@ const ChatBox = () => {
         const res = await api.post("/chat", fd, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        
+        const audioBase64 = res?.data?.audio;
+        const aiAudioUrl = audioBase64 ? `data:audio/mp3;base64,${audioBase64}` : null;
+
         setMessages((prev) => [
           ...prev,
           {
@@ -303,6 +418,7 @@ const ChatBox = () => {
             text: res?.data?.reply || "I've analyzed your image!",
             sender: "ai",
             timestamp: new Date(),
+            audioUrl: aiAudioUrl,
           },
         ]);
       } else {
@@ -321,6 +437,8 @@ const ChatBox = () => {
         const res = await api.post("/chat-simple", requestBody, {
           headers: { session_token: sessionId },
         });
+        const audioBase64 = res?.data?.audio;
+        const aiAudioUrl = audioBase64 ? `data:audio/mp3;base64,${audioBase64}` : null;
 
         setMessages((prev) => [
           ...prev,
@@ -329,6 +447,7 @@ const ChatBox = () => {
             text: res?.data?.reply || "I received your message!",
             sender: "ai",
             timestamp: new Date(),
+            audioUrl: aiAudioUrl,
           },
         ]);
       }
@@ -421,6 +540,11 @@ const ChatBox = () => {
             >
               <div className="message-bubble">
                 {formatMessage(m.text)}
+                {m.audioUrl && (
+                  <div className="message-audio-container" style={{ marginTop: 8 }}>
+                    <audio controls src={m.audioUrl} />
+                  </div>
+                )}
                 {m.image && (
                   <div className="message-image-container">
                     <img
@@ -518,6 +642,18 @@ const ChatBox = () => {
                 <FontAwesomeIcon icon={faUpload} />
               </Button>
             )}
+
+            {/* Audio record button */}
+            <Button
+              className="ms-1 d-flex align-items-center justify-content-center"
+              type="button"
+              onClick={toggleRecording}
+              title={isRecording ? "Stop recording" : "Record audio"}
+              disabled={connectionStatus !== "connected" || isTyping}
+              variant={isRecording ? "danger" : "primary"}
+            >
+              <FontAwesomeIcon icon={isRecording ? faStop : faMicrophone} />
+            </Button>
 
             {/* Send button */}
             <Button
