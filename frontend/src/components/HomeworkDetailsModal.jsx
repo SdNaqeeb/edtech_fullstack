@@ -32,12 +32,12 @@ const HomeworkDetailsModal = ({ show, onHide, submission }) => {
           questions.map((q, i) => (
             <div key={i} className="mb-4 border p-3 rounded bg-light">
               <h5><strong>Q{i + 1}:</strong> {q.question}</h5>
-              <p><strong>Topic:</strong> {q.topic || 'N/A'}</p>
-              <p><strong>Score:</strong> {q.total_score} / {q.max_score}</p>
-              <p><strong>Category:</strong> {q.answer_category}</p>
-              <p><strong>Concepts:</strong> {q.concept_required?.join(", ") || 'N/A'}</p>
-              <p><strong>Feedback:</strong> {q.comment || '—'}</p>
-              <p><strong>Correction:</strong> {q.correction_comment || '—'}</p>
+              
+              <p><strong>Score:</strong> {q.total_score} / {q.max_score || q.max_marks}</p>
+              <p><strong>Category:</strong> {q.answer_category || q.error_type}</p>
+              <p><strong>Concepts:</strong> {q.concept_required?.join(", ") || q.concepts_required?.join(", ")}</p>
+              <p><strong>Feedback:</strong> {q.comment || q.gap_analysis}</p>
+              <p><strong>Correction:</strong> {q.correction_comment || q.mistakes_made}</p>
             </div>
           ))
         )}

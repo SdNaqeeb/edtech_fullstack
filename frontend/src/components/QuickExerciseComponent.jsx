@@ -25,7 +25,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
   const [questionList, setQuestionList] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // State for homework form
   const [showHomeworkForm, setShowHomeworkForm] = useState(false);
   const [homeworkTitle, setHomeworkTitle] = useState("");
@@ -186,7 +186,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     try {
       const response = await axiosInstance.get("/classwork-list/");
       console.log("Classwork list:", response.data);
-      
+
       if (response.data && response.data.homework_codes && Array.isArray(response.data.homework_codes)) {
         setClassworkList(response.data.homework_codes);
       } else if (response.data && Array.isArray(response.data)) {
@@ -214,7 +214,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     try {
       const response = await axiosInstance.get(`/classwork-submission/?classwork_code=${classworkCode}`);
       console.log("Previous classwork submissions for:", classworkCode, response.data);
-      
+
       if (response.data) {
         if (Array.isArray(response.data)) {
           setPreviousClassworkData(response.data);
@@ -250,7 +250,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     try {
       const response = await axiosInstance.get("/homework-list/");
       console.log("Homework list:", response.data);
-      
+
       if (response.data && response.data.homework_codes && Array.isArray(response.data.homework_codes)) {
         setHomeworkList(response.data.homework_codes);
       } else {
@@ -276,7 +276,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     try {
       const response = await axiosInstance.get(`/homework-submission/?homework_code=${homeworkCode}`);
       console.log("Previous homework submissions for:", homeworkCode, response.data);
-      
+
       if (response.data && Array.isArray(response.data)) {
         setPreviousHomeworkData(response.data);
       } else if (response.data && response.data.submissions && Array.isArray(response.data.submissions)) {
@@ -357,14 +357,14 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
         exercise: questionType === "exercise",
         subtopic: questionType === "external" ? questionLevel : null,
         worksheet_name: questionType === "worksheets" ? selectedWorksheet : null,
-        
+
       };
 
       console.log("Requesting questions with:", requestData);
-      
+
       const response = await axiosInstance.post("/question-images/", requestData);
       console.log("Questions response:", response.data);
-      
+
       // Process questions if they exist
       if (response.data && response.data.questions && Array.isArray(response.data.questions)) {
         console.log("Questions found:", response.data);
@@ -383,18 +383,18 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
         // If no questions array in the response, try to map the subtopics to exercises
         // This is a fallback if the API behaves differently than expected
         console.log("No questions found in response, creating manual questions");
-        
+
         // Get the selected subtopic's index in the subtopics array
         const subtopicIndex = subTopics.findIndex(st => st === questionLevel);
         const exerciseNumber = subtopicIndex !== -1 ? subtopicIndex + 1 : 1;
-        
+
         // Create a single mock question representing the exercise
         const mockQuestions = [{
-          question: `Exercise ${exerciseNumber} from Chapter ${selectedChapters.map(c => 
+          question: `Exercise ${exerciseNumber} from Chapter ${selectedChapters.map(c =>
             chapters.find(ch => ch.topic_code === c)?.name || c).join(", ")}`,
           question_image: null
         }];
-        
+
         setQuestionList(mockQuestions);
         setSelectedQuestions([]); // Reset selected questions
         setShowQuestionList(true);
@@ -413,19 +413,19 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     setSelectedQuestions(selectedQuestionsData);
     setShowQuestionList(false);
     setShowHomeworkForm(true);
-    
+
     // Generate a default homework code
     const timestamp = new Date().getTime().toString().slice(-6);
     setHomeworkCode(`HW-${timestamp}`);
-    
+
     // Generate a default title based on subject and chapter
     const subjectName = subjects.find(s => s.subject_code === selectedSubject)?.subject_name || "Subject";
     const chapterName = chapters.find(c => c.topic_code === selectedChapters[0])?.name || "Chapter";
-    
+
     // Get exercise number from subtopic
     const subtopicIndex = subTopics.findIndex(st => st === questionLevel);
     const exerciseNumber = subtopicIndex !== -1 ? subtopicIndex + 1 : "";
-    
+
     setHomeworkTitle(`${subjectName} - ${chapterName} Exercise ${exerciseNumber}`);
   };
 
@@ -443,12 +443,12 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
 
     try {
       // Create the questions text for the description
-      const questionsText = selectedQuestions.map((q, idx) => 
+      const questionsText = selectedQuestions.map((q, idx) =>
         `Question ${idx + 1}: ${q.question}`
       ).join('\n\n');
       console.log("Questions text:", questionsText);
       // Combine user description with questions
-      const fullDescription = homeworkDescription.trim() 
+      const fullDescription = homeworkDescription.trim()
         ? `${homeworkDescription}\n\n${questionsText}`
         : questionsText;
 
@@ -464,10 +464,10 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
         date_assigned: new Date().toISOString(),
         questions: selectedQuestions,
       };
-      
+
       // Submit assignment
       await onCreateHomework(assignment);
-      
+
       // Reset form and state
       setShowHomeworkForm(false);
       setHomeworkTitle("");
@@ -475,9 +475,9 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
       setHomeworkDescription("");
       setDueDate("");
       setSelectedQuestions([]);
-      
+
       // Show success message
-     
+
     } catch (error) {
       setError(error.response?.data?.message || "Failed to create assignment");
       console.error("Error creating homework assignment:", error);
@@ -489,7 +489,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
   // Handle PDF file upload for classwork with 30MB limit
   const handleClassworkPDFChange = (e) => {
     const file = e.target.files[0];
-    
+
     if (file) {
       // Check if file is PDF
       if (file.type !== 'application/pdf') {
@@ -498,7 +498,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
         setClassworkPDF(null);
         return;
       }
-      
+
       // Check file size (30MB = 30 * 1024 * 1024 bytes)
       const maxSize = 30 * 1024 * 1024; // 30MB in bytes
       if (file.size > maxSize) {
@@ -507,7 +507,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
         setClassworkPDF(null);
         return;
       }
-      
+
       setClassworkError(null); // Clear any previous errors
       setClassworkPDF(file);
     }
@@ -518,45 +518,45 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     e.preventDefault();
     setClassworkError(null);
     setIsClassworkSubmitting(true);
-    
+
     if (!classworkTitle.trim() || !classworkCode.trim() || !classworkDueDate) {
       setClassworkError("Please fill in all required fields.");
       setIsClassworkSubmitting(false);
       return;
     }
-    
+
     if (!classworkPDF) {
       setClassworkError("Please upload a PDF file of student work.");
       setIsClassworkSubmitting(false);
       return;
     }
-    
+
     if (!selectedQuestions || selectedQuestions.length === 0) {
       setClassworkError("Please select at least one question.");
       setIsClassworkSubmitting(false);
       return;
     }
-    
+
     try {
       const formData = new FormData();
-      
+
       // Append PDF file
       formData.append('pdf_response', classworkPDF);
-      
+
       // Append classwork information
       formData.append('class_work_code', classworkCode.trim());
       formData.append('worksheet_name', classworkTitle.trim());
-      
+
       // Append questions data
       formData.append('questions', JSON.stringify(selectedQuestions));
-      
+
       // Make API call to classwork-submission endpoint
       const response = await axiosInstance.post('/classwork-submission/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      
+
       // Reset form and state
       setClassworkTitle("");
       setClassworkCode("");
@@ -565,7 +565,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
       setClassworkPDF(null);
       setSelectedQuestions([]);
       setShowClassworkForm(false);
-      
+
       alert("Classwork PDF and questions uploaded successfully!");
     } catch (error) {
       setClassworkError(error.response?.data?.error || "Failed to upload classwork");
@@ -581,13 +581,13 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
       <div className="homework-form-container">
         <h3>Create Homework Assignment</h3>
         {error && <div className="error-message">{error}</div>}
-        
+
         <Form onSubmit={handleHomeworkSubmit}>
           <Row className="mb-3">
             <Col xs={12} md={6}>
               <Form.Group controlId="homeworkCode">
                 <Form.Label>Homework Code</Form.Label>
-                <Form.Control 
+                <Form.Control
                   type="text"
                   value={homeworkCode}
                   onChange={(e) => setHomeworkCode(e.target.value)}
@@ -599,7 +599,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
             <Col xs={12} md={6}>
               <Form.Group controlId="dueDate">
                 <Form.Label>Due Date</Form.Label>
-                <Form.Control 
+                <Form.Control
                   type="datetime-local"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
@@ -608,10 +608,10 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
               </Form.Group>
             </Col>
           </Row>
-          
+
           <Form.Group controlId="homeworkTitle" className="mb-3">
             <Form.Label>Assignment Title</Form.Label>
-            <Form.Control 
+            <Form.Control
               type="text"
               value={homeworkTitle}
               onChange={(e) => setHomeworkTitle(e.target.value)}
@@ -619,10 +619,10 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
               required
             />
           </Form.Group>
-          
+
           <Form.Group controlId="homeworkDescription" className="mb-3">
             <Form.Label>Additional Instructions (Optional)</Form.Label>
-            <Form.Control 
+            <Form.Control
               as="textarea"
               rows={3}
               value={homeworkDescription}
@@ -630,7 +630,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
               placeholder="Enter any additional instructions"
             />
           </Form.Group>
-          
+
           <div className="selected-questions-preview mb-3">
             <h5>Selected Questions ({selectedQuestions.length})</h5>
             <ul className="question-preview-list">
@@ -648,10 +648,10 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
               ))}
             </ul>
           </div>
-          
+
           <div className="d-flex justify-content-between">
-            <Button 
-              variant="secondary" 
+            <Button
+              variant="secondary"
               onClick={() => {
                 setShowHomeworkForm(false);
                 setShowQuestionList(true);
@@ -659,8 +659,8 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
             >
               Back to Questions
             </Button>
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               type="submit"
               disabled={isSubmitting}
             >
@@ -723,7 +723,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
             placeholder="Enter any additional instructions"
           />
         </Form.Group>
-        
+
         {/* PDF upload with 30MB limit */}
         <Form.Group controlId="classworkPDF" className="mb-3">
           <Form.Label>Upload Student Work PDF (Max 30MB)</Form.Label>
@@ -742,7 +742,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
             Only PDF files up to 30MB are allowed
           </Form.Text>
         </Form.Group>
-        
+
         {/* Preview selected questions */}
         <div className="selected-questions-preview mb-3">
           <h5>Selected Questions ({selectedQuestions.length})</h5>
@@ -790,8 +790,8 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
 
   // Render Previous Classwork Modal
   const renderPreviousClassworkModal = () => (
-    <Modal 
-      show={showPreviousClasswork} 
+    <Modal
+      show={showPreviousClasswork}
       onHide={() => setShowPreviousClasswork(false)}
       size="xl"
       scrollable
@@ -879,15 +879,15 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                           <h5 className="mb-1">{submission.class_analytics.total_students || 0}</h5>
                         </Col>
                       </Row>
-                      
+
                       {/* Grade Distribution */}
                       {submission.class_analytics.grade_distribution && (
                         <div className="mt-3">
                           <small className="text-muted">Grade Distribution:</small>
                           <div className="d-flex gap-2 mt-2">
                             {Object.entries(submission.class_analytics.grade_distribution).map(([grade, count]) => (
-                              <Badge 
-                                key={grade} 
+                              <Badge
+                                key={grade}
                                 bg={grade === 'A' ? 'success' : grade === 'B' ? 'info' : grade === 'C' ? 'warning' : grade === 'D' ? 'secondary' : 'danger'}
                                 className="p-2"
                               >
@@ -935,11 +935,11 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                             <tr key={sIndex}>
                               <td>{student.roll_number}</td>
                               <td>
-                                <Badge 
-                                  bg={student.grade === 'A' ? 'success' : 
-                                     student.grade === 'B' ? 'info' : 
-                                     student.grade === 'C' ? 'warning' : 
-                                     student.grade === 'D' ? 'secondary' : 'danger'}
+                                <Badge
+                                  bg={student.grade === 'A' ? 'success' :
+                                    student.grade === 'B' ? 'info' :
+                                      student.grade === 'C' ? 'warning' :
+                                        student.grade === 'D' ? 'secondary' : 'danger'}
                                 >
                                   {student.grade}
                                 </Badge>
@@ -952,7 +952,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                           ))}
                         </tbody>
                       </Table>
-                      
+
                       {/* Detailed Question Analysis for Each Student */}
                       {submission.student_results.some(s => s.questions && s.questions.length > 0) && (
                         <details className="mt-3">
@@ -1061,8 +1061,8 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
 
   // Render Previous Homework Modal
   const renderPreviousHomeworkModal = () => (
-    <Modal 
-      show={showPreviousHomework} 
+    <Modal
+      show={showPreviousHomework}
       onHide={() => setShowPreviousHomework(false)}
       size="xl"
       scrollable
@@ -1090,18 +1090,24 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
             {previousHomeworkData.map((submission, index) => (
               <Card key={submission.id || index} className="mb-4 shadow-sm border-0">
                 <Card.Header className="bg-gradient-primary text-black py-3">
+                  
                   <div className="d-flex justify-content-between align-items-center">
+                    
                     <div>
                       {/* <h5 className="mb-1">
                         <i className="fas fa-homework me-2"></i>
                         Homework: {submission.homework || 'N/A'}
                       </h5> */}
-                     
+
                     </div>
+                    
                     <div className="text">
+                      
+                   
                       <Badge bg="light" text="dark" className="fs-2 px-3 py-2">
                         <i className="fas fa-file-alt me-1"></i>
-                        Analysis Report of {submission.student_id || submission.result_json.roll_number} 
+                        Analysis Report of {submission.student_id || submission.result_json.roll_number}
+                        
                       </Badge>
                       <small className="opacity-75">
                         {/* Student: {submission.student_name || 'N/A'} |  */}
@@ -1110,7 +1116,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                     </div>
                   </div>
                 </Card.Header>
-                
+
                 <Card.Body className="p-0">
                   {/* Overall Performance Summary */}
                   {submission.result_json && submission.result_json.questions && (
@@ -1120,7 +1126,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                         Performance Overview
                       </h6>
                       <Row>
-                        <Col md={3}>
+                        {/* <Col md={3}>
                           <div className="text-center p-3 bg-white rounded shadow-sm">
                             <div className="text-success fs-4 fw-bold">
                               {submission.result_json.questions.filter(q => q.answer_category === 'Correct').length}
@@ -1143,7 +1149,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                             </div>
                             <small className="text-muted">Incorrect</small>
                           </div>
-                        </Col>
+                        </Col> */}
                         <Col md={3}>
                           <div className="text-center p-3 bg-white rounded shadow-sm">
                             <div className="text-info fs-4 fw-bold">
@@ -1163,14 +1169,13 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                         <i className="fas fa-list-ul me-2"></i>
                         Question-by-Question Analysis
                       </h6>
-                      
+
                       {submission.result_json.questions.map((question, qIndex) => (
                         <Card key={qIndex} className="mb-3 border-0 shadow-sm">
-                          <Card.Header className={`py-2 ${
-                            question.answer_category === 'Correct' ? 'bg-success text-white' :
+                          <Card.Header className={`py-2 ${question.answer_category === 'Correct' ? 'bg-success text-white' :
                             question.answer_category === 'Partially-Correct' ? 'bg-warning text-dark' :
-                            'bg-danger text-white'
-                          }`}>
+                              'bg-danger text-white'
+                            }`}>
                             <div className="d-flex justify-content-between align-items-center">
                               <h6 className="mb-0">
                                 <i className="fas fa-question-circle me-2"></i>
@@ -1186,30 +1191,30 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                               </div>
                             </div>
                           </Card.Header>
-                          
+
                           <Card.Body className="p-3">
                             <Row>
                               <Col md={8}>
-                                <div className="mb-3">
+                                {/* <div className="mb-3">
                                   <strong className="text-primary">Question:</strong>
                                   <p className="mb-2 mt-1">{question.question}</p>
-                                </div>
-                                
+                                </div> */}
+
                                 <div className="mb-3">
                                   <strong className="text-primary">Student's Work:</strong>
-                                  <p className="mb-2 mt-1 text-muted"><MarkdownWithMath content={question.comment  ||question.gap_analysis} /></p>
+                                  <p className="mb-2 mt-1 text-muted"><MarkdownWithMath content={question.comment || question.gap_analysis} /></p>
                                 </div>
-                                
+
                                 <div className="mb-3">
                                   <strong className="text-primary">Correction:</strong>
                                   <p className="mb-0 mt-1 text-success"><MarkdownWithMath content={question.correction_comment || question.mistakes_made} /></p>
                                 </div>
                               </Col>
-                              
+
                               <Col md={4}>
                                 <div className="bg-light p-3 rounded">
                                   <h6 className="text-primary mb-2">Analysis</h6>
-                                  
+
                                   <div className="mb-2">
                                     <small className="text-muted">Score:</small>
                                     <div className="d-flex align-items-center gap-2">
@@ -1218,21 +1223,21 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                                       <span className="text-muted">{question.max_score || question.max_marks}</span>
                                     </div>
                                   </div>
-                                  
+
                                   <div className="mb-2">
                                     <small className="text-muted">Category:</small>
-                                    <Badge 
+                                    <Badge
                                       bg={
                                         question.answer_category || question.error_type === 'Correct' ? 'success' :
-                                        question.answer_category || question.error_type === 'Partially-Correct' ? 'warning' :
-                                        'danger'
+                                          question.answer_category || question.error_type === 'Partially-Correct' ? 'warning' :
+                                            'danger'
                                       }
                                       className="ms-2"
                                     >
                                       {question.answer_category || question.error_type}
                                     </Badge>
                                   </div>
-                                  
+
                                   <div className="mb-2">
                                     <small className="text-muted">Concepts:</small>
                                     <div className="mt-1">
@@ -1253,7 +1258,37 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                   )}
 
                   {/* Concepts Mastery Summary */}
-                  {submission.result_json && submission.result_json.questions && (
+                  {submission.result_json && (
+                    <div className="p-4 bg-light">
+                      <h6 className="text-primary mb-3">
+                        <i className="fas fa-brain me-2"></i>
+                       Strengths:
+                      </h6>
+
+                      <div className="row">
+                        {(() => {
+                          const conceptStats = {};
+
+
+                          return submission.result_json.strengths.map((concept) => (
+                            <Col md={6} key={concept} className="mb-3">
+                              <Card className="border-0 shadow-sm">
+                                <Card.Body className="p-3">
+                                  <div className="d-flex justify-content-between align-items-center mb-2">
+                                    <p className="mb-2 mt-1 text-success"><MarkdownWithMath content={concept} /></p>
+
+                                  </div>
+                                 
+                                </Card.Body>
+                              </Card>
+                            </Col>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* {submission.result_json && submission.result_json.questions && (
                     <div className="p-4 bg-light">
                       <h6 className="text-primary mb-3">
                         <i className="fas fa-brain me-2"></i>
@@ -1314,7 +1349,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                         })()}
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </Card.Body>
               </Card>
             ))}
@@ -1452,46 +1487,46 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
 
   return (
     <>
-    <div className="quick-exercise-container">
-      {/* Add Previous Classwork Button only for classwork mode */}
-      {mode === "classwork" && !showClassworkForm && (
-        <div className="d-flex justify-content-end mb-3">
-          <Button 
-            variant="info" 
-            onClick={fetchClassworkList}
-            disabled={isLoadingClassworkList}
-          >
-            {isLoadingClassworkList ? 'Loading...' : 'View Previous Classwork Assignments'}
-          </Button>
-        </div>
-      )}
+      <div className="quick-exercise-container">
+        {/* Add Previous Classwork Button only for classwork mode */}
+        {mode === "classwork" && !showClassworkForm && (
+          <div className="d-flex justify-content-end mb-3">
+            <Button
+              variant="info"
+              onClick={fetchClassworkList}
+              disabled={isLoadingClassworkList}
+            >
+              {isLoadingClassworkList ? 'Loading...' : 'View Previous Classwork Assignments'}
+            </Button>
+          </div>
+        )}
 
-      {mode === "homework" && !showHomeworkForm && (
-        <div className="d-flex justify-content-end mb-3">
-          {/* <Button 
+        {mode === "homework" && !showHomeworkForm && (
+          <div className="d-flex justify-content-end mb-3">
+            {/* <Button 
             variant="info" 
             onClick={fetchPreviousHomeworkSubmissions}
             disabled={isLoadingPreviousHomework}
           >
             {isLoadingPreviousHomework ? 'Loading...' : 'View Previous Homework Submissions'}
           </Button> */}
-        </div>
-      )}
+          </div>
+        )}
 
-      {mode === "homework" && !showHomeworkForm && (
-        <div className="d-flex justify-content-end mb-3">
-          <Button 
-            variant="info" 
-            onClick={fetchHomeworkList}
-            disabled={isLoadingHomeworkList}
-          >
-            {isLoadingHomeworkList ? 'Loading...' : 'View Previous Homework Assignments'}
-          </Button>
-        </div>
-      )}
+        {mode === "homework" && !showHomeworkForm && (
+          <div className="d-flex justify-content-end mb-3">
+            <Button
+              variant="info"
+              onClick={fetchHomeworkList}
+              disabled={isLoadingHomeworkList}
+            >
+              {isLoadingHomeworkList ? 'Loading...' : 'View Previous Homework Assignments'}
+            </Button>
+          </div>
+        )}
 
-      {mode === "classwork"
-        ? (
+        {mode === "classwork"
+          ? (
             !showClassworkForm ? (
               <div className="question-selection-container">
                 <h3>Quick Classwork Generator</h3>
@@ -1581,7 +1616,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                           <option value="exercise">Practice Exercises</option>
                           <option value="external">Set of Questions</option>
                           <option value="worksheets">Worksheets</option>
-                          
+
                         </Form.Control>
                       </Form.Group>
                     </Col>
@@ -1647,7 +1682,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
               </div>
             ) : renderClassworkForm()
           )
-        : (!showHomeworkForm ? (
+          : (!showHomeworkForm ? (
             <div className="question-selection-container">
               <h3>Quick Homework Generator</h3>
               <p className="text-muted">Select class, subject, and chapter to generate questions for homework</p>
@@ -1800,55 +1835,55 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
               </Form>
             </div>
           ) : renderHomeworkForm())}
-      
-      {/* Question List Modal */}
-      {showQuestionList && mode !== "classwork" && (
-        <QuestionListModal
-          show={showQuestionList}
-          onHide={() => setShowQuestionList(false)}
-          questionList={questionList}
-          isMultipleSelect={true}
-          onMultipleSelectSubmit={handleMultipleSelectSubmit}
-        />
-      )}
-      
-      {/* For classwork mode, show question list modal and then classwork form */}
-      {showQuestionList && mode === "classwork" && (
-        <QuestionListModal
-          show={showQuestionList}
-          onHide={() => setShowQuestionList(false)}
-          questionList={questionList}
-          isMultipleSelect={true}
-          onMultipleSelectSubmit={(selectedQuestionsData) => {
-            setSelectedQuestions(selectedQuestionsData);
-            setShowQuestionList(false);
-            setShowClassworkForm(true);
-            // Optionally, generate a default code/title
-            const timestamp = new Date().getTime().toString().slice(-6);
-            setClassworkCode(`CW-${timestamp}`);
-            const subjectName = subjects.find(s => s.subject_code === selectedSubject)?.subject_name || "Subject";
-            const chapterName = chapters.find(c => c.topic_code === selectedChapters[0])?.name || "Chapter";
-            const subtopicIndex = subTopics.findIndex(st => st === questionLevel);
-            const exerciseNumber = subtopicIndex !== -1 ? subtopicIndex + 1 : "";
-            setClassworkTitle(`${subjectName} - ${chapterName} Exercise ${exerciseNumber}`);
-          }}
-        />
-      )}
-      
-      {/* Render Previous Classwork Modal */}
-      {renderPreviousClassworkModal()}
 
-      {/* Render Classwork List Modal */}
-      {renderClassworkListModal()}
+        {/* Question List Modal */}
+        {showQuestionList && mode !== "classwork" && (
+          <QuestionListModal
+            show={showQuestionList}
+            onHide={() => setShowQuestionList(false)}
+            questionList={questionList}
+            isMultipleSelect={true}
+            onMultipleSelectSubmit={handleMultipleSelectSubmit}
+          />
+        )}
 
-      {/* Render Previous Homework Modal */}
-      {renderPreviousHomeworkModal()}
+        {/* For classwork mode, show question list modal and then classwork form */}
+        {showQuestionList && mode === "classwork" && (
+          <QuestionListModal
+            show={showQuestionList}
+            onHide={() => setShowQuestionList(false)}
+            questionList={questionList}
+            isMultipleSelect={true}
+            onMultipleSelectSubmit={(selectedQuestionsData) => {
+              setSelectedQuestions(selectedQuestionsData);
+              setShowQuestionList(false);
+              setShowClassworkForm(true);
+              // Optionally, generate a default code/title
+              const timestamp = new Date().getTime().toString().slice(-6);
+              setClassworkCode(`CW-${timestamp}`);
+              const subjectName = subjects.find(s => s.subject_code === selectedSubject)?.subject_name || "Subject";
+              const chapterName = chapters.find(c => c.topic_code === selectedChapters[0])?.name || "Chapter";
+              const subtopicIndex = subTopics.findIndex(st => st === questionLevel);
+              const exerciseNumber = subtopicIndex !== -1 ? subtopicIndex + 1 : "";
+              setClassworkTitle(`${subjectName} - ${chapterName} Exercise ${exerciseNumber}`);
+            }}
+          />
+        )}
 
-      {/* Render Homework List Modal */}
-      {renderHomeworkListModal()}
-    </div>
+        {/* Render Previous Classwork Modal */}
+        {renderPreviousClassworkModal()}
 
-    <div></div>
+        {/* Render Classwork List Modal */}
+        {renderClassworkListModal()}
+
+        {/* Render Previous Homework Modal */}
+        {renderPreviousHomeworkModal()}
+
+        {/* Render Homework List Modal */}
+        {renderHomeworkListModal()}
+      </div>
+
+      <div></div>
     </>
   );
 };
