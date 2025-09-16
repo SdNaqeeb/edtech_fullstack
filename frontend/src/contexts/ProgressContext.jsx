@@ -48,9 +48,9 @@ export const ProgressProvider = ({ children }) => {
 
   // Save data to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem(`totalQuestions_${username}`, totalQuestions.toString());
-    localStorage.setItem(`correctQuestions_${username}`, correctQuestions.toString());
-    localStorage.setItem(`studyTimeData_${username}`, JSON.stringify(studyTimeData));
+    // localStorage.setItem(`totalQuestions_${username}`, totalQuestions.toString());
+    // localStorage.setItem(`correctQuestions_${username}`, correctQuestions.toString());
+    // localStorage.setItem(`studyTimeData_${username}`, JSON.stringify(studyTimeData));
   }, [username, totalQuestions, correctQuestions, studyTimeData]);
 
   // Update streak and rewards when studying
@@ -217,7 +217,7 @@ export const ProgressProvider = ({ children }) => {
 
     if (!completedChapters.includes(chapterId)) {
       completedChapters.push(chapterId);
-      localStorage.setItem('completedChapters', JSON.stringify(completedChapters));
+      // localStorage.setItem('completedChapters', JSON.stringify(completedChapters));
 
       // Check chapter completion rewards
       const chapterRewards = rewardSystem.checkChapterCompletionRewards(
@@ -254,8 +254,8 @@ export const ProgressProvider = ({ children }) => {
 
   // Save progress data to local storage
   const saveProgressData = () => {
-    localStorage.setItem(`streakData_${username}`, streakTracker.toJSON());
-    localStorage.setItem(`rewardData_${username}`, rewardSystem.toJSON());
+    // localStorage.setItem(`streakData_${username}`, streakTracker.toJSON());
+    // localStorage.setItem(`rewardData_${username}`, rewardSystem.toJSON());
   };
 
   // Get current progress summary

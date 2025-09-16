@@ -1,142 +1,118 @@
+// axiosInstance.jsx
 import axios from "axios";
 import { getErrorMessage } from "../utils/errorHandling";
 
-// Token management utilities
-const TOKEN_KEY = 'access_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
+// =============================
+// Token management
+// =============================
+const ACCESS_KEY = "accessToken";
+const REFRESH_KEY = "refreshToken";
 
-const getAccessToken = () => localStorage.getItem(TOKEN_KEY);
-const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
-const setTokens = (access, refresh) => {
-  localStorage.setItem(TOKEN_KEY, access);
-  localStorage.setItem(REFRESH_TOKEN_KEY, refresh);
-};
-const clearTokens = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
-  localStorage.removeItem("username");
-  localStorage.removeItem("streakData");
-  localStorage.removeItem("rewardData");
-  localStorage.removeItem("completedChapters");
-  localStorage.removeItem("userRole");
-  localStorage.removeItem("userEmail");
+const getAccessToken = () => localStorage.getItem(ACCESS_KEY);
+const setAccessToken = (access) => localStorage.setItem(ACCESS_KEY, access);
+const clearAccessToken = () => localStorage.removeItem(ACCESS_KEY);
+
+const getRefreshToken = () => localStorage.getItem(REFRESH_KEY);
+const setRefreshToken = (refresh) => localStorage.setItem(REFRESH_KEY, refresh);
+const clearRefreshToken = () => localStorage.removeItem(REFRESH_KEY);
+
+const clearAllTokens = () => {
+  clearAccessToken();
+  clearRefreshToken();
 };
 
+// =============================
 // Create axios instance
+// =============================
 const axiosInstance = axios.create({
-  baseURL: "https://autogen.aieducator.com/",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: "https://autogen.aieducator.com",
+  headers: { "Content-Type": "application/json" },
   timeout: 60000,
 });
 
-// Flag to prevent multiple refresh attempts
+// =============================
+// Refresh handling
+// =============================
 let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
+  failedQueue.forEach((prom) => {
+    if (error) prom.reject(error);
+    else prom.resolve(token);
   });
-  
   failedQueue = [];
 };
 
+// =============================
 // Request Interceptor
+// =============================
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Add JWT token to requests
     const token = getAccessToken();
-    if (token && !config.url.includes('/api/token/')) {
+    if (token && !config.url.includes("/api/token/")) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
-    // Don't set Content-Type for FormData
     if (config.data instanceof FormData) {
       delete config.headers["Content-Type"];
     }
-
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor with token refresh logic
+// =============================
+// Response Interceptor
+// =============================
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle timeout errors
     if (error.code === "ECONNABORTED") {
-      console.error("Request Timeout Error");
       return Promise.reject(new Error("Request timed out. Please try again."));
     }
 
-    // Handle 401 errors (Unauthorized)
+    // Handle expired access token
     if (error.response?.status === 401 && !originalRequest._retry) {
-      // Don't retry for login or refresh endpoints
-      if (originalRequest.url.includes('/api/token/')) {
-        clearTokens();
+      if (originalRequest.url.includes("/api/token/")) {
+        clearAllTokens();
         window.location.href = "/login";
         return Promise.reject(error);
       }
 
       if (isRefreshing) {
-        // If already refreshing, queue this request
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then(token => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return axiosInstance(originalRequest);
-        }).catch(err => {
-          return Promise.reject(err);
-        });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return axiosInstance(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = getRefreshToken();
-      
-      if (!refreshToken) {
-        clearTokens();
-        window.location.href = "/login";
-        return Promise.reject(new Error("No refresh token available"));
-      }
-
       try {
-        // Attempt to refresh the token
+        const refreshToken = getRefreshToken();
+        if (!refreshToken) throw new Error("No refresh token found");
+
         const response = await axios.post(
-          `${axiosInstance.defaults.baseURL}api/token/refresh/`,
+          "http://localhost:8000/api/token/refresh/",
           { refresh: refreshToken }
         );
 
-        const { access, refresh } = response.data;
-        
-        // Store new tokens
-        if (refresh) {
-          setTokens(access, refresh);
-        } else {
-          localStorage.setItem(TOKEN_KEY, access);
-        }
+        const { access } = response.data;
+        setAccessToken(access);
 
-        // Process queued requests with new token
         processQueue(null, access);
-        
-        // Retry original request with new token
         originalRequest.headers.Authorization = `Bearer ${access}`;
         return axiosInstance(originalRequest);
-        
       } catch (refreshError) {
-        // Refresh failed, logout user
         processQueue(refreshError, null);
-        clearTokens();
+        clearAllTokens();
         window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
@@ -149,66 +125,40 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// Authentication methods
+// =============================
+// Authentication API methods
+// =============================
 axiosInstance.login = async (username, password) => {
-  try {
-    const response = await axiosInstance.post('/api/token/', {
-      username,
-      password
-    });
-    
-    const { access, refresh, username: user, role, email, full_name } = response.data;
-    
-    // Store tokens and user info
-    setTokens(access, refresh);
-    localStorage.setItem('username', user);
-    localStorage.setItem('userRole', role);
-    localStorage.setItem('userEmail', email);
-    localStorage.setItem('fullName', full_name);
-    
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await axiosInstance.post("/api/token/", {
+    username,
+    password,
+  });
+  const { access, refresh } = response.data;
+  setAccessToken(access);
+  setRefreshToken(refresh);
+  return response.data;
 };
 
 axiosInstance.logout = async () => {
   try {
-    const refreshToken = getRefreshToken();
-    
-    if (refreshToken) {
-      // Call logout endpoint to blacklist the token
-      await axiosInstance.post('/api/logout/', {
-        refresh_token: refreshToken
-      });
-    }
+    await axiosInstance.post("/api/logout/");
   } catch (error) {
-    console.error('Logout error:', error);
+    console.error("Logout error:", error);
   } finally {
-    // Clear tokens regardless of API call success
-    clearTokens();
-    window.location.href = "/login";
+    clearAllTokens();
   }
 };
 
 axiosInstance.verifyToken = async () => {
-  try {
-    const token = getAccessToken();
-    if (!token) {
-      throw new Error('No token found');
-    }
-    
-    const response = await axiosInstance.post('/api/token/verify/', {
-      token
-    });
-    
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const token = getAccessToken();
+  if (!token) throw new Error("No token found");
+  const response = await axiosInstance.get("/api/token/verify/");
+  return response.data;
 };
 
-// File Upload Method with JWT
+// =============================
+// File upload with JWT
+// =============================
 axiosInstance.uploadFile = async (url, formData, progressCallback) => {
   try {
     const response = await axiosInstance.post(url, formData, {
@@ -225,9 +175,9 @@ axiosInstance.uploadFile = async (url, formData, progressCallback) => {
     return response;
   } catch (error) {
     if (error.code === "ECONNABORTED") {
-      error.friendlyMessage = "Upload timed out. Please try with a smaller image or check your connection.";
+      error.friendlyMessage = "Upload timed out. Please try again.";
     } else if (error.response?.status === 413) {
-      error.friendlyMessage = "File too large. Please upload a smaller image.";
+      error.friendlyMessage = "File too large. Please upload a smaller file.";
     } else {
       error.friendlyMessage = "Error uploading file. Please try again.";
     }

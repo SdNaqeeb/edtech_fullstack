@@ -50,13 +50,13 @@ class SoundManager {
     // Adjust volume
     setVolume(volume) {
       this.volume = Math.max(0, Math.min(1, volume));
-      localStorage.setItem('soundVolume', this.volume.toString());
+      // localStorage.setItem('soundVolume', this.volume.toString());
     }
   
     // Toggle sound on/off
     toggleSound() {
       this.isSoundEnabled = !this.isSoundEnabled;
-      localStorage.setItem('soundEnabled', this.isSoundEnabled.toString());
+      // localStorage.setItem('soundEnabled', this.isSoundEnabled.toString());
     }
   
     // Get sound preference from localStorage

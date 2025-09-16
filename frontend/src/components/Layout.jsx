@@ -36,9 +36,9 @@ const Layout = ({ children }) => {
     { path: '/student-dash', label: 'Student Dash' },
     { path: '/teacher-dash', label: 'Teacher Dash' },
     { path: '/analytics', label: 'Analytics' },
-    { path: '/progress-dashboard', label: 'Progress' },
+    // { path: '/progress-dashboard', label: 'Progress' },
     { path: '/leaderboard', label: 'Leaderboard' },
-    { path: '/quests', label: 'Quests', icon: faTrophy }
+    // { path: '/quests', label: 'Quests', icon: faTrophy }
   ];
 
   // ✅ Filter based on role
@@ -90,9 +90,9 @@ const Layout = ({ children }) => {
                 </Nav.Link>
 
                 {/* Added margin to create spacing */}
-            { role=='student'  ? <div className=" ms-0">
+             <div className=" ms-0">
                   <NotificationDropdown />
-                </div>: ""}
+                </div>
                 
                 {/* Admin section with spacing */}
                 <Nav.Item className="d-flex align-items-center ms-0">

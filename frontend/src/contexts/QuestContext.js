@@ -51,10 +51,10 @@ export const QuestProvider = ({ children }) => {
 
   // Save quests to localStorage
   const saveQuests = (questType, quests) => {
-    localStorage.setItem(
-      `${questType}Quests_${username}`, 
-      JSON.stringify(quests.map(quest => quest.toJSON()))
-    );
+    // localStorage.setItem(
+    //   `${questType}Quests_${username}`, 
+    //   JSON.stringify(quests.map(quest => quest.toJSON()))
+    // );
   };
 
   // Reset daily quests

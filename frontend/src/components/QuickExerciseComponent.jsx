@@ -546,9 +546,11 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
       // Append classwork information
       formData.append('class_work_code', classworkCode.trim());
       formData.append('worksheet_name', classworkTitle.trim());
+      formData.append('due-time',classworkDueDate.trim())
 
       // Append questions data
       formData.append('questions', JSON.stringify(selectedQuestions));
+      formData.append('title', classworkTitle.trim());
 
       // Make API call to classwork-submission endpoint
       const response = await axiosInstance.post('/classwork-submission/', formData, {
@@ -566,7 +568,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
       setSelectedQuestions([]);
       setShowClassworkForm(false);
 
-      alert("Classwork PDF and questions uploaded successfully!");
+      alert("Classwork PDF Processing is Started");
     } catch (error) {
       setClassworkError(error.response?.data?.error || "Failed to upload classwork");
       console.error("Error uploading classwork:", error);

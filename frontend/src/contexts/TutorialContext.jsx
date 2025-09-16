@@ -17,20 +17,20 @@ export const TutorialProvider = ({ children }) => {
 
   // Save tutorial state to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem("tutorialShown", showTutorial);
+    // localStorage.setItem("tutorialShown", showTutorial);
   }, [showTutorial]);
 
   // Save completed pages to localStorage
   useEffect(() => {
-    localStorage.setItem(
-      "completedTutorialPages",
-      JSON.stringify(completedPages)
-    );
+    // localStorage.setItem(
+    //   "completedTutorialPages",
+    //   JSON.stringify(completedPages)
+    // );
   }, [completedPages]);
 
   // Save tutorial flow to localStorage
   useEffect(() => {
-    localStorage.setItem("tutorialFlow", tutorialFlow);
+    // localStorage.setItem("tutorialFlow", tutorialFlow);
   }, [tutorialFlow]);
 
   // Function to mark a page as completed or uncompleted
@@ -55,8 +55,8 @@ export const TutorialProvider = ({ children }) => {
     setCompletedPages([]);
     setTutorialFlow("active");
     localStorage.removeItem("completedTutorialPages");
-    localStorage.setItem("tutorialShown", true);
-    localStorage.setItem("tutorialFlow", "active");
+    // localStorage.setItem("tutorialShown", true);
+    // localStorage.setItem("tutorialFlow", "active");
   };
 
   // Function to restart tutorial for a specific page
@@ -67,10 +67,10 @@ export const TutorialProvider = ({ children }) => {
     // Remove the page from completed pages if it's there
     if (completedPages.includes(pageName)) {
       setCompletedPages(completedPages.filter((page) => page !== pageName));
-      localStorage.setItem(
-        "completedTutorialPages",
-        JSON.stringify(completedPages.filter((page) => page !== pageName))
-      );
+      // localStorage.setItem(
+      //   "completedTutorialPages",
+      //   JSON.stringify(completedPages.filter((page) => page !== pageName))
+      // );
     }
   };
 

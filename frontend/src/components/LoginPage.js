@@ -24,7 +24,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  // Background animation circles
+  // Animated background
   const backgroundCircles = useMemo(() => {
     return [...Array(10)].map((_, i) => ({
       id: i,
@@ -42,28 +42,12 @@ function LoginPage() {
 
     try {
       const response = await axiosInstance.login(username, password);
+      const { access, username: user, role, full_name, class_name } = response;
 
-      const {
-        access,
-        refresh,
-        username: user,
-        role,
-        email,
-        full_name,
-        class_name,
-      } = response;
-
-      // Extra user info (tokens already set by axiosInstance.login)
-      localStorage.setItem("username", user);
-      localStorage.setItem("fullName", full_name || "");
-      if (class_name) {
-        localStorage.setItem("className", class_name);
-      }
-
-      // Update auth context
+      // AuthContext handles storage
       login(user, access, role, class_name);
 
-      // Navigate based on role
+      // Redirect based on role
       if (role === "teacher") {
         navigate("/teacher-dash");
       } else {
@@ -79,10 +63,6 @@ function LoginPage() {
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
     <div className="login-wrapper">
       <div className="background-container">
@@ -96,17 +76,12 @@ function LoginPage() {
               left: `${circle.left}%`,
               top: `${circle.top}%`,
             }}
-            initial={{
-              opacity: 0,
-              scale: 0.5,
-              x: -50,
-              y: -50,
-            }}
+            initial={{ opacity: 0, scale: 0.5, x: -50, y: -50 }}
             animate={{
               opacity: [0.3, 0.6, 0.3],
               scale: [0.8, 1.2, 0.8],
-              x: [-50, Math.random() * 100 - 50, Math.random() * 100 - 50],
-              y: [-50, Math.random() * 100 - 50, Math.random() * 100 - 50],
+              x: [-50, Math.random() * 100 - 50],
+              y: [-50, Math.random() * 100 - 50],
             }}
             transition={{
               duration: 6 + Math.random() * 5,
@@ -166,7 +141,7 @@ function LoginPage() {
             <button
               type="button"
               className="password-toggle"
-              onClick={togglePasswordVisibility}
+              onClick={() => setShowPassword(!showPassword)}
             >
               <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
             </button>

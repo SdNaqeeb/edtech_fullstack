@@ -86,7 +86,7 @@ export const ProgressProvider = ({ children }) => {
 
     if (!completedChapters.includes(chapterId)) {
       completedChapters.push(chapterId);
-      localStorage.setItem('completedChapters', JSON.stringify(completedChapters));
+      // localStorage.setItem('completedChapters', JSON.stringify(completedChapters));
 
       // Check chapter completion rewards
       const chapterRewards = rewardSystem.checkChapterCompletionRewards(
@@ -118,8 +118,8 @@ export const ProgressProvider = ({ children }) => {
 
   // Save progress data to local storage
   const saveProgressData = () => {
-    localStorage.setItem(`streakData_${username}`, streakTracker.toJSON());
-    localStorage.setItem(`rewardData_${username}`, rewardSystem.toJSON());
+    // localStorage.setItem(`streakData_${username}`, streakTracker.toJSON());
+    // localStorage.setItem(`rewardData_${username}`, rewardSystem.toJSON());
   };
 
   // Get current progress summary

@@ -12,7 +12,7 @@ import ChatBox from "./components/ChatBox";
 import "./styles/theme.css";
 import { TutorialProvider } from "./contexts/TutorialContext";
 import { TimerProvider } from "./contexts/TimerContext";
-
+import RouteTracker from "./components/RouteTracker";
 
 // Wrapper component to use location hook
 function AppContent() {
@@ -23,6 +23,7 @@ function AppContent() {
 
   return (
     <>
+    <RouteTracker />
       <AppRoutes />
       {!isAuthPage && <ChatBox />}
     </>

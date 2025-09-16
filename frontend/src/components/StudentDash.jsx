@@ -66,9 +66,18 @@ function StudentDash() {
   // Extract class from username (e.g., 10HPS24 -> 10, 12ABC24 -> 12)
   const extractClassFromUsername = (username) => {
     if (!username) return "";
-    // Extract first 2 characters for class number
-    const classNumber = username.substring(0, 2);
-    return isNaN(classNumber) ? "" : classNumber;
+
+    const firstTwo = username.substring(0, 2);
+    if (!isNaN(firstTwo)) {
+      return firstTwo; // ✅ both are digits
+    }
+
+    const firstOne = username.charAt(0);
+    if (!isNaN(firstOne)) {
+      return firstOne; // ✅ only first is digit
+    }
+
+    return ""; // ❌ no digits at the start
   };
 
   // Enhanced time-based greeting with more personalization
