@@ -27,7 +27,7 @@ const API_URL = "https://chatbot.smartlearners.ai";
 // Axios client (no login cookies; pure session-based)
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 30000,
+  timeout: 180000,
 });
 
 // ====== Helpers for formatting ======

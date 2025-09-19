@@ -96,7 +96,8 @@ function LoginPage() {
 
       <div className="login-form-container">
         <div className="logo-section">
-          <h1 className="platform-name">AI EDUCATOR</h1>
+          <h3 className="platform-name">SMART LEARNERS</h3>
+          
         </div>
 
         <div className="portal-section">

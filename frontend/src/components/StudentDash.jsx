@@ -656,6 +656,7 @@ function StudentDash() {
           <div className="greeting-content">
             <div className="greeting-text">
               <h1>
+                
                 <FontAwesomeIcon icon={faGraduationCap} className="me-1" />
                 {getTimeBasedGreeting()}, {username}! 
                 <span className="graduation-emoji">🎓</span>

@@ -20,6 +20,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
   const [selectedChapters, setSelectedChapters] = useState([]);
   const [questionType, setQuestionType] = useState("");
   const [questionLevel, setQuestionLevel] = useState("");
+  const [selectedExercises, setSelectedExercises] = useState([]); 
   const [selectedWorksheet, setSelectedWorksheet] = useState("");
   const [showQuestionList, setShowQuestionList] = useState(false);
   const [questionList, setQuestionList] = useState([]);
@@ -97,6 +98,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
           setSelectedChapters([]);
           setQuestionType("");
           setQuestionLevel("");
+          setSelectedExercises([]);
           setSelectedWorksheet("");
         } catch (error) {
           console.error("Error fetching subjects:", error);
@@ -121,6 +123,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
           setSelectedChapters([]);
           setQuestionType("");
           setQuestionLevel("");
+          setSelectedExercises([])
           setSelectedWorksheet("");
         } catch (error) {
           console.error("Error fetching chapters:", error);
@@ -173,7 +176,10 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
 
   // Reset dependent fields when question type changes
   useEffect(() => {
-    if (questionType !== "external") setQuestionLevel("");
+    if (questionType !== "external") {
+      setQuestionLevel("");
+      setSelectedExercises([]); // Reset multiple exercises
+    }
     if (questionType !== "worksheets") setSelectedWorksheet("");
   }, [questionType]);
 
@@ -298,42 +304,21 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
 
   // Determine if generate button should be enabled
   const isGenerateButtonEnabled = () => {
-    if (questionType === "external") {
-      return (
-        selectedClass !== "" &&
-        selectedSubject !== "" &&
-        selectedChapters.length > 0 &&
-        questionType !== "" &&
-        questionLevel !== ""
-      );
-    }
 
-    if (questionType === "foundation") {
-      return (
-        selectedClass !== "" &&
-        selectedSubject !== "" &&
-        selectedChapters.length > 0 &&
-        questionType !== "" &&
-        questionLevel !== ""
-      );
-    }
+    if (questionType === "worksheets") return selectedWorksheet !== "";
+    if (questionType === "external") return selectedExercises.length > 0;
+    if (questionType!=="") return true;
+    return false;
+    if (
+      selectedClass === "" ||
+      selectedSubject === "" ||
+      selectedChapters.length === 0 ||
+      questionType === "" ||
+      isLoading
+    ) {
 
-    if (questionType === "worksheets") {
-      return (
-        selectedClass !== "" &&
-        selectedSubject !== "" &&
-        selectedChapters.length > 0 &&
-        questionType !== "" &&
-        selectedWorksheet !== ""
-      );
     }
-
-    return (
-      selectedClass !== "" &&
-      selectedSubject !== "" &&
-      selectedChapters.length > 0 &&
-      questionType !== ""
-    );
+    return false;
   };
 
   // Handle form submission to generate questions
@@ -355,7 +340,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
         topicid: selectedChapters,
         solved: questionType === "solved",
         exercise: questionType === "exercise",
-        subtopic: questionType === "external" ? questionLevel : null,
+        subtopic: questionType === "external" ? selectedExercises : null,
         worksheet_name: questionType === "worksheets" ? selectedWorksheet : null,
 
       };
@@ -389,11 +374,18 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
         const exerciseNumber = subtopicIndex !== -1 ? subtopicIndex + 1 : 1;
 
         // Create a single mock question representing the exercise
-        const mockQuestions = [{
-          question: `Exercise ${exerciseNumber} from Chapter ${selectedChapters.map(c =>
-            chapters.find(ch => ch.topic_code === c)?.name || c).join(", ")}`,
-          question_image: null
-        }];
+        const mockQuestions = selectedExercises.map((exercise) => {
+          const subtopicIndex = subTopics.findIndex(st => st === exercise);
+          const exerciseNumber = subtopicIndex !== -1 ? subtopicIndex + 1 : 1;
+          
+          return {
+            question: `Exercise ${exerciseNumber} from Chapter ${selectedChapters.map(c => 
+              chapters.find(ch => ch.topic_code === c)?.name || c).join(", ")}`,
+            question_image: null,
+            subtopic: exercise
+          };
+        });
+        
 
         setQuestionList(mockQuestions);
         setSelectedQuestions([]); // Reset selected questions
@@ -423,10 +415,13 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     const chapterName = chapters.find(c => c.topic_code === selectedChapters[0])?.name || "Chapter";
 
     // Get exercise number from subtopic
-    const subtopicIndex = subTopics.findIndex(st => st === questionLevel);
-    const exerciseNumber = subtopicIndex !== -1 ? subtopicIndex + 1 : "";
-
-    setHomeworkTitle(`${subjectName} - ${chapterName} Exercise ${exerciseNumber}`);
+    const exerciseNumbers = selectedExercises.map((exercise) => {
+      const subtopicIndex = subTopics.findIndex(st => st === exercise);
+      return subtopicIndex !== -1 ? subtopicIndex + 1 : "";
+    }).filter(num => num !== "").join(", ");
+    
+    const exerciseText = exerciseNumbers ? `Exercises ${exerciseNumbers}` : "Selected Exercises";
+    setHomeworkTitle(`${subjectName} - ${chapterName} ${exerciseText}`);
   };
 
   // Handle homework submission
@@ -1626,23 +1621,31 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                   {/* Conditional selectors for Set or Worksheet */}
                   {questionType === "external" && (
                     <Row className="mb-3">
-                      <Col xs={12} md={6}>
+                      <Col xs={12}>
                         <Form.Group controlId="formQuestionLevel">
-                          <Form.Label>Select The Set</Form.Label>
-                          <Form.Control
-                            as="select"
-                            value={questionLevel}
-                            onChange={(e) => setQuestionLevel(e.target.value)}
-                            className="form-control"
-                            disabled={selectedChapters.length === 0}
-                          >
-                            <option value="">Select The Set</option>
-                            {subTopics.map((subTopic, index) => (
-                              <option key={subTopic} value={subTopic}>
-                                {getSubtopicDisplayName(subTopic, index)}
-                              </option>
-                            ))}
-                          </Form.Control>
+                          <Form.Label>Select Exercises (Multiple Selection)</Form.Label>
+                          <Select
+                            isMulti
+                            options={subTopics.map((subTopic, index) => ({
+                              value: subTopic,
+                              label: getSubtopicDisplayName(subTopic, index),
+                            }))}
+                            value={selectedExercises.map((exercise) => {
+                              const index = subTopics.findIndex(st => st === exercise);
+                              return {
+                                value: exercise,
+                                label: getSubtopicDisplayName(exercise, index),
+                              };
+                            })}
+                            onChange={(selectedOptions) => {
+                              setSelectedExercises(
+                                selectedOptions ? selectedOptions.map((option) => option.value) : []
+                              );
+                            }}
+                            classNamePrefix="react-select"
+                            placeholder="Select one or more exercises"
+                            isDisabled={selectedChapters.length === 0}
+                          />
                         </Form.Group>
                       </Col>
                     </Row>
@@ -1779,24 +1782,32 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                 </Row>
                 {/* Conditional selectors for Set or Worksheet */}
                 {questionType === "external" && (
-                  <Row className="mb-3">
-                    <Col xs={12} md={6}>
-                      <Form.Group controlId="formQuestionLevel">
-                        <Form.Label>Select The Set</Form.Label>
-                        <Form.Control
-                          as="select"
-                          value={questionLevel}
-                          onChange={(e) => setQuestionLevel(e.target.value)}
-                          className="form-control"
-                          disabled={selectedChapters.length === 0}
-                        >
-                          <option value="">Select The Set</option>
-                          {subTopics.map((subTopic, index) => (
-                            <option key={subTopic} value={subTopic}>
-                              {getSubtopicDisplayName(subTopic, index)}
-                            </option>
-                          ))}
-                        </Form.Control>
+                    <Row className="mb-3">
+                      <Col xs={12}>
+                        <Form.Group controlId="formQuestionLevel">
+                          <Form.Label>Select Exercises (Multiple Selection)</Form.Label>
+                          <Select
+                            isMulti
+                            options={subTopics.map((subTopic, index) => ({
+                              value: subTopic,
+                              label: getSubtopicDisplayName(subTopic, index),
+                            }))}
+                            value={selectedExercises.map((exercise) => {
+                              const index = subTopics.findIndex(st => st === exercise);
+                              return {
+                                value: exercise,
+                                label: getSubtopicDisplayName(exercise, index),
+                              };
+                            })}
+                            onChange={(selectedOptions) => {
+                              setSelectedExercises(
+                                selectedOptions ? selectedOptions.map((option) => option.value) : []
+                              );
+                            }}
+                            classNamePrefix="react-select"
+                            placeholder="Select one or more exercises"
+                            isDisabled={selectedChapters.length === 0}
+                          />
                       </Form.Group>
                     </Col>
                   </Row>
@@ -1865,9 +1876,13 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
               setClassworkCode(`CW-${timestamp}`);
               const subjectName = subjects.find(s => s.subject_code === selectedSubject)?.subject_name || "Subject";
               const chapterName = chapters.find(c => c.topic_code === selectedChapters[0])?.name || "Chapter";
-              const subtopicIndex = subTopics.findIndex(st => st === questionLevel);
-              const exerciseNumber = subtopicIndex !== -1 ? subtopicIndex + 1 : "";
-              setClassworkTitle(`${subjectName} - ${chapterName} Exercise ${exerciseNumber}`);
+              const exerciseNumbers = selectedExercises.map((exercise) => {
+                const subtopicIndex = subTopics.findIndex(st => st === exercise);
+                return subtopicIndex !== -1 ? subtopicIndex + 1 : "";
+              }).filter(num => num !== "").join(", ");
+              
+              const exerciseText = exerciseNumbers ? `Exercises ${exerciseNumbers}` : "Selected Exercises";
+              setClassworkTitle(`${subjectName} - ${chapterName} ${exerciseText}`);
             }}
           />
         )}

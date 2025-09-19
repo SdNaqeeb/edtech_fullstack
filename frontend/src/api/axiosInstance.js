@@ -27,7 +27,7 @@ const clearAllTokens = () => {
 const axiosInstance = axios.create({
   baseURL: "https://autogen.aieducator.com",
   headers: { "Content-Type": "application/json" },
-  timeout: 60000,
+  timeout: 180000,
 });
 
 // =============================
@@ -100,7 +100,7 @@ axiosInstance.interceptors.response.use(
         if (!refreshToken) throw new Error("No refresh token found");
 
         const response = await axios.post(
-          "http://localhost:8000/api/token/refresh/",
+          "https://autogen.aieducator.com/api/token/refresh/",
           { refresh: refreshToken }
         );
 
@@ -141,7 +141,8 @@ axiosInstance.login = async (username, password) => {
 
 axiosInstance.logout = async () => {
   try {
-    await axiosInstance.post("/api/logout/");
+    const refresh = localStorage.getItem("refreshToken");
+    await axiosInstance.post("/api/logout/", { refresh });
   } catch (error) {
     console.error("Logout error:", error);
   } finally {
@@ -162,7 +163,7 @@ axiosInstance.verifyToken = async () => {
 axiosInstance.uploadFile = async (url, formData, progressCallback) => {
   try {
     const response = await axiosInstance.post(url, formData, {
-      timeout: 120000,
+      timeout: 180000,
       onUploadProgress: (progressEvent) => {
         if (progressCallback && progressEvent.total) {
           const percentCompleted = Math.round(
