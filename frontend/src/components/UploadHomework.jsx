@@ -5,7 +5,7 @@ import './UploadHomework.css';
 const UploadHomework = () => {
   const [homeworkList, setHomeworkList] = useState([]);
   const [selectedHomeworkId, setSelectedHomeworkId] = useState(null); // <-- single select
-  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfFiles, setPdfFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchingHomework, setFetchingHomework] = useState(true);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -36,14 +36,48 @@ const UploadHomework = () => {
   };
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
-      setPdfFile(file);
-      setError(null);
-    } else {
-      setError('Please select a valid PDF file');
-      event.target.value = null;
+    const files = Array.from(event.target.files);
+
+    if (files.length === 0) {
+      return; // Don't clear existing files if no new files selected
     }
+
+    // Validate all new files
+    const validFiles = [];
+    const errors = [];
+
+    files.forEach((file, index) => {
+      // Check if file is PDF
+      if (file.type !== 'application/pdf') {
+        errors.push(`File ${index + 1} (${file.name}) is not a PDF file.`);
+        return;
+      }
+
+      // Check file size (30MB = 30 * 1024 * 1024 bytes)
+      const maxSize = 30 * 1024 * 1024; // 30MB in bytes
+      if (file.size > maxSize) {
+        errors.push(`File ${index + 1} (${file.name}) is larger than 30MB.`);
+        return;
+      }
+
+      validFiles.push(file);
+    });
+
+    if (errors.length > 0) {
+      setError(errors.join(' '));
+      event.target.value = null; // Reset the input
+      return;
+    }
+
+    setError(null); // Clear any previous errors
+    // Append new files to existing ones
+    setPdfFiles(prevFiles => [...prevFiles, ...validFiles]);
+    event.target.value = null; // Reset the input to allow selecting the same files again
+  };
+
+  // Remove individual file from selection
+  const removePdfFile = (indexToRemove) => {
+    setPdfFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSubmit = async (event) => {
@@ -54,8 +88,8 @@ const UploadHomework = () => {
       return;
     }
 
-    if (!pdfFile) {
-      setError('Please select a PDF file to upload');
+    if (!pdfFiles || pdfFiles.length === 0) {
+      setError('Please select at least one PDF file to upload');
       return;
     }
 
@@ -67,7 +101,11 @@ const UploadHomework = () => {
       const formData = new FormData();
       // keep API compatible: send array with a single id
       formData.append('homework_code', selectedHomeworkId.trim());
-      formData.append('pdf_response', pdfFile);
+      
+      // Append multiple PDF files
+      pdfFiles.forEach((pdf, index) => {
+        formData.append('pdf_response', pdf);
+      });
 
       const response = await axiosInstance.post('auto-homework-submission/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -81,7 +119,7 @@ const UploadHomework = () => {
       if (response.status === 200 || response.status === 201) {
         setSuccess(true);
         setSelectedHomeworkId(null);
-        setPdfFile(null);
+        setPdfFiles([]);
         setUploadProgress(0);
         const input = document.getElementById('pdf-upload');
         if (input) input.value = null;
@@ -120,7 +158,7 @@ const UploadHomework = () => {
         {success && (
           <div className="alert alert-success">
             <span className="alert-icon">✅</span>
-            Homework uploaded successfully!
+            {pdfFiles.length} homework file(s) uploaded successfully!
           </div>
         )}
 
@@ -172,24 +210,52 @@ const UploadHomework = () => {
 
           {/* File Upload Section */}
           <div className="form-section">
-            <h3 className="section-title">Upload PDF File</h3>
+            <h3 className="section-title">Upload PDF Files</h3>
 
             <div className="file-upload-container">
               <label htmlFor="pdf-upload" className="file-upload-label">
                 <div className="file-upload-icon">📄</div>
                 <span className="file-upload-text">
-                  {pdfFile ? pdfFile.name : 'Choose PDF file'}
+                  {pdfFiles.length > 0 ? `Choose ${pdfFiles.length} file(s)` : 'Choose PDF files'}
                 </span>
-                {pdfFile && <span className="file-size">({formatFileSize(pdfFile.size)})</span>}
               </label>
               <input
                 id="pdf-upload"
                 type="file"
                 accept=".pdf"
                 onChange={handleFileChange}
+                multiple
                 className="file-input"
               />
             </div>
+
+            {/* File Preview */}
+            {pdfFiles.length > 0 && (
+              <div className="file-preview-container">
+                <div className="file-preview-header">
+                  <span className="file-count">Selected {pdfFiles.length} file(s):</span>
+                </div>
+                <div className="file-list">
+                  {pdfFiles.map((file, index) => (
+                    <div key={index} className="file-item">
+                      <span className="file-icon">📄</span>
+                      <div className="file-details">
+                        <span className="file-name">{file.name}</span>
+                        <span className="file-size">({formatFileSize(file.size)})</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removePdfFile(index)}
+                        className="remove-file-btn"
+                        title="Remove file"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Upload Progress */}
@@ -205,18 +271,18 @@ const UploadHomework = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading || !selectedHomeworkId || !pdfFile}
+            disabled={loading || !selectedHomeworkId || pdfFiles.length === 0}
             className="submit-button"
           >
             {loading ? (
               <>
                 <span className="spinner-small"></span>
-                Uploading...
+                Uploading {pdfFiles.length} file(s)...
               </>
             ) : (
               <>
                 <span>📤</span>
-                Upload Homework
+                Upload {pdfFiles.length} Homework File(s)
               </>
             )}
           </button>

@@ -41,7 +41,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
   const [classworkCode, setClassworkCode] = useState("");
   const [classworkDescription, setClassworkDescription] = useState("");
   const [classworkDueDate, setClassworkDueDate] = useState("");
-  const [classworkPDF, setClassworkPDF] = useState(null);
+  const [classworkPDFs, setClassworkPDFs] = useState([]);
   const [isClassworkSubmitting, setIsClassworkSubmitting] = useState(false);
   const [classworkError, setClassworkError] = useState(null);
   const [showClassworkForm, setShowClassworkForm] = useState(false);
@@ -481,31 +481,50 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     }
   };
 
-  // Handle PDF file upload for classwork with 30MB limit
+  // Handle multiple PDF file upload for classwork with 30MB limit per file
   const handleClassworkPDFChange = (e) => {
-    const file = e.target.files[0];
+    const files = Array.from(e.target.files);
 
-    if (file) {
+    if (files.length === 0) {
+      return; // Don't clear existing files if no new files selected
+    }
+
+    // Validate all new files
+    const validFiles = [];
+    const errors = [];
+
+    files.forEach((file, index) => {
       // Check if file is PDF
       if (file.type !== 'application/pdf') {
-        setClassworkError("Please upload only PDF files.");
-        e.target.value = null; // Reset the input
-        setClassworkPDF(null);
+        errors.push(`File ${index + 1} (${file.name}) is not a PDF file.`);
         return;
       }
 
       // Check file size (30MB = 30 * 1024 * 1024 bytes)
       const maxSize = 30 * 1024 * 1024; // 30MB in bytes
       if (file.size > maxSize) {
-        setClassworkError("File size must be less than 30MB.");
-        e.target.value = null; // Reset the input
-        setClassworkPDF(null);
+        errors.push(`File ${index + 1} (${file.name}) is larger than 30MB.`);
         return;
       }
 
-      setClassworkError(null); // Clear any previous errors
-      setClassworkPDF(file);
+      validFiles.push(file);
+    });
+
+    if (errors.length > 0) {
+      setClassworkError(errors.join(' '));
+      e.target.value = null; // Reset the input
+      return;
     }
+
+    setClassworkError(null); // Clear any previous errors
+    // Append new files to existing ones
+    setClassworkPDFs(prevFiles => [...prevFiles, ...validFiles]);
+    e.target.value = null; // Reset the input to allow selecting the same files again
+  };
+
+  // Remove individual file from selection
+  const removeClassworkPDF = (indexToRemove) => {
+    setClassworkPDFs(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove));
   };
 
   // Classwork submission handler (after questions are selected)
@@ -514,14 +533,14 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     setClassworkError(null);
     setIsClassworkSubmitting(true);
 
-    if (!classworkTitle.trim() || !classworkCode.trim() || !classworkDueDate) {
+    if (!classworkTitle.trim() || !classworkCode.trim() || !classworkDueDate || !classworkPDFs || classworkPDFs.length === 0) {
       setClassworkError("Please fill in all required fields.");
       setIsClassworkSubmitting(false);
       return;
     }
 
-    if (!classworkPDF) {
-      setClassworkError("Please upload a PDF file of student work.");
+    if (!classworkPDFs || classworkPDFs.length === 0) {
+      setClassworkError("Please upload at least one PDF file of student work.");
       setIsClassworkSubmitting(false);
       return;
     }
@@ -535,13 +554,15 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     try {
       const formData = new FormData();
 
-      // Append PDF file
-      formData.append('pdf_response', classworkPDF);
+      // Append multiple PDF files
+      classworkPDFs.forEach((pdf, index) => {
+        formData.append('pdf_response', pdf);
+      });
 
       // Append classwork information
       formData.append('class_work_code', classworkCode.trim());
       formData.append('worksheet_name', classworkTitle.trim());
-      formData.append('due-time',classworkDueDate.trim())
+      formData.append('due-time', classworkDueDate.trim());
 
       // Append questions data
       formData.append('questions', JSON.stringify(selectedQuestions));
@@ -559,11 +580,11 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
       setClassworkCode("");
       setClassworkDescription("");
       setClassworkDueDate("");
-      setClassworkPDF(null);
+      setClassworkPDFs([]);
       setSelectedQuestions([]);
       setShowClassworkForm(false);
 
-      alert("Classwork PDF Processing is Started");
+      alert(`Classwork PDF Processing Started for ${classworkPDFs.length} file(s)`);
     } catch (error) {
       setClassworkError(error.response?.data?.error || "Failed to upload classwork");
       console.error("Error uploading classwork:", error);
@@ -721,22 +742,59 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
           />
         </Form.Group>
 
-        {/* PDF upload with 30MB limit */}
+        {/* Multiple PDF upload with 30MB limit per file */}
         <Form.Group controlId="classworkPDF" className="mb-3">
-          <Form.Label>Upload Student Work PDF (Max 30MB)</Form.Label>
+          <Form.Label>Upload Student Work PDFs (Max 30MB per file)</Form.Label>
           <Form.Control
             type="file"
             accept="application/pdf,.pdf"
             onChange={handleClassworkPDFChange}
-            required
+            multiple
+            
           />
-          {classworkPDF && (
-            <div style={{ marginTop: 8, color: '#28a745' }}>
-              <span>✓ Selected file: {classworkPDF.name} ({(classworkPDF.size / (1024 * 1024)).toFixed(2)} MB)</span>
+          {classworkPDFs.length > 0 && (
+            <div style={{ marginTop: 8 }}>
+              <div style={{ color: '#28a745', marginBottom: 8 }}>
+                ✓ Selected {classworkPDFs.length} file(s):
+              </div>
+              <div style={{ maxHeight: '150px', overflowY: 'auto', border: '1px solid #dee2e6', borderRadius: '4px', padding: '8px' }}>
+                {classworkPDFs.map((pdf, index) => (
+                  <div key={index} style={{ 
+                    marginBottom: '4px', 
+                    fontSize: '14px', 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    padding: '4px 8px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '4px'
+                  }}>
+                    <span>
+                      <span style={{ color: '#28a745' }}>•</span> {pdf.name} ({(pdf.size / (1024 * 1024)).toFixed(2)} MB)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeClassworkPDF(index)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#dc3545',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        padding: '2px 6px',
+                        borderRadius: '3px'
+                      }}
+                      title="Remove file"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           <Form.Text className="text-muted">
-            Only PDF files up to 30MB are allowed
+            Select multiple PDF files. Each file must be under 30MB.
           </Form.Text>
         </Form.Group>
 
@@ -770,9 +828,9 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
           <Button
             variant="primary"
             type="submit"
-            disabled={isClassworkSubmitting}
+            disabled={isClassworkSubmitting || classworkPDFs.length === 0}
           >
-            {isClassworkSubmitting ? "Uploading..." : "Upload Classwork PDF & Questions"}
+            {isClassworkSubmitting ? "Uploading..." : `Upload ${classworkPDFs.length} PDF(s) & Questions`}
           </Button>
         </div>
       </Form>
@@ -1255,7 +1313,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                   )}
 
                   {/* Concepts Mastery Summary */}
-                  {submission.result_json && (
+                  {/* {submission.result_json && (
                     <div className="p-4 bg-light">
                       <h6 className="text-primary mb-3">
                         <i className="fas fa-brain me-2"></i>
@@ -1283,7 +1341,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                         })()}
                       </div>
                     </div>
-                  )}
+                  )} */}
 
                   {/* {submission.result_json && submission.result_json.questions && (
                     <div className="p-4 bg-light">

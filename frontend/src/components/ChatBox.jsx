@@ -38,13 +38,13 @@ const formatMessage = (text) => {
       <div className="paragraph-solution">
         {text.map((p, i) => (
           <p key={i} className="solution-paragraph">
-            <MarkdownViewer>{p}</MarkdownViewer>
+            <MarkdownWithMath content={p} />
           </p>
         ))}
       </div>
     );
   }
-  return <MarkdownViewer>{text}</MarkdownViewer>;
+  return <MarkdownWithMath content={text} />;
 };
 
 // ====== Fetch Student Data Function ======
@@ -53,20 +53,20 @@ function student_Data() {
     homework: "true",
     agentic_data: "true",
   })
-  .then((response) => {
-    return response.data;
-  })
-  .catch((error) => {
-    console.error("❌ Error fetching dummy data:", error);
-    throw error;
-  });
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("❌ Error fetching dummy data:", error);
+      throw error;
+    });
 }
 
 // ====== Main Component ======
 const ChatBox = () => {
   const { username } = useContext(AuthContext);
-  const className=localStorage.getItem("class_name"); 
-  
+  const className = localStorage.getItem("class_name");
+
   const [isOpen, setIsOpen] = useState(false);
   const toggleChat = () => setIsOpen((o) => !o);
 
@@ -105,6 +105,8 @@ const ChatBox = () => {
   const messagesEndRef = useRef(null);
   const hasInitialized = useRef(false);
 
+  const [inputText, setInputText] = useState("");
+
   // ====== Effects ======
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -114,7 +116,7 @@ const ChatBox = () => {
   useEffect(() => {
     if (hasInitialized.current) return;
     if (!username) return; // Wait for username to be available
-    
+
     hasInitialized.current = true;
     fetchStudentDataAndCreateSession();
   }, [username]);
@@ -123,11 +125,11 @@ const ChatBox = () => {
   const fetchStudentDataAndCreateSession = async () => {
     setConnectionStatus("checking");
     console.log("Fetching student data and creating session for:", username);
-    
+
     try {
       // First, fetch the student data
       const data = await student_Data();
-      
+
       let filteredData = null;
       if (data && data[username]) {
         filteredData = data[username];
@@ -136,10 +138,10 @@ const ChatBox = () => {
       } else {
         console.warn("⚠️ No student data found for", username);
       }
-      
+
       // Now create session with the fetched data
       await createSessionWithData(filteredData);
-      
+
     } catch (err) {
       console.error("❌ Failed to fetch student data or create session:", err);
       setConnectionStatus("disconnected");
@@ -163,21 +165,21 @@ const ChatBox = () => {
       };
 
       console.log("Creating session with student info:", filteredStudentInfo);
-      
+
       const payload = {
         student_id: username,
         json_data: filteredStudentInfo,
       };
-      
+
       const res = await api.post("/create_session", payload);
       console.log("create_session response:", res.data);
-      
+
       if (!res.data?.session_id) throw new Error("No session_id");
-      
+
       setSessionId(res.data.session_id);
       setConnectionStatus("connected");
       console.log("Session created successfully:", res.data.session_id);
-      
+
     } catch (e) {
       console.error("create_session error:", e);
       setConnectionStatus("disconnected");
@@ -218,6 +220,11 @@ const ChatBox = () => {
   // ====== File handlers ======
   const handleFileButtonClick = () => fileInputRef.current?.click();
   const handleFileChange = (e) => handleFile(e.target.files?.[0]);
+
+  const handleText = (e) => {
+    setInputText(e.target.value); // store user input in state
+  };
+
 
   const handleFile = (file) => {
     if (!file) return;
@@ -391,7 +398,7 @@ const ChatBox = () => {
 
     try {
       const combinedQuery = `${text || ""} `;
-      
+
       if (imageFile) {
         // Image upload with message
         const fd = new FormData();
@@ -399,7 +406,7 @@ const ChatBox = () => {
         fd.append("query", combinedQuery || "");
         fd.append("language", language);
         fd.append("image", imageFile, imageFile.name || `image_${Date.now()}.jpg`);
-        
+
         // Add student context if available
         if (studentInfo) {
           fd.append("student_context", JSON.stringify(studentInfo));
@@ -428,7 +435,7 @@ const ChatBox = () => {
           query: text || "",
           language: language,
         };
-        
+
         // Add student context if available
         if (studentInfo) {
           requestBody.student_context = studentInfo;
@@ -520,8 +527,8 @@ const ChatBox = () => {
             {connectionStatus === "connected"
               ? "Connected"
               : connectionStatus === "checking"
-              ? "Connecting..."
-              : "Disconnected"}
+                ? "Connecting..."
+                : "Disconnected"}
           </Button>
 
           <button className="close-btn" onClick={toggleChat}>
@@ -534,9 +541,8 @@ const ChatBox = () => {
           {messages.map((m) => (
             <div
               key={m.id}
-              className={`message ${
-                m.sender === "user" ? "user-message" : "ai-message"
-              }`}
+              className={`message ${m.sender === "user" ? "user-message" : "ai-message"
+                }`}
             >
               <div className="message-bubble">
                 {formatMessage(m.text)}
@@ -563,9 +569,9 @@ const ChatBox = () => {
               >
                 {m.timestamp
                   ? new Date(m.timestamp).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
                   : ""}
               </div>
             </div>
@@ -692,7 +698,7 @@ const ChatBox = () => {
               />
             </div>
           )}
-          <div className="d-grid gap-2">
+          <div className="upload d-grid gap-2">
             <Button
               variant="primary"
               onClick={() => sendImageWithCommand("solve it")}
@@ -707,20 +713,26 @@ const ChatBox = () => {
             >
               ✅ Correct It
             </Button>
+            <div className="input-container">
+              <input
+                type="text"
+                className="custom-input"
+                onChange={handleText}
+                accept="image/*"
+                placeholder="Type your message..."
+
+                disabled={connectionStatus !== "connected" || isTyping}
+              />
+              <Button
+                className="send-btn"
+                onClick={() => sendImageWithCommand(inputText)}
+                disabled={connectionStatus !== "connected"}
+              >
+                Send Input
+              </Button>
+            </div>
           </div>
-          <div
-            style={{
-              marginTop: 12,
-              fontSize: 12,
-              color: "#555",
-              background: "#fff3cd",
-              border: "1px solid #ffeeba",
-              padding: 8,
-              borderRadius: 6,
-            }}
-          >
-            💡 Tip: Use "Solve It" for new questions, "Correct It" to check your answers.
-          </div>
+
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={clearSelectedFile}>
