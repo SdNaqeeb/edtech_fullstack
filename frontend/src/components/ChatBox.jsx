@@ -409,7 +409,7 @@ const ChatBox = () => {
 
         // Add student context if available
         if (studentInfo) {
-          fd.append("student_context", JSON.stringify(studentInfo));
+          // fd.append("student_context", JSON.stringify(studentInfo));
         }
 
         const res = await api.post("/chat", fd, {
@@ -437,9 +437,9 @@ const ChatBox = () => {
         };
 
         // Add student context if available
-        if (studentInfo) {
-          requestBody.student_context = studentInfo;
-        }
+        // if (studentInfo) {
+        //   requestBody.student_context = studentInfo;
+        // }
 
         const res = await api.post("/chat-simple", requestBody, {
           headers: { session_token: sessionId },

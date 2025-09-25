@@ -4,7 +4,461 @@ import axiosInstance from '../api/axiosInstance';
 import CameraCapture from './CameraCapture';
 import QuestionListModal from './QuestionListModal'; // Import the modal
 import { AuthContext } from './AuthContext';
+import MarkdownWithMath from './MarkdownWithMath';
 
+// ViewQuestionsModal Component with Delete Functionality
+const ViewQuestionsModal = ({ show, onHide, worksheetName, questions, loading }) => {
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState(new Set());
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [localQuestions, setLocalQuestions] = useState([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Update local questions when props change
+  useEffect(() => {
+    setLocalQuestions(questions);
+    setSelectedQuestionIds(new Set()); // Reset selections when questions change
+  }, [questions]);
+
+  if (!show) return null;
+
+  // Toggle selection of a question
+  const toggleQuestionSelection = (questionId) => {
+    setSelectedQuestionIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(questionId)) {
+        newSet.delete(questionId);
+      } else {
+        newSet.add(questionId);
+      }
+      return newSet;
+    });
+  };
+
+  // Select/Deselect all questions
+  const toggleSelectAll = () => {
+    if (selectedQuestionIds.size === localQuestions.length) {
+      setSelectedQuestionIds(new Set());
+    } else {
+      const allIds = new Set(localQuestions.map(q => q.id));
+      setSelectedQuestionIds(allIds);
+    }
+  };
+
+  // Handle delete selected questions
+  const handleDeleteSelected = async () => {
+    setShowDeleteConfirm(false);
+    setIsDeleting(true);
+    
+    try {
+      const formData = new FormData();
+      // Append each ID separately - this is what getlist() expects
+      const idsArray = Array.from(selectedQuestionIds);
+      idsArray.forEach(id => {
+        formData.append("worksheet_question_ids", id);
+      });
+      
+      // Use POST method as your backend expects POST, not DELETE
+      const response = await axiosInstance.post('/worksheet-delete/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.success) {
+        // Remove deleted questions from local state
+        const updatedQuestions = localQuestions.filter(
+          q => !selectedQuestionIds.has(q.id)
+        );
+        setLocalQuestions(updatedQuestions);
+        setSelectedQuestionIds(new Set());
+        
+        // Show success message
+        alert(`Successfully deleted ${idsArray.length} question(s)`);
+      } else {
+        alert('Failed to delete questions. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error deleting questions:', error);
+      alert('An error occurred while deleting questions. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Delete Confirmation Modal Component
+  const DeleteConfirmModal = () => {
+    if (!showDeleteConfirm) return null;
+    
+    const questionCount = selectedQuestionIds.size;
+    
+    return (
+      <div 
+        className="delete-confirm-overlay" 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000
+        }}
+        onClick={() => setShowDeleteConfirm(false)}
+      >
+        <div 
+          className="delete-confirm-modal"
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            padding: '24px',
+            maxWidth: '400px',
+            width: '90%',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            transform: 'scale(1)',
+            animation: 'modalSlideIn 0.2s ease-out'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '16px'
+          }}>
+            <div style={{
+              backgroundColor: '#fee2e2',
+              borderRadius: '50%',
+              padding: '12px',
+              marginRight: '12px'
+            }}>
+              <svg 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="#dc2626" 
+                strokeWidth="2"
+              >
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <h3 style={{
+              fontSize: '18px',
+              fontWeight: '600',
+              margin: 0,
+              color: '#111827'
+            }}>
+              Confirm Deletion
+            </h3>
+          </div>
+          
+          <p style={{
+            margin: '0 0 20px 0',
+            color: '#6b7280',
+            lineHeight: '1.5'
+          }}>
+            Are you sure you want to delete {questionCount === 1 
+              ? 'this question' 
+              : `these ${questionCount} questions`}? This action cannot be undone.
+          </p>
+          
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            justifyContent: 'flex-end'
+          }}>
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              disabled={isDeleting}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#fff',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                color: '#374151',
+                fontWeight: '500',
+                cursor: isDeleting ? 'not-allowed' : 'pointer',
+                opacity: isDeleting ? 0.5 : 1,
+                transition: 'all 0.15s ease'
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteSelected}
+              disabled={isDeleting}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: isDeleting ? '#fca5a5' : '#dc2626',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                fontWeight: '500',
+                cursor: isDeleting ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {isDeleting ? (
+                <>
+                  <span className="spinner" style={{
+                    display: 'inline-block',
+                    width: '14px',
+                    height: '14px',
+                    border: '2px solid #fff',
+                    borderTopColor: 'transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 0.6s linear infinite'
+                  }}></span>
+                  Deleting...
+                </>
+              ) : (
+                <>Delete {questionCount === 1 ? 'Question' : `${questionCount} Questions`}</>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="view-modal-overlay" onClick={onHide}>
+      <div className="view-modal-container" onClick={(e) => e.stopPropagation()}>
+        <div className="view-modal-header">
+          <h2 className="view-modal-title">
+            Worksheet Questions
+            {worksheetName && <span className="worksheet-badge">{worksheetName}</span>}
+          </h2>
+          <button className="view-modal-close" onClick={onHide}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        {/* Action Bar */}
+        {localQuestions.length > 0 && !loading && (
+          <div className="view-modal-actions" style={{
+            padding: '10px 20px',
+            borderBottom: '1px solid #e5e7eb',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#f9fafb'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                onClick={toggleSelectAll}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: '#fff',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f9fafb';
+                  e.currentTarget.style.borderColor = '#9ca3af';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#fff';
+                  e.currentTarget.style.borderColor = '#d1d5db';
+                }}
+              >
+                <div style={{
+                  width: '16px',
+                  height: '16px',
+                  border: '2px solid',
+                  borderColor: selectedQuestionIds.size === localQuestions.length && localQuestions.length > 0 ? '#3b82f6' : '#d1d5db',
+                  borderRadius: '4px',
+                  backgroundColor: selectedQuestionIds.size === localQuestions.length && localQuestions.length > 0 ? '#3b82f6' : '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.15s ease'
+                }}>
+                  {selectedQuestionIds.size === localQuestions.length && localQuestions.length > 0 && (
+                    <svg 
+                      width="10" 
+                      height="10" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="#fff" 
+                      strokeWidth="3"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  )}
+                </div>
+                Select All
+              </button>
+              
+              {selectedQuestionIds.size > 0 && (
+                <span style={{ fontSize: '14px', color: '#6b7280' }}>
+                  {selectedQuestionIds.size} selected
+                </span>
+              )}
+            </div>
+
+            {selectedQuestionIds.size > 0 && (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isDeleting}
+                style={{
+                  padding: '6px 16px',
+                  backgroundColor: isDeleting ? '#fca5a5' : '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: isDeleting ? 'not-allowed' : 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Delete Selected
+              </button>
+            )}
+          </div>
+        )}
+
+        <div className="view-modal-body">
+          {loading ? (
+            <div className="view-modal-loading">
+              <div className="spinner"></div>
+              <p>Loading questions...</p>
+            </div>
+          ) : localQuestions.length === 0 ? (
+            <div className="view-modal-empty">
+              <p>No questions found for this worksheet.</p>
+            </div>
+          ) : (
+            <div className="questions-grid">
+              {localQuestions.map((question, index) => (
+                <div 
+                  key={question.id} 
+                  className={`question-card ${selectedQuestionIds.has(question.id) ? 'selected' : ''}`}
+                  onClick={() => toggleQuestionSelection(question.id)}
+                  style={{
+                    position: 'relative',
+                    border: selectedQuestionIds.has(question.id) ? '2px solid #3b82f6' : '1px solid #e5e7eb',
+                    backgroundColor: selectedQuestionIds.has(question.id) ? '#eff6ff' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    userSelect: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!selectedQuestionIds.has(question.id)) {
+                      e.currentTarget.style.borderColor = '#9ca3af';
+                      e.currentTarget.style.backgroundColor = '#fafafa';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!selectedQuestionIds.has(question.id)) {
+                      e.currentTarget.style.borderColor = '#e5e7eb';
+                      e.currentTarget.style.backgroundColor = '#fff';
+                    }
+                  }}
+                >
+                  {/* Selection Checkbox */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    zIndex: 1,
+                    pointerEvents: 'none'
+                  }}>
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      border: '2px solid',
+                      borderColor: selectedQuestionIds.has(question.id) ? '#3b82f6' : '#d1d5db',
+                      borderRadius: '4px',
+                      backgroundColor: selectedQuestionIds.has(question.id) ? '#3b82f6' : '#fff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      {selectedQuestionIds.has(question.id) && (
+                        <svg 
+                          width="12" 
+                          height="12" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="#fff" 
+                          strokeWidth="3"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="question-header">
+                    <span className="question">Question {index + 1}</span>
+                  </div>
+                  
+                  <div className="question-content">
+                    <div className="question-text">
+                      <MarkdownWithMath content={question.question_text} />
+                    </div>
+                    
+                    {question.question_image && (
+                      <div className="question-image-container">
+                        <img 
+                          src={`data:image/jpeg;base64,${question.question_image}`}
+                          alt={`Question ${index + 1} diagram`}
+                          className="question-image"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="view-modal-footer">
+          <div className="footer-info">
+            Total Questions: {localQuestions.length}
+            {selectedQuestionIds.size > 0 && (
+              <span style={{ marginLeft: '15px', color: '#3b82f6' }}>
+                | Selected: {selectedQuestionIds.size}
+              </span>
+            )}
+          </div>
+          <button className="btn-close-modal" onClick={onHide}>
+            Close
+          </button>
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmModal />
+      </div>
+    </div>
+  );
+};
+
+// Main TeacherDashboard Component
 const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }) => {
   const [homework_code, setHomeworkCode] = useState("");
   const [title, setTitle] = useState("");
@@ -33,8 +487,52 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [isPreviewMode, setIsPreviewMode] = useState(true);
   const [worksheetUploadData, setWorksheetUploadData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [worksheets, setWorksheets] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [worksheetToDelete, setWorksheetToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // New state for viewing worksheet questions
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewWorksheetName, setViewWorksheetName] = useState('');
+  const [viewQuestions, setViewQuestions] = useState([]);
+  const [viewLoading, setViewLoading] = useState(false);
 
   const { username } = useContext(AuthContext);
+
+  // Function to open view modal and fetch questions
+  const openViewModal = async (worksheetName) => {
+    setShowViewModal(true);
+    setViewWorksheetName(worksheetName);
+    setViewLoading(true);
+    setViewQuestions([]);
+
+    try {
+      const response = await axiosInstance.get(`/worksheet-questions/?worksheet_name=${worksheetName}`);
+      console.log('Fetched questions:', response.data.worksheet_questions);
+      
+      // Extract questions from the response
+      if (response.data && response.data.worksheet_questions) {
+        setViewQuestions(response.data.worksheet_questions);
+      } else {
+        setViewQuestions([]);
+      }
+    } catch (error) {
+      console.error('Error fetching worksheet questions:', error);
+      setError('Failed to fetch worksheet questions');
+      setViewQuestions([]);
+    } finally {
+      setViewLoading(false);
+    }
+  };
+
+  // Function to close view modal
+  const closeViewModal = () => {
+    setShowViewModal(false);
+    setViewWorksheetName('');
+    setViewQuestions([]);
+  };
 
   // Fetch classes on component mount
   useEffect(() => {
@@ -49,6 +547,34 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
     }
     fetchClasses();
   }, []);
+
+  const openDeleteModal = (name) => {
+    setWorksheetToDelete(name);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setWorksheetToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!worksheetToDelete) return;
+    try {
+      setIsDeleting(true);
+      // API expects worksheet_name in array form
+      const formData = new FormData();
+      formData.append("worksheet_names", [worksheetToDelete]);
+      await axiosInstance.post('/worksheet-delete/', formData);
+      setWorksheets((prev) => prev.filter((w) => w.worksheet_name !== worksheetToDelete));
+      closeDeleteModal();
+    } catch (err) {
+      console.error('Error deleting worksheet:', err);
+      setError(err.message || 'Failed to delete worksheet');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   // Fetch subjects when class is selected
   useEffect(() => {
@@ -120,7 +646,7 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
       // Process questions to match QuestionListModal format
       const questionsWithImages = savedWorksheets.map((worksheet, index) => ({
         question: worksheet.question_text,
-        question_image: worksheet.question_image,// No base64 images in worksheet upload response
+        question_image: worksheet.question_image,
         level: "Medium", // Default level since not provided
         id: worksheet.id,
         question_id: worksheet.question_id,
@@ -402,6 +928,22 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
     };
   });
 
+  useEffect(() => {
+    async function fetchdata() {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get("/worksheetslist/");
+        console.log(response.data);
+        setWorksheets(response.data);
+      } catch (error) {
+        console.error("Error fetching worksheets:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchdata();
+  }, []);
+
   return (
     <div className="teacher-dashboard">
       {/* Assignment Creation Form */}
@@ -439,10 +981,9 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
             <div className="form-group">
               <label className="form-label">Assignment Type</label>
               <div className="type-buttons">
-              
                 <button
                   type="button"
-                  className={`btn-primary `}
+                  className={`btn-primary`}
                   onClick={() => setSubmissionType("worksheet")}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -772,71 +1313,37 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
           </form>
         </div>
       </div>
-
-      {/* Assignments List */}
-      {/* <div className="dashboard-card assignments-list-card">
-        <div className="card-header">
-          <div className="header-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-          </div>
-          <div>
-            <h2 className="card-title">Your Assignments</h2>
-            <p className="card-description">Manage your created assignments and view submissions</p>
-          </div>
-        </div>
+      
+      <div className="dashboard-card worksheet-list-card">
+        <h3 className="worksheet-list-title">Available Worksheets</h3>
         
-        <div className="card-content">
-          <div className="assignments-list">
-            {mappedAssignments.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-icon">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14,2 14,8 20,8"/>
-                  </svg>
-                </div>
-                <p>No assignments created yet</p>
-              </div>
-            ) : (
-              mappedAssignments.map((assignment) => (
-                <div key={assignment.id} className="assignment-item">
-                  <div className="assignment-header">
-                    <h3 className="assignment-title">{assignment.title}</h3>
-                    <div className="submission-badge">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                      </svg>
-                      {getSubmissionCount(assignment.id)} submissions
-                    </div>
-                  </div>
-                  {assignment.description && (
-                    <p className="assignment-description">{assignment.description}</p>
-                  )}
-                  {assignment.imageUrl && (
-                    <img
-                      src={`data:image/jpeg;base64,${assignment.imageUrl}`}
-                      alt="Assignment"
-                      className="assignment-image"
-                    />
-                  )}
-                  <div className="assignment-dates">
-                    <span>Created: {assignment.createdAt.toLocaleDateString()}</span>
-                    <span>Due: {assignment.dueDate.toLocaleDateString()}</span>
-                  </div>
-                </div>
-              ))
-            )}
+        {loading ? (
+          <div className="loading-container">
+            <p>Loading worksheets...</p>
           </div>
-        </div>
-      </div> */}
+        ) : worksheets.length === 0 ? (
+          <div className="no-worksheets">
+            <p>No worksheets available</p>
+          </div>
+        ) : (
+          <div className="worksheet-list-container">
+            <ul className="worksheet-list">
+              {worksheets.map((worksheet, index) => (
+                <li key={index} className="worksheet-item">
+                  <span className="worksheet-number">{index + 1}.</span>
+                  <span className="worksheet-name">{worksheet.worksheet_name}</span>
+                  <button className="worksheet-action-btn" onClick={() => openViewModal(worksheet.worksheet_name)}>
+                    View
+                  </button>
+                  <button className="worksheet-action-btn" onClick={() => openDeleteModal(worksheet.worksheet_name)}>
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
 
       {/* Question Preview Modal */}
       <QuestionListModal
@@ -851,6 +1358,30 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
         isMultipleSelect={isPreviewMode} // Enable multiple selection in preview mode
         onMultipleSelectSubmit={handleMultipleSelectSubmit}
       />
+
+      {/* View Questions Modal */}
+      <ViewQuestionsModal
+        show={showViewModal}
+        onHide={closeViewModal}
+        worksheetName={viewWorksheetName}
+        questions={viewQuestions}
+        loading={viewLoading}
+      />
+
+      {showDeleteModal && (
+        <div className="modal-overlay" role="dialog" aria-modal="true">
+          <div className="modal-content1">
+            <h4 className="modal-title">Confirm Deletion</h4>
+            <p className="modal-text">Are you sure you want to delete "{worksheetToDelete}"?</p>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={closeDeleteModal} disabled={isDeleting}>Cancel</button>
+              <button className="btn-danger" onClick={handleConfirmDelete} disabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
       setRole("");
       setClassName("");
 
-      window.location.href = "/login";
+      
     }
   };
 
