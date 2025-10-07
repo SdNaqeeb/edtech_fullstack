@@ -133,9 +133,10 @@ axiosInstance.login = async (username, password) => {
     username,
     password,
   });
-  const { access, refresh } = response.data;
+  const { access, refresh,fullname } = response.data;
   setAccessToken(access);
   setRefreshToken(refresh);
+  if(fullname!=null) await localStorage.setItem("fullName", fullname || "");
   return response.data;
 };
 

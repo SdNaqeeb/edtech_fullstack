@@ -1159,12 +1159,12 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
                     <div className="text">
                       
                    
-                      <Badge bg="light" text="dark" className="fs-2 px-3 py-2">
-                        <i className="fas fa-file-alt me-1"></i>
-                        Analysis Report of {submission.student_id || submission.result_json.roll_number}
+                      <Badge bg="light" text="dark" className="homework-text fs-2 px-0 py-2">
+                    
+                        Analysis Report of {submission.student_fullname} ({ submission.student_id || submission.result_json.roll_number}) 
                         
                       </Badge>
-                      <small className="opacity-75">
+                      <small className="opacity-75 px-4">
                         {/* Student: {submission.student_name || 'N/A'} |  */}
                         Submitted: {submission.submission_date ? new Date(submission.submission_date).toLocaleString() : 'N/A'}
                       </small>

@@ -121,7 +121,7 @@ function LoginPage() {
             </div>
             <input
               type="text"
-              placeholder="Student Email"
+              placeholder="Login Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="form-input"

@@ -46,6 +46,16 @@ function SolveQuestion() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState(null);
   const [imageSourceType, setImageSourceType] = useState("upload"); // "upload" or "camera"
+  const [shareWithChat, setShareWithChat] = useState(() => {
+    const stored = localStorage.getItem("include_question_context");
+    return stored === null ? false : stored === "true";
+  });
+
+  // Ensure context sharing starts enabled when entering SolveQuestion
+  useEffect(() => {
+    setShareWithChat(true);
+    localStorage.setItem("include_question_context", "true");
+  }, []);
 
   // Extract data from location state
   const {
@@ -120,6 +130,11 @@ function SolveQuestion() {
       setProcessingButton(null);
     }
   }, [location.state, index, setContextQuestion,]);
+
+  // Persist the share-with-chat preference
+  useEffect(() => {
+    localStorage.setItem("include_question_context", String(shareWithChat));
+  }, [shareWithChat]);
 
   // Helper function to convert base64 to Blob
   const base64ToBlob = (base64Data, mimeType) => {
@@ -574,6 +589,16 @@ function SolveQuestion() {
             />
           )}
           <div className="question-text"><MarkdownWithMath content={currentQuestion.question} /></div>
+          <div className="mt-2">
+            <Form.Check
+              type="switch"
+              id="share-with-chat-toggle"
+              label="Share this question with Chat"
+              checked={shareWithChat}
+              onChange={(e) => setShareWithChat(e.target.checked)}
+              disabled={isAnyButtonProcessing()}
+            />
+          </div>
         </div>
 
         {/* Error Message */}

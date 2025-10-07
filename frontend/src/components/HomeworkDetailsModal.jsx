@@ -1,6 +1,7 @@
 // src/components/HomeworkDetailsModal.jsx
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import MarkdownWithMath from './MarkdownWithMath';
 
 const HomeworkDetailsModal = ({ show, onHide, submission }) => {
   const questions = submission?.result_json?.questions || [];
@@ -31,13 +32,13 @@ const HomeworkDetailsModal = ({ show, onHide, submission }) => {
         ) : (
           questions.map((q, i) => (
             <div key={i} className="mb-4 border p-3 rounded bg-light">
-              <h5><strong>Q{i + 1}:</strong> {q.question}</h5>
+              <h5><strong> Question {i + 1}:</strong> <MarkdownWithMath content={q.question_text || q.question} /></h5>
               
               <p><strong>Score:</strong> {q.total_score} / {q.max_score || q.max_marks}</p>
-              <p><strong>Category:</strong> {q.answer_category || q.error_type}</p>
-              <p><strong>Concepts:</strong> {q.concept_required?.join(", ") || q.concepts_required?.join(", ")}</p>
-              <p><strong>Feedback:</strong> {q.comment || q.gap_analysis}</p>
-              <p><strong>Correction:</strong> {q.correction_comment || q.mistakes_made}</p>
+              <p><strong>Category:</strong> <MarkdownWithMath content={q.answer_category || q.error_type} /></p>
+              <p><strong>Concepts:</strong> <MarkdownWithMath content={q.concept_required?.join(", ") || q.concepts_required?.join(", ")} /></p>
+              <p><strong>Feedback:</strong> <MarkdownWithMath content={q.comment || q.gap_analysis} /></p>
+              <p><strong>Correction:</strong> <MarkdownWithMath content={q.correction_comment || q.mistakes_made} /></p>
             </div>
           ))
         )}

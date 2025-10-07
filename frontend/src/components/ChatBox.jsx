@@ -20,6 +20,7 @@ import "./ChatBox.css";
 import { AuthContext } from './AuthContext';
 import axiosInstance from "../api/axiosInstance";
 import MarkdownViewer from "./MarkdownViewer";
+import { useCurrentQuestion } from "../contexts/CurrentQuestionContext";
 
 // ====== API BASE ======
 const API_URL = "https://chatbot.smartlearners.ai";
@@ -66,6 +67,11 @@ function student_Data() {
 const ChatBox = () => {
   const { username } = useContext(AuthContext);
   const className = localStorage.getItem("class_name");
+  const { currentQuestion } = useCurrentQuestion();
+  const includeQuestionContext = (() => {
+    const stored = localStorage.getItem("include_question_context");
+    return stored === null ? true : stored === "true";
+  })();
 
   const [isOpen, setIsOpen] = useState(false);
   const toggleChat = () => setIsOpen((o) => !o);
@@ -397,7 +403,19 @@ const ChatBox = () => {
     setIsTyping(true);
 
     try {
-      const combinedQuery = `${text || ""} `;
+      // Build combined query with optional context
+      let combinedQuery = `${text || ""}`.trim();
+      if (includeQuestionContext && currentQuestion && (currentQuestion.question || currentQuestion.image)) {
+        const contextParts = [];
+        if (currentQuestion.question) {
+          contextParts.push(`Question: ${currentQuestion.question}`);
+        }
+        // if (currentQuestion.image) {
+        //   contextParts.push(`Question Image: ${currentQuestion.image}`);
+        // }
+        const contextStr = contextParts.join("\n");
+        combinedQuery = [combinedQuery, contextStr].filter(Boolean).join("\n\nContext:\n");
+      }
 
       if (imageFile) {
         // Image upload with message
@@ -432,7 +450,7 @@ const ChatBox = () => {
         // Text-only message
         const requestBody = {
           session_id: sessionId,
-          query: text || "",
+          query: combinedQuery || "",
           language: language,
         };
 

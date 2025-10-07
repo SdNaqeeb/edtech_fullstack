@@ -361,7 +361,7 @@ const UnifiedSessions = () => {
                 Score: <strong>{session.student_score}</strong>
               </span>
             </div>
-            <Button
+            {/* <Button
               variant="outline-info"
               size="sm"
               className="mt-2 gap-analysis-btn"
@@ -371,7 +371,7 @@ const UnifiedSessions = () => {
               }}
             >
               Gap Analysis
-            </Button>
+            </Button> */}
           </div>
           <FontAwesomeIcon icon={faChevronRight} className="session-arrow" />
         </Card.Body>
@@ -428,7 +428,7 @@ const UnifiedSessions = () => {
                   >
                     View Details
                   </Button>
-                  <Button
+                  {/* <Button
                     variant="outline-info"
                     size="sm"
                     className="gap-analysis-btn"
@@ -438,7 +438,7 @@ const UnifiedSessions = () => {
                     }}
                   >
                     Gap Analysis
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </div>
@@ -497,7 +497,7 @@ const UnifiedSessions = () => {
                   >
                     View Details
                   </Button>
-                  <Button
+                  {/* <Button
                     variant="outline-info"
                     size="sm"
                     className="gap-analysis-btn"
@@ -507,7 +507,7 @@ const UnifiedSessions = () => {
                     }}
                   >
                     Gap Analysis
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </div>
