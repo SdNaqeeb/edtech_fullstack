@@ -12,6 +12,7 @@ import ClassAnalysis from './ClassAnalysis';
 import StudentAnalysis from './StudentAnalysis';
 import UploadHomework from './UploadHomework';
 import UploadClasswork from './UploadClasswork';
+import { useAlert } from './AlertBox';
 
 // Mock data for different classes (6th to 12th)
 const classesData = {
@@ -158,6 +159,7 @@ const classesData = {
 };
 
 const EnhancedTeacherDash = () => {
+  const { showAlert, AlertContainer } = useAlert();
   const [selectedClass, setSelectedClass] = useState(classesData[1]);
   const [activeTab, setActiveTab] = useState('homework'); // Now defaults to Worksheets tab
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -238,11 +240,11 @@ const EnhancedTeacherDash = () => {
           setAssignments(prev => [...prev, response.data]);
         }
         
-        alert(`${mode.charAt(0).toUpperCase() + mode.slice(1)} created successfully!`);
+        showAlert(`${mode.charAt(0).toUpperCase() + mode.slice(1)} created successfully!`, "success");
       }
     } catch (error) {
       console.error(`Error creating ${mode}:`, error);
-      alert(`Failed to create ${mode}. Please try again.`);
+      showAlert(`Failed to create ${mode}. Please try again.`, "error");
     }
   };
 
@@ -331,7 +333,9 @@ const renderMainSidebar = () => {
 
   // Main render function
   return (
-    <div className="dashboard-container">
+    <>
+      <AlertContainer />
+      <div className="dashboard-container">
       <div className="dashboard-wrapper">
         <div className="main-dashboard-layout">
           {/* Fixed Sidebar */}
@@ -381,6 +385,7 @@ const renderMainSidebar = () => {
         </div>
       </div>
     </div>
+    </>
   ); 
 };
 

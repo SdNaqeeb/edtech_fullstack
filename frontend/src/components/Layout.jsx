@@ -20,7 +20,7 @@ import { soundManager } from '../utils/SoundManager';
 const Layout = ({ children }) => {
   const navigate = useNavigate();
   const currentLocation = useLocation();
-  const { username, logout,role } = useContext(AuthContext);
+  const { username, logout, role, fullName } = useContext(AuthContext);
   
   // Sound configuration state
   const [showSoundConfig, setShowSoundConfig] = useState(false);

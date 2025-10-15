@@ -11,6 +11,7 @@ import Select from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AuthContext } from "./AuthContext";
 import RecentSessions from "./RecentSessions";
+import { useAlert } from './AlertBox';
 import {
   faSchool,
   faBookOpen,
@@ -38,7 +39,8 @@ import UnifiedSessions from "./UnifiedSessions";
 
 function StudentDash() {
   const navigate = useNavigate();
-  const { username } = useContext(AuthContext);
+  const { username, fullName } = useContext(AuthContext);
+  const { showAlert, AlertContainer } = useAlert();
 
   // Dark mode state with improved persistence
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -378,7 +380,7 @@ function StudentDash() {
       setShowQuestionList(true);
     } catch (error) {
       console.error("Error generating questions:", error);
-      alert("Failed to generate questions. Please try again.");
+      showAlert("Failed to generate questions. Please try again.", "error");
     }
   };
 
@@ -597,7 +599,9 @@ function StudentDash() {
   };
 
   return (
-    <div className={`student-dash-wrapper ${isDarkMode ? 'dark-mode' : ''}`}>
+    <>
+      <AlertContainer />
+      <div className={`student-dash-wrapper ${isDarkMode ? 'dark-mode' : ''}`}>
       {/* Enhanced Fixed Sidebar */}
       <div className="sidebar-fixed">
         {/* <div className="sidebar-header">
@@ -658,7 +662,7 @@ function StudentDash() {
               <h1>
                 
                 <FontAwesomeIcon icon={faGraduationCap} className="me-1" />
-                {getTimeBasedGreeting()}, {username}! 
+                {getTimeBasedGreeting()}, {localStorage.getItem("fullName")}! 
                 <span className="graduation-emoji">🎓</span>
               </h1>
               {/* <p>Class 10 Student • {getMotivationalMessage()}</p> */}
@@ -1071,6 +1075,7 @@ function StudentDash() {
 
       />
     </div>
+    </>
   );
 }
 

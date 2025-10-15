@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [username, setUsername] = useState(() => localStorage.getItem("username") || "");
   const [role, setRole] = useState(() => localStorage.getItem("userRole") || "");
   const [className, setClassName] = useState(() => localStorage.getItem("className") || "");
-  const [fullName, setFullName] = useState("");
+  const [fullName, setFullName] = useState(() => localStorage.getItem("fullName") || "");
 
   // Keep state in sync with localStorage
   useEffect(() => {
@@ -61,13 +61,14 @@ export const AuthProvider = ({ children }) => {
       // Clear localStorage
       localStorage.removeItem("accessToken");
       localStorage.removeItem("username");
-      localStorage.removeItem("role");
+      localStorage.removeItem("userRole");
       localStorage.removeItem("className");
       localStorage.removeItem("streakData");
       localStorage.removeItem("rewardData");
       localStorage.removeItem("completedChapters");
       localStorage.removeItem("lastRoute");
       localStorage.removeItem("fullName");
+      localStorage.removeItem("include_question_context")
 
       // Reset state
       setIsAuthenticated(false);

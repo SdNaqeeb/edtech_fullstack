@@ -16,6 +16,7 @@ import { ProgressContext } from '../contexts/ProgressContext';
 import StudyStreak from './StudyStreak';
 import SubjectProgress from './SubjectProgress';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useAlert } from './AlertBox';
 import { 
   faTrophy, 
   faChartLine, 
@@ -26,6 +27,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const ProgressDashboard = () => {
+  const { showAlert, AlertContainer } = useAlert();
   const { 
     getProgressSummary, 
     redeemReward,
@@ -109,16 +111,18 @@ const ProgressDashboard = () => {
     try {
       const redeemedReward = redeemReward(rewardName);
       if (redeemedReward) {
-        alert(`Successfully redeemed: ${redeemedReward.name}`);
+        showAlert(`Successfully redeemed: ${redeemedReward.name}`, "success");
         setShowRedeemModal(false);
       }
     } catch (error) {
-      alert(error.message);
+      showAlert(error.message, "error");
     }
   };
 
   return (
-    <div className="progress-page-container">
+    <>
+      <AlertContainer />
+      <div className="progress-page-container">
       {/* Study Streak Section */}
       <div className="streak-card">
         <StudyStreak />
@@ -340,6 +344,7 @@ const ProgressDashboard = () => {
         </Modal.Body>
       </Modal>
     </div>
+    </>
   );
 };
 

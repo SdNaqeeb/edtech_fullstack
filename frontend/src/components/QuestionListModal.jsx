@@ -5,6 +5,7 @@ import "./QuestionListModal.css";
 import MarkdownWithMath from "./MarkdownWithMath";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboardCheck, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { useAlert } from './AlertBox';
 
 const QuestionListModal = ({
   show,
@@ -18,6 +19,7 @@ const QuestionListModal = ({
   mode = "" // Add mode prop (homework/classwork)
 }) => {
   const navigate = useNavigate();
+  const { showAlert, AlertContainer } = useAlert();
   const [selectedQuestions, setSelectedQuestions] = useState([]);
 
   // In QuestionListModal.jsx, update the handleQuestionClick function:
@@ -36,7 +38,7 @@ const handleQuestionClick = (questionData, index) => {
         if (prev.length < 20) {
           return [...prev, index];
         } else {
-          alert("You can select up to 20 questions only");
+          showAlert("You can select up to 20 questions only", "warning");
         }
         return prev;
       }
@@ -96,7 +98,7 @@ const handleQuestionClick = (questionData, index) => {
   // Handle multiple question submission (for teachers)
   const handleMultipleSubmit = () => {
     if (selectedQuestions.length === 0) {
-      alert("Please select at least one question");
+      showAlert("Please select at least one question", "warning");
       return;
     }
 
@@ -167,13 +169,15 @@ const handleQuestionClick = (questionData, index) => {
   const showSubmitButton = (isTeacherMode && isWorksheetMode) || isMultipleSelect;
 
   return (
-    <Modal 
-      show={show} 
-      onHide={handleModalClose} 
-      size="lg" 
-      className="question-modal"
-      backdrop="static"
-    >
+    <>
+      <AlertContainer />
+      <Modal 
+        show={show} 
+        onHide={handleModalClose} 
+        size="lg" 
+        className="question-modal"
+        backdrop="static"
+      >
       <Modal.Header closeButton>
         <Modal.Title>{getModalTitle()}</Modal.Title>
       </Modal.Header>
@@ -268,6 +272,7 @@ const handleQuestionClick = (questionData, index) => {
         </div>
       </Modal.Footer>
     </Modal>
+    </>
   );
 };
 

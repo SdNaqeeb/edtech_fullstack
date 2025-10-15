@@ -5,9 +5,11 @@ import CameraCapture from './CameraCapture';
 import QuestionListModal from './QuestionListModal'; // Import the modal
 import { AuthContext } from './AuthContext';
 import MarkdownWithMath from './MarkdownWithMath';
+import { useAlert } from './AlertBox';
 
 // ViewQuestionsModal Component with Delete Functionality
 const ViewQuestionsModal = ({ show, onHide, worksheetName, questions, loading }) => {
+  const { showAlert } = useAlert();
   const [selectedQuestionIds, setSelectedQuestionIds] = useState(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
   const [localQuestions, setLocalQuestions] = useState([]);
@@ -73,13 +75,13 @@ const ViewQuestionsModal = ({ show, onHide, worksheetName, questions, loading })
         setSelectedQuestionIds(new Set());
         
         // Show success message
-        alert(`Successfully deleted ${idsArray.length} question(s)`);
+        showAlert(`Successfully deleted ${idsArray.length} question(s)`, "success");
       } else {
-        alert('Failed to delete questions. Please try again.');
+        showAlert('Failed to delete questions. Please try again.', "error");
       }
     } catch (error) {
       console.error('Error deleting questions:', error);
-      alert('An error occurred while deleting questions. Please try again.');
+      showAlert('An error occurred while deleting questions. Please try again.', "error");
     } finally {
       setIsDeleting(false);
     }
@@ -460,6 +462,7 @@ const ViewQuestionsModal = ({ show, onHide, worksheetName, questions, loading })
 
 // Main TeacherDashboard Component
 const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }) => {
+  const { showAlert, AlertContainer } = useAlert();
   const [homework_code, setHomeworkCode] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -945,7 +948,9 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
   }, []);
 
   return (
-    <div className="teacher-dashboard">
+    <>
+      <AlertContainer />
+      <div className="teacher-dashboard">
       {/* Assignment Creation Form */}
       <div className="dashboard-card create-assignment-card">
         <div className="card-header">
@@ -1383,6 +1388,7 @@ const TeacherDashboard = ({ user, assignments, submissions, onAssignmentSubmit }
         </div>
       )}
     </div>
+    </>
   );
 };
 

@@ -5,8 +5,10 @@ import axiosInstance from '../api/axiosInstance';
 import QuestionListModal from './QuestionListModal';
 import './QuickExerciseComponent.css';
 import MarkdownWithMath from "./MarkdownWithMath";
+import { useAlert } from './AlertBox';
 
 const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
+  const { showAlert, AlertContainer } = useAlert();
   // State for dropdown data
   const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -393,7 +395,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
       }
     } catch (error) {
       console.error("Error generating questions:", error);
-      alert(`Failed to generate questions: ${error.response?.data?.message || error.message}`);
+      showAlert(`Failed to generate questions: ${error.response?.data?.message || error.message}`, "error");
     } finally {
       setIsLoading(false);
     }
@@ -584,7 +586,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
       setSelectedQuestions([]);
       setShowClassworkForm(false);
 
-      alert(`Classwork PDF Processing Started for ${classworkPDFs.length} file(s)`);
+      showAlert(`Classwork PDF Processing Started for ${classworkPDFs.length} file(s)`, "success");
     } catch (error) {
       setClassworkError(error.response?.data?.error || "Failed to upload classwork");
       console.error("Error uploading classwork:", error);
@@ -1542,6 +1544,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
 
   return (
     <>
+      <AlertContainer />
       <div className="quick-exercise-container">
         {/* Add Previous Classwork Button only for classwork mode */}
         {mode === "classwork" && !showClassworkForm && (

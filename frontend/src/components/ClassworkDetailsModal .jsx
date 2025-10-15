@@ -12,6 +12,7 @@ import {
   faLightbulb,
   faBrain
 } from '@fortawesome/free-solid-svg-icons';
+import MarkdownWithMath from './MarkdownWithMath';
 
 const ClassworkDetailsModal = ({ show, onHide, submission }) => {
   const questions = submission?.questions || [];
@@ -32,7 +33,7 @@ const ClassworkDetailsModal = ({ show, onHide, submission }) => {
   const getErrorTypeInfo = (errorType) => {
     switch (errorType) {
       case 'no_error':
-        return { icon: faCheckCircle, color: 'success', label: 'Correct' };
+        return { icon: faCheckCircle, color: 'success', label: 'No error' };
       case 'calculation_error':
         return { icon: faTimesCircle, color: 'danger', label: 'Calculation Error' };
       case 'conceptual_error':
@@ -170,7 +171,7 @@ const ClassworkDetailsModal = ({ show, onHide, submission }) => {
                   {q.mistakes_made && q.mistakes_made !== "Question not attempted" && (
                     <div className="mb-3">
                       <strong className="text-danger">Mistakes Made:</strong>
-                      <p className="mb-0 mt-1">{q.mistakes_made}</p>
+                      <p className="mb-0 mt-1"><MarkdownWithMath content={q.mistakes_made} /></p>
                     </div>
                   )}
 
@@ -181,7 +182,7 @@ const ClassworkDetailsModal = ({ show, onHide, submission }) => {
                         <FontAwesomeIcon icon={faBrain} className="me-2" />
                         Feedback:
                       </strong>
-                      <p className="mb-0 mt-2">{q.gap_analysis}</p>
+                      <p className="mb-0 mt-2"><MarkdownWithMath content={q.gap_analysis} /></p>
                     </div>
                   )}
                 </div>
@@ -195,12 +196,12 @@ const ClassworkDetailsModal = ({ show, onHide, submission }) => {
         <Button variant="secondary" onClick={onHide}>
           Close
         </Button>
-        <Button variant="primary" onClick={() => {
+        {/* <Button variant="primary" onClick={() => {
           // Navigate to detailed gap analysis if needed
           // navigate(`/classwork-gap-analysis/${submission?.classwork_code}`, { state: { submission } });
         }}>
           View Full Gap Analysis
-        </Button>
+        </Button> */}
       </Modal.Footer>
     </Modal>
   );

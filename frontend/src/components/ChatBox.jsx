@@ -17,6 +17,7 @@ import { InlineMath } from "react-katex";
 import axios from "axios";
 import MarkdownWithMath from "./MarkdownWithMath";
 import "./ChatBox.css";
+import { useAlert } from './AlertBox';
 import { AuthContext } from './AuthContext';
 import axiosInstance from "../api/axiosInstance";
 import MarkdownViewer from "./MarkdownViewer";
@@ -66,7 +67,8 @@ function student_Data() {
 // ====== Main Component ======
 const ChatBox = () => {
   const { username } = useContext(AuthContext);
-  const className = localStorage.getItem("class_name");
+  const { showAlert, AlertContainer } = useAlert();
+  const className = localStorage.getItem("className");
   const { currentQuestion } = useCurrentQuestion();
   const includeQuestionContext = (() => {
     const stored = localStorage.getItem("include_question_context");
@@ -173,7 +175,7 @@ const ChatBox = () => {
       console.log("Creating session with student info:", filteredStudentInfo);
 
       const payload = {
-        student_id: username,
+        student_id: localStorage.getItem("fullName"),
         json_data: filteredStudentInfo,
       };
 
@@ -235,11 +237,11 @@ const ChatBox = () => {
   const handleFile = (file) => {
     if (!file) return;
     if (!file.type.match("image.*")) {
-      alert("Please upload an image file");
+      showAlert("Please upload an image file", "warning");
       return;
     }
     if (file.size > 12 * 1024 * 1024) {
-      alert("Image must be ≤ 12MB");
+      showAlert("Image must be ≤ 12MB", "warning");
       return;
     }
     setSelectedFile(file);
@@ -410,9 +412,9 @@ const ChatBox = () => {
         if (currentQuestion.question) {
           contextParts.push(`Question: ${currentQuestion.question}`);
         }
-        // if (currentQuestion.image) {
-        //   contextParts.push(`Question Image: ${currentQuestion.image}`);
-        // }
+        if (currentQuestion.image) {
+          contextParts.push(`Question Image: ${currentQuestion.image}`);
+        }
         const contextStr = contextParts.join("\n");
         combinedQuery = [combinedQuery, contextStr].filter(Boolean).join("\n\nContext:\n");
       }
@@ -495,7 +497,9 @@ const ChatBox = () => {
 
   // ====== Render ======
   return (
-    <div className="chat-box-container">
+    <>
+      <AlertContainer />
+      <div className="chat-box-container">
       {/* Floating Toggle */}
       <button
         className={`chat-toggle-btn ${isOpen ? "open" : ""}`}
@@ -759,6 +763,7 @@ const ChatBox = () => {
         </Modal.Footer>
       </Modal>
     </div>
+    </>
   );
 };
 
