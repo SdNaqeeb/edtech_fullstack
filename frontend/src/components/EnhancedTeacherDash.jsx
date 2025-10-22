@@ -1,4 +1,4 @@
-// EnhancedTeacherDash.jsx - Updated with UploadHomework component
+// EnhancedTeacherDash.jsx
 
 import React, { useState, useEffect } from 'react';
 import './EnhancedTeacherDash.css';
@@ -6,13 +6,19 @@ import axiosInstance from '../api/axiosInstance';
 import TeacherDashboard from './TeacherDashboard';
 import StudentDash from './StudentDash';
 import QuickExerciseComponent from './QuickExerciseComponent';
+import ExamAnalytics from './ExamAnalytics';
+import ProgressTab from './ProgressTab';
+import { useNavigate } from 'react-router-dom';
+
 
 // Import the separated components
 import ClassAnalysis from './ClassAnalysis';
 import StudentAnalysis from './StudentAnalysis';
 import UploadHomework from './UploadHomework';
 import UploadClasswork from './UploadClasswork';
+import ExamCorrection from './ExamCorrection';
 import { useAlert } from './AlertBox';
+import { progress } from 'framer-motion';
 
 // Mock data for different classes (6th to 12th)
 const classesData = {
@@ -158,8 +164,12 @@ const classesData = {
   }
 };
 
+
 const EnhancedTeacherDash = () => {
+
+  const navigate = useNavigate();
   const { showAlert, AlertContainer } = useAlert();
+
   const [selectedClass, setSelectedClass] = useState(classesData[1]);
   const [activeTab, setActiveTab] = useState('homework'); // Now defaults to Worksheets tab
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -173,26 +183,77 @@ const EnhancedTeacherDash = () => {
     fetchTeacherData();
   }, []);
 
-  const fetchTeacherData = async () => {
-    try {
-      const response = await axiosInstance.get('/teacher-dashboard/');
-      console.log('teacher-data', response.data);
-      
-      setTeacherData(response.data);
-      
-      if (response.data.students && response.data.students.length > 0) {
-        setSelectedClass({
-          id: 1,
-          name: "Class 6th",
-          students: response.data.students
-        });
-      }
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching teacher data:', error);
-      setLoading(false);
+  useEffect(() => {
+    // Function for ExamCorrection to switch to analytics
+    window.handleExamAnalyticsView = () => {
+      setActiveTab('exam-analytics');
+    };
+    
+    // Function for ExamAnalytics to switch to correction
+    window.handleExamCorrectionView = () => {
+      setActiveTab('exam-correction');
+    };
+    
+    return () => {
+      delete window.handleExamAnalyticsView;
+      delete window.handleExamCorrectionView;
+    };
+  }, []); // Empty dependency array - only runs once
+
+  // In the useEffect that fetches teacher data, save to localStorage:
+const fetchTeacherData = async () => {
+  try {
+    const response = await axiosInstance.get('/teacher-dashboard/');
+    console.log('teacher-data', response.data);
+    
+    // Detailed logging to see EXACTLY what you're getting
+    console.log('===========================================');
+    console.log('TEACHER DASHBOARD API RESPONSE');
+    console.log('===========================================');
+    console.log('Full Response Object:', response);
+    console.log('Response Status:', response.status);
+    console.log('Response Headers:', response.headers);
+    console.log('===========================================');
+    console.log('RESPONSE DATA:');
+    console.log(JSON.stringify(response.data, null, 2));
+    console.log('===========================================');
+
+    // Check what type of data we got
+    if (response.data.status === 'warning') {
+      console.warn('⚠ WARNING from API:', response.data.message);
+      console.log('Available Students (IDs only):', response.data.available_students);
     }
-  };
+
+    if (response.data.students) {
+      console.log('✅ Got full student data:', response.data.students);
+    } else {
+      console.log('❌ No full student data received, only IDs');
+    }
+    
+    setTeacherData(response.data);
+    
+     // Also log what's being saved to localStorage
+    console.log('Saving to localStorage:', {
+      teacherData: response.data,
+      studentData: response.data.students || []
+    });
+    // Save to localStorage for Progress tab
+    localStorage.setItem('teacherData', JSON.stringify(response.data));
+    localStorage.setItem('studentData', JSON.stringify(response.data.students || []));
+    
+    if (response.data.students && response.data.students.length > 0) {
+      setSelectedClass({
+        id: 1,
+        name: "Class 6th",
+        students: response.data.students
+      });
+    }
+    setLoading(false);
+  } catch (error) {
+    console.error('Error fetching teacher data:', error);
+    setLoading(false);
+  }
+};
 
   const generateStudentData = (studentName, classId) => {
     const baseEfficiency = Math.floor(Math.random() * 30) + 60;
@@ -240,11 +301,11 @@ const EnhancedTeacherDash = () => {
           setAssignments(prev => [...prev, response.data]);
         }
         
-        showAlert(`${mode.charAt(0).toUpperCase() + mode.slice(1)} created successfully!`, "success");
+        showalert(`${mode.charAt(0).toUpperCase() + mode.slice(1)} created successfully!`);
       }
     } catch (error) {
       console.error(`Error creating ${mode}:`, error);
-      showAlert(`Failed to create ${mode}. Please try again.`, "error");
+      
     }
   };
 
@@ -253,7 +314,24 @@ const EnhancedTeacherDash = () => {
     setSelectedStudent(null);
   };
 
-  // Render main sidebar navigation - UPDATED ORDER
+  // Loading state
+  if (loading) {
+    return (
+      <div className="dashboard-container">
+        <div className="dashboard-wrapper">
+          <div className="empty-state">
+            <div>
+              <div className="empty-state-icon">⏳</div>
+              <h3 className="empty-state-title">Loading Dashboard</h3>
+              <p className="empty-state-text">Please wait while we fetch your data...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+   // Render main sidebar navigation - UPDATED ORDER
 const renderMainSidebar = () => {
   return (
     <div className="main-sidebar-container">
@@ -277,7 +355,7 @@ const renderMainSidebar = () => {
           onClick={() => setActiveTab('classwork')}
           className={`main-sidebar-button tab-classwork ${activeTab === 'classwork' ? 'active' : ''}`}
         >
-          ✏️ Classwork
+          ✏ Classwork
         </button>
         <button 
           onClick={() => setActiveTab('upload-classwork')}
@@ -293,8 +371,16 @@ const renderMainSidebar = () => {
         >
           📄 Worksheets
         </button>
+
+        {/* 4. Exam Correction - Fourth */}
+              <button 
+                onClick={() => setActiveTab('exam-correction')}
+                className={`main-sidebar-button tab-exam ${activeTab === 'exam-correction' ? 'active' : ''}`}
+              >
+                📄 Exam Correction
+              </button>
         
-        {/* 4. Class Analysis - Fourth */}
+        {/* 5. Class Analysis - Fifth */}
         <button 
           onClick={() => setActiveTab('class')}
           className={`main-sidebar-button tab-class ${activeTab === 'class' ? 'active' : ''}`}
@@ -302,13 +388,21 @@ const renderMainSidebar = () => {
           📊 Class Analysis
         </button>
         
-        {/* 5. Student Analysis - Fifth */}
+        {/* 6. Student Analysis - Sixth */}
         <button 
           onClick={() => setActiveTab('student')}
           className={`main-sidebar-button tab-student ${activeTab === 'student' ? 'active' : ''}`}
         >
           👤 Student Analysis
         </button>
+
+        {/* 7. Progress - Seventh*/}
+              <button 
+                onClick={() => setActiveTab('progress')}
+                className={`main-sidebar-button tab-progress ${activeTab === 'progress' ? 'active' : ''}`}
+              >
+                📈 Progress
+              </button>
       </div>
     </div>
   );
@@ -380,6 +474,18 @@ const renderMainSidebar = () => {
               <div  style={{ padding: '20px' }}>
                 <QuickExerciseComponent onCreateHomework={(assignment) => handleAssignmentSubmit(assignment, "homework")} />
               </div>
+            ) : activeTab === 'exam-correction' ? (
+              <ExamCorrection />
+            ) : activeTab === 'exam-analytics' ? (
+              <div style={{ padding: '20px', height: 'calc(100vh - 100px)', overflow: 'auto' }}>
+                <ExamAnalytics />
+                </div>
+            ) : activeTab === 'progress' ? (
+              <ProgressTab 
+              teacherData={teacherData}
+              selectedClass={selectedClass}
+              onClassChange={handleClassChange}
+              />
             ) : null}
           </div>
         </div>
@@ -389,4 +495,5 @@ const renderMainSidebar = () => {
   ); 
 };
 
+ 
 export default EnhancedTeacherDash;

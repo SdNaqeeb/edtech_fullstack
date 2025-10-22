@@ -1,0 +1,588 @@
+/* src/components/StudentAnalytics.css */
+
+.student-analytics-container {
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 120px);
+  padding: 20px;
+}
+.student-analytics-container{
+.analytics-header {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.analytics-header h4 {
+  color: #2c3e50;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.analytics-header p {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+/* Analytics Tabs */
+.analytics-tabs {
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.analytics-tabs .nav-link {
+  background-color: linear-gradient(135deg, #1f46bd 0%, #e9ecef 100%);
+  color: #495057;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+}
+
+.analytics-tabs .nav-link:hover {
+  background-color: #dee2e6;
+  transform: translateY(-2px);
+}
+
+.analytics-tabs .nav-link.active {
+  background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(78, 115, 223, 0.25);
+}
+
+/* Cards with Gradient Backgrounds */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none;
+}
+
+.bg-gradient-info {
+  background: linear-gradient(135deg, #00B4DB 0%, #0083B0 100%) !important;
+  border: none;
+}
+
+.bg-gradient-warning {
+  background: linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%) !important;
+  border: none;
+  color: white !important;
+}
+
+.bg-gradient-success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+  border: none;
+}
+
+.bg-gradient-danger {
+  background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%) !important;
+  border: none;
+}
+
+.card-header.bg-gradient-primary,
+.card-header.bg-gradient-info,
+.card-header.bg-gradient-warning,
+.card-header.bg-gradient-success,
+.card-header.bg-gradient-danger {
+  padding: 20px !important;
+  border-radius: 10px 10px 0 0 !important;
+}
+
+/* View Toggle Buttons */
+.view-toggle-btn {
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.view-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn-light.view-toggle-btn {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  color: #495057;
+  border: 1px solid #dee2e6;
+}
+
+.btn-outline-light.view-toggle-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.btn-outline-light.view-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: white;
+  color: white;
+}
+
+/* View Options Container */
+.view-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Enhanced Analytics Tabs */
+.analytics-tabs {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.analytics-tabs .nav-link {
+  background: linear-gradient(135deg, #81e6fa 0%, #e069da 100%);
+  color: #495057;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.analytics-tabs .nav-link:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.analytics-tabs .nav-link.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  border: 1px solid transparent;
+}
+
+/* Table Styling */
+.table {
+  font-size: 13px;
+}
+
+.table thead th {
+  background-color: #f8f9fc;
+  border-bottom: 2px solid #e3e6f0;
+  color: #5a5c69;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  padding: 12px 10px;
+  white-space: nowrap;
+}
+
+.table tbody td {
+  padding: 10px;
+  vertical-align: middle;
+  border-bottom: 1px solid #e3e6f0;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8f9fc;
+}
+
+/* Badge Styling */
+.badge {
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.badge.bg-success {
+  background: #1cc88a !important;
+}
+
+.badge.bg-warning {
+  background: #f6c23e !important;
+  color: #333 !important;
+}
+
+.badge.bg-danger {
+  background: #e74a3b !important;
+}
+
+.badge.bg-primary {
+  background: #4e73df !important;
+}
+
+.badge.bg-info {
+  background: #36b9cc !important;
+}
+
+/* Priority Cards with Vibrant Gradients */
+.bg-danger.bg-opacity-10 {
+  background: linear-gradient(135deg, rgba(238, 9, 121, 0.15) 0%, rgba(255, 106, 0, 0.15) 100%) !important;
+  border-left: 4px solid transparent;
+  border-image: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+  border-image-slice: 1;
+}
+
+.bg-warning.bg-opacity-10 {
+  background: linear-gradient(135deg, rgba(255, 183, 94, 0.15) 0%, rgba(237, 143, 3, 0.15) 100%) !important;
+  border-left: 4px solid transparent;
+  border-image: linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%);
+  border-image-slice: 1;
+}
+
+.bg-success.bg-opacity-10 {
+  background: linear-gradient(135deg, rgba(17, 153, 142, 0.15) 0%, rgba(56, 239, 125, 0.15) 100%) !important;
+  border-left: 4px solid transparent;
+  border-image: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  border-image-slice: 1;
+}
+
+/* Summary Statistics Cards */
+.summary-stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.summary-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Display Number with Gradient */
+.display-3 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Recommendation Cards */
+.bg-light.rounded {
+  background-color: #f8f9fc !important;
+  border: 1px solid #e3e6f0;
+}
+
+/* Form Controls */
+.form-select {
+  border: 1px solid #d1d3e2;
+  border-radius: 5px;
+  font-size: 13px;
+  color: #6e707e;
+  padding: 8px 12px;
+}
+
+.form-select:focus {
+  border-color: #4e73df;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5a5c69;
+  margin-bottom: 8px;
+}
+
+/* Button Styles */
+.btn-success {
+  background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+  border: none;
+  box-shadow: 0 2px 4px rgba(28, 200, 138, 0.3);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+  border: none;
+  box-shadow: 0 2px 4px rgba(78, 115, 223, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #858796 0%, #60616f 100%);
+  border: none;
+  box-shadow: 0 2px 4px rgba(133, 135, 150, 0.3);
+}
+
+.btn-outline-success {
+  color: #1cc88a;
+  border-color: #1cc88a;
+}
+
+.btn-outline-primary {
+  color: #4e73df;
+  border-color: #4e73df;
+}
+
+.btn-outline-secondary {
+  color: #858796;
+  border-color: #858796;
+}
+
+/* Text Colors */
+.text-primary {
+  color: #4e73df !important;
+}
+
+.text-success {
+  color: #1cc88a !important;
+}
+
+.text-info {
+  color: #36b9cc !important;
+}
+
+.text-warning {
+  color: #f6c23e !important;
+}
+
+.text-danger {
+  color: #e74a3b !important;
+}
+
+.text-muted {
+  color: #858796 !important;
+}
+
+/* Shadows */
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .analytics-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 10px;
+  }
+
+  .analytics-tabs .nav-link {
+    white-space: nowrap;
+    font-size: 12px;
+    padding: 8px 15px;
+  }
+
+  .view-options {
+    flex-direction: column;
+    gap: 5px !important;
+  }
+
+  .view-options .btn {
+    width: 100%;
+    font-size: 11px;
+  }
+
+  .display-3 {
+    font-size: 2.5rem;
+  }
+
+  .table {
+    font-size: 11px;
+  }
+
+  .table thead th {
+    font-size: 10px;
+    padding: 8px 5px;
+  }
+
+  .card-header h6 {
+    font-size: 14px;
+  }
+}
+
+/* Dark Mode Support */
+body.dark-mode .student-analytics-container {
+  background-color: #1a1a2e;
+}
+
+body.dark-mode .analytics-header {
+  background: #2c3e50;
+  color: #e0e0e0;
+}
+
+body.dark-mode .analytics-tabs {
+  background: #2c3e50;
+}
+
+body.dark-mode .analytics-tabs .nav-link {
+  background-color: #34495e;
+  color: #b8c1cc;
+}
+
+body.dark-mode .analytics-tabs .nav-link:hover {
+  background-color: #3a4d63;
+  color: #e0e0e0;
+}
+
+body.dark-mode .analytics-tabs .nav-link.active {
+  background: linear-gradient(135deg, #00c1d4 0%, #001b6c 100%);
+  color: white;
+}
+
+body.dark-mode .card {
+  background-color: #2c3e50;
+  color: #e0e0e0;
+}
+
+body.dark-mode .card-header {
+  border-bottom-color: #34495e;
+}
+
+body.dark-mode .card-header.bg-light {
+  background: #34495e !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .table {
+  color: #e0e0e0;
+}
+
+body.dark-mode .table thead th {
+  background-color: #34495e;
+  color: #b8c1cc;
+  border-bottom-color: #495057;
+}
+
+body.dark-mode .table tbody td {
+  border-bottom-color: #495057;
+}
+
+body.dark-mode .table-hover tbody tr:hover {
+  background-color: #34495e;
+}
+
+body.dark-mode .form-select {
+  background-color: #34495e;
+  border-color: #495057;
+  color: #e0e0e0;
+}
+
+body.dark-mode .bg-light.rounded {
+  background-color: #34495e !important;
+  border-color: #495057;
+}
+
+/* Animation Effects */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-pane {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Scrollbar Styling */
+.table-responsive::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Loading State */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3em;
+}
+
+/* Custom Card Hover Effects */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* Priority Chapter Cards Enhanced */
+.priority-card {
+  border-left: 4px solid;
+  transition: all 0.3s ease;
+}
+
+.priority-card.high {
+  border-left-color: #e74a3b;
+}
+
+.priority-card.medium {
+  border-left-color: #f6c23e;
+}
+
+.priority-card.maintain {
+  border-left-color: #1cc88a;
+}
+
+/* Chart Legend Customization */
+.chartjs-legend {
+  padding: 10px 0;
+  font-size: 12px;
+}
+
+/* Print Styles */
+@media print {
+  .student-analytics-container {
+    background: white;
+  }
+  
+  .btn, .view-options {
+    display: none !important;
+  }
+  
+  .card {
+    box-shadow: none;
+    border: 1px solid #dee2e6;
+    page-break-inside: avoid;
+  }
+}
+}

@@ -1045,7 +1045,7 @@ function StudentDash() {
 
                 <div className="form-actions">
                   <Button
-                    variant="primary"
+                  
                     type="submit"
                     className="btn-generate-enhanced"
                     disabled={!isGenerateButtonEnabled()}

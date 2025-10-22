@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Nav, Badge, Row, Col, Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
+import {
   faUser,
   faSchool,
   faHome,
@@ -14,13 +14,15 @@ import {
   faCalculator,
   faSquareRootAlt,
   faBook,
-  faClock
+  faClock,
+  faFileAlt
 } from '@fortawesome/free-solid-svg-icons';
 import axiosInstance from '../api/axiosInstance';
 import SessionDetails from './SessionDetails';
 import './UnifiedSessions.css';
 import HomeworkDetailsModal from './HomeworkDetailsModal';
 import ClassworkDetailsModal from './ClassworkDetailsModal ';
+import ExamDetailsModal from './ExamDetailsModal';
 
 const UnifiedSessions = () => {
   // State for active tab
@@ -35,11 +37,13 @@ const UnifiedSessions = () => {
   const [recentSessions, setRecentSessions] = useState([]);
   const [homeworkSubmissions, setHomeworkSubmissions] = useState([]);
   const [classworkSubmissions, setClassworkSubmissions] = useState([]);
+  const [examResults, setExamResults] = useState([]);
 
   // Loading/error state
   const [loadingSessions, setLoadingSessions] = useState(false);
   const [loadingHomework, setLoadingHomework] = useState(false);
   const [loadingClasswork, setLoadingClasswork] = useState(false);
+  const [loadingExams, setLoadingExams] = useState(false);
   const [error, setError] = useState(null);
 
   // Selection state for self sessions
@@ -53,6 +57,10 @@ const UnifiedSessions = () => {
   // Selection state for classwork
   const [selectedClasswork, setSelectedClasswork] = useState(null);
   const [showClassworkModal, setShowClassworkModal] = useState(false);
+
+  // Selection state for exams
+  const [selectedExam, setSelectedExam] = useState(null);
+  const [showExamModal, setShowExamModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -77,6 +85,8 @@ const UnifiedSessions = () => {
       fetchRecentSessions();
     } else if (activeTab === 'classwork') {
       fetchClassworkSubmissions();
+    } else if (activeTab === 'exams') {
+      fetchExamResults();
     } else {
       fetchHomeworkSubmissions();
     }
@@ -225,6 +235,29 @@ const UnifiedSessions = () => {
     }
   };
 
+  // Fetch exam results
+  const fetchExamResults = async () => {
+    try {
+      setLoadingExams(true);
+      setError(null);
+      const response = await axiosInstance.get('/student-results/');
+
+      if (!response.data) {
+        setExamResults([]);
+        return;
+      }
+
+      // The API returns an object with results array for students
+      const results = response.data.results || [];
+      setExamResults(results);
+    } catch (error) {
+      console.error("Error fetching exam results:", error);
+      setError('Failed to fetch exam results');
+    } finally {
+      setLoadingExams(false);
+    }
+  };
+
   // Get filtered data based on active tab
   const getFilteredData = () => {
     if (activeTab === 'self') {
@@ -232,6 +265,9 @@ const UnifiedSessions = () => {
     }
     if (activeTab === 'classwork') {
       return classworkSubmissions;
+    }
+    if (activeTab === 'exams') {
+      return examResults;
     }
     return homeworkSubmissions;
   };
@@ -243,6 +279,9 @@ const UnifiedSessions = () => {
     }
     if (tabType === 'classwork') {
       return classworkSubmissions.length;
+    }
+    if (tabType === 'exams') {
+      return examResults.length;
     }
     return homeworkSubmissions.length;
   };
@@ -517,11 +556,91 @@ const UnifiedSessions = () => {
     );
   };
 
+  // Helper function to get grade color
+  const getGradeColor = (grade) => {
+    switch (grade) {
+      case 'A': case 'A+': return 'success';
+      case 'B': case 'B+': return 'info';
+      case 'C': case 'C+': return 'warning';
+      case 'D': return 'danger';
+      case 'F': return 'danger';
+      default: return 'secondary';
+    }
+  };
+
+  // Helper function to get percentage color
+  const getPercentageColor = (percentage) => {
+    if (percentage >= 80) return 'success';
+    if (percentage >= 60) return 'info';
+    if (percentage >= 40) return 'warning';
+    return 'danger';
+  };
+
+  // Render exam result card
+  const renderExamCard = (result, index) => {
+    const percentage = result.overall_percentage || 0;
+    const statusInfo = getStatusInfo(result);
+
+    return (
+      <Col key={index} md={4} sm={6} className="mb-3">
+        <Card
+          className={`submission-card ${isDarkMode ? 'dark-card' : ''}`}
+          style={{ borderColor: statusInfo.color }}
+        >
+          <Card.Body>
+            <div className="d-flex align-items-start">
+              <div className="submission-info flex-grow-1">
+                <h5 className="submission-title mb-1">
+                  {result.exam_name || 'Exam'}
+                </h5>
+                <div className="submission-meta mb-2">
+                  <small className="text-muted d-block">
+                    {result.class_section || 'N/A'} | {result.exam_type || 'N/A'}
+                  </small>
+                  <div className="mt-1">
+                    <Badge bg={getGradeColor(result.grade)}>
+                      Grade {result.grade || 'N/A'}
+                    </Badge>
+                    <Badge bg={getPercentageColor(percentage)} className="ms-2">
+                      {percentage.toFixed(1)}%
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="mt-2">
+                  <small className="text-muted">
+                    <strong>Score:</strong> {result.total_marks_obtained || 0} / {result.total_max_marks || 0}
+                  </small>
+                </div>
+
+                <div className="mt-3">
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    className="view-details-btn"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setSelectedExam(result);
+                      setShowExamModal(true);
+                    }}
+                  >
+                    View Details
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card.Body>
+        </Card>
+      </Col>
+    );
+  };
+
   // Grid data + loading
   const filteredData = getFilteredData();
-  const isLoading = 
+  const isLoading =
     (activeTab === 'self' && loadingSessions) ||
     (activeTab === 'classwork' && loadingClasswork) ||
+    (activeTab === 'exams' && loadingExams) ||
     (activeTab === 'homework' && loadingHomework);
 
   return (
@@ -564,7 +683,22 @@ const UnifiedSessions = () => {
         </Nav.Item>
         
         <Nav.Item>
-          <Nav.Link 
+          <Nav.Link
+            active={activeTab === 'exams'}
+            onClick={() => setActiveTab('exams')}
+            className={`d-flex align-items-center ${activeTab === 'exams' ? 'active' : ''}`}
+            data-tab="exams"
+          >
+            <FontAwesomeIcon icon={faFileAlt} className="me-2" />
+            Exams
+            <Badge pill className="ms-2 tab-badge">
+              {getTabCount('exams')}
+            </Badge>
+          </Nav.Link>
+        </Nav.Item>
+
+        <Nav.Item>
+          <Nav.Link
             active={activeTab === 'homework'}
             onClick={() => setActiveTab('homework')}
             className={`d-flex align-items-center ${activeTab === 'homework' ? 'active' : ''}`}
@@ -591,12 +725,13 @@ const UnifiedSessions = () => {
           <div className="text-center py-4 text-danger">
             {error}
             <div className="mt-2">
-              <Button 
+              <Button
                 variant="outline-primary"
-                size="sm" 
+                size="sm"
                 onClick={() => {
                   if (activeTab === 'self') fetchRecentSessions();
                   else if (activeTab === 'classwork') fetchClassworkSubmissions();
+                  else if (activeTab === 'exams') fetchExamResults();
                   else fetchHomeworkSubmissions();
                 }}
               >
@@ -606,8 +741,10 @@ const UnifiedSessions = () => {
           </div>
         ) : filteredData.length === 0 ? (
           <div className="text-center py-4 no-data-message">
-            {activeTab === 'self' 
+            {activeTab === 'self'
               ? 'You have not attempted any questions in recent sessions.'
+              : activeTab === 'exams'
+              ? 'No exam results found.'
               : `No ${activeTab} submissions found.`}
           </div>
         ) : (
@@ -615,11 +752,14 @@ const UnifiedSessions = () => {
             {activeTab === 'self' && 
               filteredData.map((session, index) => renderSessionCard(session, index))
             }
-            {activeTab === 'homework' && 
+            {activeTab === 'homework' &&
               filteredData.map((submission, index) => renderHomeworkCard(submission, index))
             }
-            {activeTab === 'classwork' && 
+            {activeTab === 'classwork' &&
               filteredData.map((submission, index) => renderClassworkCard(submission, index))
+            }
+            {activeTab === 'exams' &&
+              filteredData.map((result, index) => renderExamCard(result, index))
             }
           </Row>
         )}
@@ -649,6 +789,15 @@ const UnifiedSessions = () => {
           show={showClassworkModal}
           onHide={() => setShowClassworkModal(false)}
           submission={selectedClasswork}
+        />
+      )}
+
+      {/* Exam Details Modal */}
+      {selectedExam && (
+        <ExamDetailsModal
+          show={showExamModal}
+          onHide={() => setShowExamModal(false)}
+          result={selectedExam}
         />
       )}
     </Container>

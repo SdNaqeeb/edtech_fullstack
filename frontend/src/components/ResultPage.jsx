@@ -43,7 +43,9 @@ const ResultPage = () => {
     total_marks, 
     question_marks,
     question_image_base64,
-    student_answer_base64 // Add this to get the processed student image from API
+    student_answer_base64, // Add this to get the processed student image from API
+    videos = [],
+    real_world_videos = []
   } = ai_data || {};
   console.log('AI Data:', ai_data);
   const formated_concepts_used = Array.isArray(concepts_used)
@@ -341,6 +343,40 @@ const ResultPage = () => {
       </div>
     );
   };
+// Function to render video cards (for concept videos or real-world applications)
+  const renderVideoSection = (videosArray, title) => {
+    if (!Array.isArray(videosArray) || videosArray.length === 0) return null;
+
+    return (
+      <div className="video-section">
+        <h5 className="video-section-title">{title}</h5>
+        <div className="video-list">
+          {videosArray.map((video, index) => (
+            <div key={index} className="video-card">
+              <a
+                href={video.url || video.embed_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src={video.thumbnail}
+                  alt={video.title}
+                  className="video-thumbnail"
+                />
+              </a>
+              <div className="video-info">
+                <p className="video-title"><strong>{video.title}</strong></p>
+                <p className="video-channel">{video.channel}</p>
+                <p className="video-meta">
+                  ⏱ {video.duration} | 👁 {video.views} | 👍 {video.likes}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const renderContentBasedOnAction = () => {
     if (!actionType) {
@@ -462,40 +498,72 @@ const ResultPage = () => {
                       <strong>{`Concept ${index + 1}`}</strong>
                     </Accordion.Header>
                     <Accordion.Body>
-                      <p className="concept-title"><strong>{conceptItem.concept}</strong></p>
-                      {/* <p className="chapter-name"><strong>Chapter Name:</strong> {conceptItem.chapter}</p> */}
-                      <div className="example-section">
-                        <p className="example-header"><strong>Example:</strong></p>
-                        {/* {formatExampleContent(conceptItem['example'])} */}
-                        {/* {console.log('Concept example:', conceptItem.example)}
-                        {console.log('Concept ex-solution:', conceptItem.application)} */}
-                        {conceptItem.example && (
-                          <div className="example-content">
-                            {typeof conceptItem.example === "string" ? (
-                              <>
-                                <MarkdownWithMath content={conceptItem.example} />
-                                <strong className="example-header">Solution:</strong>
-                                <MarkdownWithMath content={conceptItem.application} />
-                              </>
-                            ) : (
-                              <>
-                                {conceptItem.example.problem && (
-                                  <MarkdownWithMath content={conceptItem.example.problem} />
-                                )}
-                                {conceptItem.example.solution && (
-                                  <>
-                                    <strong className="example-header">Solution:</strong>
-                                    <MarkdownWithMath content={conceptItem.example.solution} />
-                                  </>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        )}
+                      <p className="concept-title">
+                        <strong>{conceptItem.concept}</strong>
+                      </p>
+                       <p className="example-content">
+                        <strong className='example-header'>Explanation:</strong>
+                      </p>
+                      <p>  <MarkdownWithMath content={conceptItem.explanation} /></p>
 
-                      </div>
-                      <p className="explanation"><strong>Explanation:</strong> <MarkdownWithMath content={conceptItem.explanation} /></p>
-                      
+                      {/* 🧮 Example Section */}
+                      {conceptItem.example && (
+                        <div className="example-content pt-3">
+                          {typeof conceptItem.example === "string" ? (
+                            <>
+                            <p className="example-content">
+                        <strong className='example-header'>Example:</strong>
+                      </p>
+                              <MarkdownWithMath content={conceptItem.example} />
+                              <strong className="example-header">Solution:</strong>
+                              <MarkdownWithMath content={conceptItem.application} />
+                            
+                            </>
+                          ) : (
+                            <>
+                              {conceptItem.example.problem && (
+                                <MarkdownWithMath content={conceptItem.example.problem} />
+                              )}
+                              {conceptItem.example.solution && (
+                                <>
+                                  <strong className="example-header">Solution:</strong>
+                                  <MarkdownWithMath content={conceptItem.example.solution} />
+                                  <MarkdownWithMath content={conceptItem.example.explaination} />
+                                </>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      {/* 🟦 Add filtered video + real world video sections */}
+                      {Array.isArray(videos) && videos.length > 0 && (
+                        videos
+                          .filter(
+                            (item) =>
+                              item.concept_name?.toLowerCase().trim() ===
+                              conceptItem.concept?.toLowerCase().trim()
+                          )
+                          .map((item, idx) => (
+                            <div key={idx}>
+                              {/* Concept Explanation Videos */}
+                              {Array.isArray(item.videos) && item.videos.length > 0 && (
+                                renderVideoSection(
+                                  item.videos,
+                                  `Concept Explanation Videos`
+                                )
+                              )}
+
+                              {/* Real World Applications */}
+                              {item.real_world_video && (
+                                renderVideoSection(
+                                  [item.real_world_video],
+                                  // `${item.concept_name} - Real World Applications`
+                                )
+                              )}
+                            </div>
+                          ))
+                      )}
                     </Accordion.Body>
                   </Accordion.Item>
                 ))}

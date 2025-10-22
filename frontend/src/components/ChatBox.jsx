@@ -49,20 +49,7 @@ const formatMessage = (text) => {
   return <MarkdownWithMath content={text} />;
 };
 
-// ====== Fetch Student Data Function ======
-function student_Data() {
-  return axiosInstance.post("dummy/", {
-    homework: "true",
-    agentic_data: "true",
-  })
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      console.error("❌ Error fetching dummy data:", error);
-      throw error;
-    });
-}
+
 
 // ====== Main Component ======
 const ChatBox = () => {
@@ -130,67 +117,123 @@ const ChatBox = () => {
   }, [username]);
 
   // ====== Session handling ======
+  const fetchStudentData = async () => {
+    try {
+      console.log("Fetching student data for:", username)
+      const response = await axiosInstance.post("dummy/", {
+        homework: "true",
+        agentic_data: "true",
+      })
+
+      console.log("✅ Student Data Response:", response.data)
+
+      if (response.data && response.data[username]) {
+        console.log("📦 Student data found for", username)
+        return response.data[username]
+      } else {
+        console.warn("⚠ No student data found for", username)
+        return null
+      }
+    } catch (error) {
+      console.error("❌ Error fetching student data:", error)
+      return null
+    }
+  }
+
+  const fetchExamData = async () => {
+    try {
+      console.log("Fetching student data for:", username)
+      const response = await axiosInstance.get("questions-evaluated/")
+
+      console.log("✅ Student Data Response:", response.data)
+
+      if (response.data) {
+        console.log("📦 Student data found for", username)
+        return response.data
+      } else {
+        console.warn("⚠ No student data found for", username)
+        return null
+      }
+    } catch (error) {
+      console.error("❌ Error fetching student data:", error)
+      return null
+    }
+  }
+
   const fetchStudentDataAndCreateSession = async () => {
-    setConnectionStatus("checking");
-    console.log("Fetching student data and creating session for:", username);
+    setConnectionStatus("checking")
+    console.log("Fetching student data and creating session for:", username)
 
     try {
-      // First, fetch the student data
-      const data = await student_Data();
+      const data = await fetchStudentData()
+      const examdata = await fetchExamData()
+      console.log("Fetched exam data:", examdata)
 
-      let filteredData = null;
-      if (data && data[username]) {
-        filteredData = data[username];
-        setStudentInfo(filteredData);
-        console.log("✅ Student data fetched:", filteredData);
+      let filteredData = null
+      if (data) {
+        filteredData = data
+        setStudentInfo(filteredData)
+        console.log("✅ Student data fetched:", filteredData)
       } else {
-        console.warn("⚠️ No student data found for", username);
+        console.warn("⚠️ No student data found for", username)
       }
 
-      // Now create session with the fetched data
-      await createSessionWithData(filteredData);
+      await createSessionWithData(filteredData, examdata)
 
     } catch (err) {
-      console.error("❌ Failed to fetch student data or create session:", err);
-      setConnectionStatus("disconnected");
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: "conn_fail",
-          text: "⚠️ Unable to connect to AI service right now. Please refresh the page or try again later.",
-          sender: "ai",
-          timestamp: new Date(),
-        },
-      ]);
+      console.error("❌ Failed to fetch student data or create session:", err)
+      setConnectionStatus("disconnected")
+      setMessages([{
+        id: "conn_fail",
+        text: "⚠️ Unable to connect to AI service right now. Please refresh the page or try again later.",
+        sender: "ai",
+        timestamp: new Date(),
+      }])
     }
-  };
+  }
 
-  const createSessionWithData = async (studentData) => {
+  const createSessionWithData = async (studentData, examData) => {
     try {
-      // Use the passed studentData directly, not the state
       const filteredStudentInfo = {
         data: studentData || {},
-      };
+      }
 
-      console.log("Creating session with student info:", filteredStudentInfo);
+     console.log("Creating session with student info:", filteredStudentInfo);
+console.log("Student ID:", localStorage.getItem("fullName") || username || "guest_user");
+console.log("Exam data:", examData);
+console.log("Class name:", className || "default_class");
 
-      const payload = {
-        student_id: localStorage.getItem("fullName"),
-        json_data: filteredStudentInfo,
-      };
+// Create FormData object
+const formData = new FormData();
+formData.append("student_name", localStorage.getItem("fullName") || username || "guest_user");
+formData.append("json_data", JSON.stringify(filteredStudentInfo));  // serialize JSON
+formData.append("exam_data", JSON.stringify(examData || {}));       // serialize JSON
+formData.append("class_name", className || "default_class");
 
-      const res = await api.post("/create_session", payload);
-      console.log("create_session response:", res.data);
+// Log formData entries for debugging
+for (let [key, value] of formData.entries()) {
+  console.log(`${key}:`, value);
+}
 
-      if (!res.data?.session_id) throw new Error("No session_id");
+// Send the request using FormData
+const res = await api.post("/create_session", formData, {
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
+});
 
-      setSessionId(res.data.session_id);
-      setConnectionStatus("connected");
-      console.log("Session created successfully:", res.data.session_id);
+
+      console.log("create_session response:", res.data)
+
+      if (!res.data?.session_id) throw new Error("No session_id")
+
+      setSessionId(res.data.session_id)
+      setConnectionStatus("connected")
+      console.log("Session created successfully:", res.data.session_id)
 
     } catch (e) {
-      console.error("create_session error:", e);
-      setConnectionStatus("disconnected");
+      console.error("create_session error:", e)
+      setConnectionStatus("disconnected")
       setMessages((prev) => [
         ...prev,
         {
@@ -199,9 +242,9 @@ const ChatBox = () => {
           sender: "ai",
           timestamp: new Date(),
         },
-      ]);
+      ])
     }
-  };
+  }
 
   const clearChat = async () => {
     if (!sessionId) return;
@@ -471,7 +514,7 @@ const ChatBox = () => {
           ...prev,
           {
             id: id + 1,
-            text: res?.data?.reply || "I received your message!",
+            text: res?.data?.response || "I received your message!",
             sender: "ai",
             timestamp: new Date(),
             audioUrl: aiAudioUrl,
