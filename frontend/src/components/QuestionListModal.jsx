@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./QuestionListModal.css";
 import MarkdownWithMath from "./MarkdownWithMath";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClipboardCheck, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faClipboardCheck, faCheckCircle, faBookOpenReader } from "@fortawesome/free-solid-svg-icons";
 import { useAlert } from './AlertBox';
 
 const QuestionListModal = ({
@@ -27,7 +27,7 @@ const QuestionListModal = ({
 const handleQuestionClick = (questionData, index) => {
   // Check if we're in teacher mode
   const isTeacherMode = window.location.pathname.includes('teacher-dash');
-  
+
   if (isTeacherMode || isMultipleSelect) {
     // Multiple selection for teachers
     setSelectedQuestions((prev) => {
@@ -51,8 +51,16 @@ const handleQuestionClick = (questionData, index) => {
         ? `data:image/png;base64,${questionData.question_image}`
         : null,
       question_id: questionData.question_id || questionData.id || index,
+      context: questionData.context || null,
     };
-    onQuestionClick(selectedQuestion.question, index, selectedQuestion.image, selectedQuestion.question_id);
+  
+    onQuestionClick(
+      selectedQuestion.question,
+      index,
+      selectedQuestion.image,
+      selectedQuestion.question_id,
+      selectedQuestion.context
+    );
   }
 };
 
@@ -89,6 +97,9 @@ const handleQuestionClick = (questionData, index) => {
       level: questionData.level || '',
       worksheet_name: worksheetName || ''
     };
+    if(questionData.context){
+      selectedQuestion.context=questionData.context
+    }
 
     console.log("Navigating to solve page with:", selectedQuestion);
     navigate("/solve", { state: selectedQuestion });
@@ -207,6 +218,13 @@ const handleQuestionClick = (questionData, index) => {
                     <div className="question-text">
                       {renderQuestionContent(questionData)}
                     </div>
+
+                    {questionData.context && (
+                      <div className="context-indicator">
+                      <FontAwesomeIcon icon={faBookOpenReader} />
+                        <span className="context-preview"><MarkdownWithMath content={questionData.context} /></span>
+                      </div>
+                    )}
 
                     <div
                       className={`question-level ${

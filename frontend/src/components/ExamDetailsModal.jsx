@@ -129,9 +129,9 @@ const ExamDetailsModal = ({ show, onHide, result }) => {
       if (response.data) {
         // API returns an array with one object containing questions_evaluation
         let data = Array.isArray(response.data) ? response.data[0] : response.data;
-        data=data?.question_data?.[0] || [];
-   console.log("Fetched questions evaluation:", data);  
-   
+        data = data?.question_data?.[0] || [];
+        console.log("Fetched questions evaluation:", data);
+
         setQuestionsEvaluation(data);
         setShowQuestions(true);
       }
@@ -144,7 +144,7 @@ const ExamDetailsModal = ({ show, onHide, result }) => {
   };
 
   return (
-    <Modal show={show} onHide={onHide} size="lg" scrollable centered>
+    <Modal show={show} onHide={onHide} size="xl" scrollable centered>
       <Modal.Header closeButton className="bg-primary text-white">
         <Modal.Title>
           <FontAwesomeIcon icon={faFileAlt} className="me-2" />
@@ -154,7 +154,7 @@ const ExamDetailsModal = ({ show, onHide, result }) => {
 
       <Modal.Body>
         {/* Exam Overview */}
-        <div className="mb-4 p-3 bg-light rounded">
+        <div className="mb-2 p-3 bg-light rounded">
           <div className="row">
             <div className="col-md-6">
               <p className="mb-2">
@@ -290,12 +290,12 @@ const ExamDetailsModal = ({ show, onHide, result }) => {
 
         {/* No detailed data available */}
         {(!result?.questions || result.questions.length === 0) &&
-         (!strengths.length && !improvements.length) && !showQuestions && (
-          <Alert variant="info">
-            <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
-            No detailed analysis available for this exam.
-          </Alert>
-        )}
+          (!strengths.length && !improvements.length) && !showQuestions && (
+            <Alert variant="info">
+              <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
+              No detailed analysis available for this exam.
+            </Alert>
+          )}
 
         {/* Questions Evaluation Section */}
         {showQuestions && questionsEvaluation && (
@@ -334,9 +334,9 @@ const ExamDetailsModal = ({ show, onHide, result }) => {
                           <FontAwesomeIcon icon={faClipboardCheck} className="me-2" />
                           {question.question_number || `Question ${index + 1}`}
                         </h6>
-                        <div className="d-flex gap-2 align-items-center">
+                        <div className="d-flex gap-2 align-items-center ">
                           {question.total_score !== undefined && question.max_marks !== undefined && (
-                            <Badge bg="light" text="dark">
+                            <Badge bg="light" text="dark" >
                               {question.total_score} / {question.max_marks} marks
                             </Badge>
                           )}
@@ -380,48 +380,81 @@ const ExamDetailsModal = ({ show, onHide, result }) => {
                             <FontAwesomeIcon icon={faLightbulb} className="me-2" />
                             Concepts Required:
                           </strong>
-                          <div className="d-flex flex-wrap gap-2">
-                            {question.concepts_required.map((concept, idx) => (
-                              <Badge key={idx} bg="info" className="px-2 py-1">
-                                {concept}
-                              </Badge>
-                            ))}
+
+                          <div className="d-flex flex-column gap-2">
+                            {question.concepts_required.map((concept, idx) => {
+                              // Handle both string and object formats
+                              const conceptName =
+                                typeof concept === "object" && concept.concept_name
+                                  ? concept.concept_name
+                                  : concept;
+
+                              const conceptDescription =
+                                typeof concept === "object" && concept.concept_description
+                                  ? concept.concept_description
+                                  : null;
+
+                              return (
+                                <div key={idx} className="d-flex flex-column">
+                                  <Badge
+                                    bg="info"
+                                    className="px-3 py-2 align-self-start"
+                                    style={{ fontSize: '14px' }}
+                                  >
+                                    {conceptName}
+                                  </Badge>
+                                  {conceptDescription && (
+                                    <div className="mt-2 ms-2 p-2 bg-light rounded border border-info" style={{ fontSize: '13px' }}>
+                                      <MarkdownWithMath content={conceptDescription} />
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
 
-                      {/* Mistakes Made */}
-                      {question.mistakes_made && (
-                        <Alert variant="danger" className="mb-3">
-                          <strong>
-                            <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
-                            Mistakes Made:
-                          </strong>
-                          <div className="mt-2">
-                            <MarkdownWithMath content={question.mistakes_made} />
-                          </div>
-                          {question.mistake_section && (
-                            <div className="mt-2">
-                              <small className="text-muted">
-                                <strong>Section:</strong> {question.mistake_section}
-                              </small>
-                            </div>
-                          )}
-                        </Alert>
-                      )}
 
-                      {/* Gap Analysis */}
-                      {question.gap_analysis && (
-                        <Alert variant="warning" className="mb-0">
-                          <strong>
-                            <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
-                            Gap Analysis:
-                          </strong>
-                          <div className="mt-2">
-                            <MarkdownWithMath content={question.gap_analysis} />
-                          </div>
-                        </Alert>
-                      )}
+                      {/* Mistakes Made and Gap Analysis - Column Layout */}
+                      <div className="d-flex flex-column gap-3">
+                        {/* Mistakes Made */}
+                        {question.mistakes_made && (
+                          <Alert variant="danger" className="mb-0">
+                            <div className="d-flex flex-column">
+                              <strong className="mb-2">
+                                <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
+                                Mistakes Made:
+                              </strong>
+                              <div className="ms-0">
+                                <MarkdownWithMath content={question.mistakes_made} />
+                              </div>
+                              {question.mistake_section && (
+                                <div className="mt-2">
+                                  <small className="text-muted">
+                                    <strong>Section:</strong> {question.mistake_section}
+                                  </small>
+                                </div>
+                              )}
+                            </div>
+                          </Alert>
+                        )}
+
+                        {/* Gap Analysis */}
+                        {question.gap_analysis && (
+                          <Alert variant="warning" className="mb-0">
+                            <div className="d-flex flex-column">
+                              <strong className="mb-2">
+                                <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
+                                Gap Analysis:
+                              </strong>
+                              <div className="ms-0">
+                                <MarkdownWithMath content={question.gap_analysis} />
+                              </div>
+                            </div>
+                          </Alert>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -448,7 +481,7 @@ const ExamDetailsModal = ({ show, onHide, result }) => {
         <Button variant="secondary" onClick={onHide}>
           Close
         </Button>
-        {(result?.result_id ) && (
+        {(result?.result_id) && (
           <Button
             variant="primary"
             onClick={fetchQuestionsEvaluation}

@@ -126,6 +126,36 @@
   hyphens: auto; /* FIXED: Add hyphenation for better breaking */
 }
 
+/* Context indicator styling */
+.context-indicator {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: rgba(139, 92, 246, 0.08);
+  border-left: 3px solid #8B5CF6;
+  border-radius: 6px;
+  max-width: 100%;
+}
+
+.context-indicator .svg-inline--fa{
+  margin-right: 6px;
+  color: #8B5CF6;
+}
+.context-preview {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  font-style: italic;
+}
+
 /* FIXED: Priority level badge positioning */
 
 
@@ -401,4 +431,13 @@
 .dark-mode .modal-footer {
   background: rgba(15, 23, 42, 0.9) !important;
   border-top: 1px solid rgba(51, 65, 85, 0.5) !important;
+}
+
+.dark-mode .context-indicator {
+  background: rgba(139, 92, 246, 0.2) !important;
+  border-left-color: #a78bfa !important;
+}
+
+.dark-mode .context-preview {
+  color: #cbd5e1 !important;
 }

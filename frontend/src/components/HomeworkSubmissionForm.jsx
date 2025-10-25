@@ -192,7 +192,7 @@ const HomeworkSubmissionForm = () => {
 
   return (
     <div className="submission-form-container">
-      <div className="submission-card">
+      <div className="submission-card1">
         <div className="card-header">
           <div className="header-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

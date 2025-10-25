@@ -460,23 +460,23 @@ const ResultPage = () => {
             {renderScore()}
             {comment && (
               <div className="result-question">
-                <p><strong>Comments:</strong> {comment}</p>
+                <p><strong>Comments:</strong> <MarkdownWithMath content={comment} /></p>
               </div>
             )}
             {gap_analysis && (
               <div className="result-question">
-                <p><strong>Gap Analysis:</strong> {gap_analysis}</p>
+                <p><strong>Gap Analysis:</strong><MarkdownWithMath content={gap_analysis} /></p>
               </div>
             )}
 
             {error_type && (
               <div className="result-question">
-                <p><strong>Type of Error:</strong> {error_type}</p>
+                <p><strong>Type of Error:</strong> <MarkdownWithMath content={error_type} /></p>
               </div>
             )}
             {time_analysis && (
               <div className="result-question">
-                <p><strong>Time-Management:</strong> {time_analysis}</p>
+                <p><strong>Time-Management:</strong><MarkdownWithMath content={time_analysis} /> </p>
               </div>
             )}
             {formated_concepts_used && (

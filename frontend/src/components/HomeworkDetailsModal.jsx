@@ -175,7 +175,7 @@ const HomeworkDetailsModal = ({ show, onHide, submission }) => {
 
           {/* Summary Stats */}
           {questions.length > 0 && (
-            <div className="row mt-3">
+            <div className="row mt-3 d-flex justify-content-around">
               <div className="col-md-4">
                 <div className="text-center">
                   <FontAwesomeIcon icon={faClipboardCheck} className="text-primary mb-1" size="lg" />
@@ -183,18 +183,7 @@ const HomeworkDetailsModal = ({ show, onHide, submission }) => {
                   <p className="mb-0 fw-bold">{questions.length}</p>
                 </div>
               </div>
-              <div className="col-md-4">
-                <div className="text-center">
-                  <FontAwesomeIcon icon={faCheckCircle} className="text-success mb-1" size="lg" />
-                  <p className="mb-0 small text-muted">Correct Answers</p>
-                  <p className="mb-0 fw-bold">
-                    {questions.filter(q => 
-                      (q.answer_category || q.error_type || '').toLowerCase().includes('correct') || 
-                      (q.answer_category || q.error_type || '').toLowerCase().includes('no_error')
-                    ).length}
-                  </p>
-                </div>
-              </div>
+             
               <div className="col-md-4">
                 <div className="text-center">
                   <FontAwesomeIcon icon={faStar} className="text-warning mb-1" size="lg" />

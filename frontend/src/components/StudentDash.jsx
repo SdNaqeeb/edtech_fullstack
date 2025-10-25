@@ -1,6 +1,5 @@
 // Enhanced StudentDash.jsx - Modern Design with Better UX and Chapter Debugging - FIXED
 import React, { useState, useEffect, useContext } from "react";
-import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import { Form, Button, Row, Col, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +9,6 @@ import QuestionListModal from "./QuestionListModal";
 import Select from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AuthContext } from "./AuthContext";
-import RecentSessions from "./RecentSessions";
 import { useAlert } from './AlertBox';
 import {
   faSchool,
@@ -362,12 +360,13 @@ function StudentDash() {
       const response = await axiosInstance.post("/question-images/", requestData);
       // console.log("the response data is :", response.data);
 
-      // Process questions with images
+      // Process questions with images and context
       const questionsWithImages = (response.data.questions || []).map((question, index) => ({
         ...question,
         id: index,
-        question_id:question.id,
+        question_id: question.id,
         question: question.question,
+        context: question.context || null,
         image: question.question_image
           ? `data:image/png;base64,${question.question_image}`
           : null,
@@ -385,11 +384,11 @@ function StudentDash() {
   };
 
   // Enhanced question click handler
-  const handleQuestionClick = (question, index, image,question_id) => {
-    console.log("Question clicked:", { question, index, image, question_id });
-    
+  const handleQuestionClick = (question, index, image, question_id, context) => {
+    console.log("Question clicked:", { question, index, image, question_id, context });
+
     setShowQuestionList(false);
-    
+
     navigate("/solvequestion", {
       state: {
         question,
@@ -402,8 +401,9 @@ function StudentDash() {
         subtopic: questionType === "external" ? questionLevel : "",
         worksheet_id: questionType === "worksheets" ? selectedWorksheet : "",
         image,
+        context: context || null,
         selectedQuestions: selectedQuestions,
-      
+
       },
     });
   };
@@ -425,6 +425,7 @@ function StudentDash() {
         subtopic: questionType === "external" ? questionLevel : "",
         worksheet_id: questionType === "worksheets" ? selectedWorksheet : "",
         image: firstQuestion.image,
+        context: firstQuestion.context || null,
         selectedQuestions: selectedQuestionsData,
       },
     });

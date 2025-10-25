@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Form, Button, Spinner, Alert, Row, Col } from "react-bootstrap";
 import axiosInstance from "../api/axiosInstance";
 import "./SolveQuestion.css";
+import { faBookOpenReader,faArrowDown ,faCaretDown} from "@fortawesome/free-solid-svg-icons";
 import QuestionListModal from "./QuestionListModal";
 import { ProgressContext } from "../contexts/ProgressContext";
 import { NotificationContext } from "../contexts/NotificationContext";
@@ -17,6 +18,7 @@ import "./StudyTimer.css";
 import { useCurrentQuestion } from "../contexts/CurrentQuestionContext";
 import MarkdownWithMath from "./MarkdownWithMath";
 import CameraCapture from "./CameraCapture";
+
 
 function SolveQuestion() {
   const location = useLocation();
@@ -50,6 +52,7 @@ function SolveQuestion() {
     const stored = localStorage.getItem("include_question_context");
     return stored === null ? false : stored === "true";
   });
+  const [isContextExpanded, setIsContextExpanded] = useState(false);
 
   // Ensure context sharing starts enabled when entering SolveQuestion
   useEffect(() => {
@@ -67,9 +70,11 @@ function SolveQuestion() {
     topic_ids,
     subtopic,
     selectedQuestions,
-    question_id
+    question_id,
+    context
+    
   } = location.state || {};
-  // console.log("Location state:", location.state);
+  console.log("Location state:", location.state);
   const { questionNumber } = location.state || {};
   const questionId = location.state?.questionId || `${index}${Date.now()}`;
   const question_image =
@@ -81,10 +86,11 @@ function SolveQuestion() {
     question: question,
     questionNumber: questionNumber || (index !== undefined ? index + 1 : 1),
     image: question_image,
+    context:context,
     // id: questionId,
     question_id: question_id || questionId
   });
-  // console.log("Current Question State:", currentQuestion);
+  console.log("Current Question State:", currentQuestion);
   // console.log("questionList", questionList);
 
   const { setCurrentQuestion: setContextQuestion } = useCurrentQuestion();
@@ -105,7 +111,7 @@ function SolveQuestion() {
   useEffect(() => {
     if (location.state) {
       const newQuestionId = location.state?.question_id || `${index}`
-      
+
       const newQuestion = {
         question: location.state.question || "",
         questionNumber:
@@ -113,7 +119,8 @@ function SolveQuestion() {
           (index !== undefined ? index + 1 : 1),
         image: location.state.image || "",
         id: newQuestionId,
-        question_id: location.state?.question_id || newQuestionId
+        question_id: location.state?.question_id || newQuestionId,
+        context: location.state?.context || null
       };
       console.log("Setting current question:", newQuestion);
       setCurrentQuestion(newQuestion);
@@ -128,6 +135,7 @@ function SolveQuestion() {
       setError(null);
       setUploadProgress(0);
       setProcessingButton(null);
+      setIsContextExpanded(false); // Reset context expansion
     }
   }, [location.state, index, setContextQuestion,]);
 
@@ -499,7 +507,8 @@ function SolveQuestion() {
     selectedQuestion,
     selectedIndex,
     selectedImage,
-    question_id
+    question_id,
+    questionContext = null
 
   ) => {
     // console.log("Question selected in SolveQuestion");
@@ -507,6 +516,7 @@ function SolveQuestion() {
     // console.log("Selected image:", selectedImage);
     // console.log("Selected index:", selectedIndex);
     // console.log("Selected question ID:", question_id || selectedIndex);
+    console.log("Selected context:", questionContext);
     // Stop the current timer
     stopTimer();
 
@@ -517,7 +527,8 @@ function SolveQuestion() {
       questionNumber: selectedIndex + 1,
       image: selectedImage,
       id: newQuestionId,
-      question_id: selectedQuestion.question_id || newQuestionId
+      question_id: selectedQuestion.question_id || newQuestionId,
+      context: questionContext
     });
 
     // Start a new timer for the selected question
@@ -528,6 +539,9 @@ function SolveQuestion() {
     setIsSolveEnabled(true);
     setError(null);
     setUploadProgress(0);
+
+    // Reset context expansion state
+    setIsContextExpanded(false);
 
     // Close modal
     setShowQuestionListModal(false);
@@ -575,6 +589,64 @@ function SolveQuestion() {
             className={processingButton ? "stopped" : ""}
           />
         </div>
+
+        {/* Context Section - Only show if context exists */}
+        {currentQuestion.context && (
+          <div className="context-section" style={{
+            backgroundColor: '#f8f9fa',
+            border: '1px solid #dee2e6',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            overflow: 'hidden'
+          }}>
+            <div
+              className="context-header"
+              onClick={() => setIsContextExpanded(!isContextExpanded)}
+             
+            >
+              <div className="context-header-content" >
+                <div className="context-icon-wrapper" >
+                 <FontAwesomeIcon icon={faBookOpenReader} />
+                </div>
+                <span className="context-header-title" style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#212529'
+                }}>Reading Context</span>
+              </div>
+             <FontAwesomeIcon
+               icon={faCaretDown}
+               style={{
+                 transform: isContextExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                 transition: 'transform 0.3s ease',
+                 color: '#6c757d',
+                 fontSize: '20px'
+               }}
+             />
+            </div>
+            <div className={`context-content-wrapper ${isContextExpanded ? 'expanded' : ''}`} style={{
+              maxHeight: isContextExpanded ? '400px' : '0',
+              overflow: 'hidden',
+              transition: 'max-height 0.3s ease'
+            }}>
+              <div className="context-scroll-view" style={{
+                maxHeight: '400px',
+                overflowY: 'auto',
+                padding: '0'
+              }}>
+                <div className="context-text-container" style={{
+                  padding: '20px',
+                  backgroundColor: '#ffffff',
+                  color: '#212529',
+                  fontSize: '15px',
+                  lineHeight: '1.6'
+                }}>
+                  <MarkdownWithMath content={currentQuestion.context} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Question Display Section */}
         <div className="question-text-container">
