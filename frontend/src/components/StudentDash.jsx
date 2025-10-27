@@ -158,20 +158,20 @@ function StudentDash() {
         // console.log("🔍 Fetching classes...");
         const classResponse = await axiosInstance.get("/classes/");
         // console.log("📋 Classes API Response:", classResponse.data);
-        
+
         const classesData = classResponse.data.data;
         setClasses(classesData);
 
         // Set default class based on username
         const defaultClass = extractClassFromUsername(username);
         // console.log("👤 Username:", username, "Extracted Class:", defaultClass);
-        
+
         if (defaultClass) {
-          const matchingClass = classesData.find(cls => 
+          const matchingClass = classesData.find(cls =>
             cls.class_name.includes(defaultClass) || cls.class_code === defaultClass
           );
           // console.log("🎯 Matching class found:", matchingClass);
-          
+
           if (matchingClass) {
             setSelectedClass(matchingClass.class_code);
             // console.log("✅ Auto-selected class:", matchingClass.class_code);
@@ -190,18 +190,18 @@ function StudentDash() {
       if (selectedClass) {
         try {
           // console.log("🔍 Fetching subjects for class:", selectedClass);
-          
+
           const subjectResponse = await axiosInstance.post("/subjects/", {
             class_id: selectedClass,
           });
-          
+
           // console.log("📚 Subjects API Response:", subjectResponse.data);
-          
+
           const subjectsData = subjectResponse.data.data;
           setSubjects(subjectsData);
 
           // Set default subject to Mathematics
-          const mathSubject = subjectsData.find(subject => 
+          const mathSubject = subjectsData.find(subject =>
             subject.subject_name.toLowerCase().includes('math')
           );
           if (mathSubject) {
@@ -234,24 +234,24 @@ function StudentDash() {
           // console.log("🔍 Fetching chapters with parameters:");
           // console.log("   📖 Subject ID:", selectedSubject);
           // console.log("   🏫 Class ID:", selectedClass);
-          
+
           const chapterResponse = await axiosInstance.post("/chapters/", {
             subject_id: selectedSubject,
             class_id: selectedClass,
           });
-          
+
           // console.log("📚 Chapters API Response:", chapterResponse.data);
           // console.log("📊 Response structure:", {
           //   hasData: !!chapterResponse.data.data,
           //   dataLength: chapterResponse.data.data?.length,
           //   firstChapter: chapterResponse.data.data?.[0]
           // });
-          
+
           if (chapterResponse.data && chapterResponse.data.data) {
             setChapters(chapterResponse.data.data);
             // console.log("✅ Chapters set successfully:", chapterResponse.data.data.length, "chapters");
             // console.log("📝 First few chapters:", chapterResponse.data.data.slice(0, 3));
-            
+
             // Log the structure of chapters to verify field names
             if (chapterResponse.data.data.length > 0) {
               // console.log("🔍 Chapter structure:", Object.keys(chapterResponse.data.data[0]));
@@ -260,7 +260,7 @@ function StudentDash() {
             console.warn("⚠ No chapters data found in response");
             setChapters([]);
           }
-          
+
           setSelectedChapters([]);
           setQuestionType("");
           setQuestionLevel("");
@@ -446,17 +446,17 @@ function StudentDash() {
     control: (provided, state) => ({
       ...provided,
       backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
-      borderColor: state.isFocused 
-        ? (isDarkMode ? '#7c3aed' : '#667eea') 
+      borderColor: state.isFocused
+        ? (isDarkMode ? '#7c3aed' : '#667eea')
         : (isDarkMode ? '#475569' : '#e2e8f0'),
       color: isDarkMode ? '#f1f5f9' : '#2d3748',
       minHeight: '56px',
-      border: `2px solid ${state.isFocused 
-        ? (isDarkMode ? '#7c3aed' : '#667eea') 
+      border: `2px solid ${state.isFocused
+        ? (isDarkMode ? '#7c3aed' : '#667eea')
         : (isDarkMode ? '#475569' : '#e2e8f0')}`,
       borderRadius: '12px',
-      boxShadow: state.isFocused 
-        ? `0 0 0 4px ${isDarkMode ? 'rgba(124, 58, 237, 0.1)' : 'rgba(102, 126, 234, 0.1)'}` 
+      boxShadow: state.isFocused
+        ? `0 0 0 4px ${isDarkMode ? 'rgba(124, 58, 237, 0.1)' : 'rgba(102, 126, 234, 0.1)'}`
         : 'none',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       '&:hover': {
@@ -474,7 +474,7 @@ function StudentDash() {
       zIndex: 10000,
       borderRadius: '12px',
       border: `2px solid ${isDarkMode ? '#7c3aed' : '#667eea'}`,
-      boxShadow: isDarkMode 
+      boxShadow: isDarkMode
         ? '0 25px 50px -12px rgba(0, 0, 0, 0.9)'
         : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       maxHeight: '500px',
@@ -514,10 +514,10 @@ function StudentDash() {
       backgroundColor: state.isFocused
         ? (isDarkMode ? '#7c3aed' : '#667eea')
         : state.isSelected
-        ? (isDarkMode ? '#6366f1' : '#5a67d8')
-        : (isDarkMode ? '#1e293b' : '#ffffff'),
-      color: state.isFocused || state.isSelected 
-        ? '#ffffff' 
+          ? (isDarkMode ? '#6366f1' : '#5a67d8')
+          : (isDarkMode ? '#1e293b' : '#ffffff'),
+      color: state.isFocused || state.isSelected
+        ? '#ffffff'
         : (isDarkMode ? '#f1f5f9' : '#2d3748'),
       padding: '16px 20px',
       cursor: 'pointer',
@@ -603,94 +603,94 @@ function StudentDash() {
     <>
       <AlertContainer />
       <div className={`student-dash-wrapper ${isDarkMode ? 'dark-mode' : ''}`}>
-      {/* Enhanced Fixed Sidebar */}
-      <div className="sidebar-fixed">
-        {/* <div className="sidebar-header">
+        {/* Enhanced Fixed Sidebar */}
+        <div className="sidebar-fixed">
+          {/* <div className="sidebar-header">
           <div className="sidebar-brand">
             <FontAwesomeIcon icon={faGraduationCap} className="brand-icon" />
             <span>AI Educator</span>
           </div>
         </div> */}
 
-        <div className="sidebar-content">
-          {/* Enhanced Progress Card with Animation */}
-          <div className="progress-card">
-            <div className="progress-icon">
-              <FontAwesomeIcon icon={faBrain} />
-            </div>
-            <div className="progress-details">
-              <h4>89%</h4>
-              <span>Progress</span>
-            </div>
-          </div>
-
-          {/* Enhanced Streak Card */}
-          <div className="streak-card">
-            <div className="streak-icon">
-              <FontAwesomeIcon icon={faFire} />
-            </div>
-            <div className="streak-details">
-              <h4>5</h4>
-              <span>Day Streak</span>
-            </div>
-          </div>
-
-          {/* Enhanced Badges Card */}
-          <div className="badges-card">
-            <div className="badges-icon">
-              <FontAwesomeIcon icon={faTrophy} />
-            </div>
-            <div className="badges-details">
-              <h4>3</h4>
-              <span>Badges</span>
-            </div>
-          </div>
-
-          {/* Enhanced Dark Mode Toggle */}
-          <div className="dark-mode-toggle" onClick={toggleDarkMode}>
-            <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
-            <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Enhanced Main Content */}
-      <div className="main-content-fixed">
-        {/* Enhanced Greeting Header with Dynamic Content */}
-        <div className="greeting-header">
-          <div className="greeting-content">
-            <div className="greeting-text">
-              <h1>
-                
-                <FontAwesomeIcon icon={faGraduationCap} className="me-1" />
-                {getTimeBasedGreeting()}, {localStorage.getItem("fullName")}! 
-                <span className="graduation-emoji">🎓</span>
-              </h1>
-              {/* <p>Class 10 Student • {getMotivationalMessage()}</p> */}
-              <div className="motivation-buttons">
-                <Button variant="warning" size="sm" className="motivation-btn">
-                  <FontAwesomeIcon icon={faStar} className="me-1" />
-                  Keep Going!
-                </Button>
-                <Button variant="info" size="sm" className="motivation-btn">
-                  <FontAwesomeIcon icon={faTrophy} className="me-1" />
-                  You're Awesome!
-                </Button>
+          <div className="sidebar-content">
+            {/* Enhanced Progress Card with Animation */}
+            <div className="progress-card">
+              <div className="progress-icon">
+                <FontAwesomeIcon icon={faBrain} />
+              </div>
+              <div className="progress-details">
+                <h4>89%</h4>
+                <span>Progress</span>
               </div>
             </div>
-            <div className="current-date">
-              <h2>{new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                month: 'long', 
-                day: 'numeric' 
-              })}</h2>
-              {/* <p>{new Date().getFullYear()}</p> */}
+
+            {/* Enhanced Streak Card */}
+            <div className="streak-card">
+              <div className="streak-icon">
+                <FontAwesomeIcon icon={faFire} />
+              </div>
+              <div className="streak-details">
+                <h4>5</h4>
+                <span>Day Streak</span>
+              </div>
+            </div>
+
+            {/* Enhanced Badges Card */}
+            <div className="badges-card">
+              <div className="badges-icon">
+                <FontAwesomeIcon icon={faTrophy} />
+              </div>
+              <div className="badges-details">
+                <h4>3</h4>
+                <span>Badges</span>
+              </div>
+            </div>
+
+            {/* Enhanced Dark Mode Toggle */}
+            <div className="dark-mode-toggle" onClick={toggleDarkMode}>
+              <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
+              <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Motivational Quote */}
-        {/* <div className="motivational-quote">
+        {/* Enhanced Main Content */}
+        <div className="main-content-fixed">
+          {/* Enhanced Greeting Header with Dynamic Content */}
+          <div className="greeting-header">
+            <div className="greeting-content">
+              <div className="greeting-text">
+                <h1>
+
+                  <FontAwesomeIcon icon={faGraduationCap} className="me-1" />
+                  {getTimeBasedGreeting()}, {localStorage.getItem("fullName")}!
+                  <span className="graduation-emoji">🎓</span>
+                </h1>
+                {/* <p>Class 10 Student • {getMotivationalMessage()}</p> */}
+                <div className="motivation-buttons">
+                  <Button variant="warning" size="sm" className="motivation-btn">
+                    <FontAwesomeIcon icon={faStar} className="me-1" />
+                    Keep Going!
+                  </Button>
+                  <Button variant="info" size="sm" className="motivation-btn">
+                    <FontAwesomeIcon icon={faTrophy} className="me-1" />
+                    You're Awesome!
+                  </Button>
+                </div>
+              </div>
+              <div className="current-date">
+                <h2>{new Date().toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'long',
+                  day: 'numeric'
+                })}</h2>
+                {/* <p>{new Date().getFullYear()}</p> */}
+              </div>
+            </div>
+          </div>
+
+          {/* Enhanced Motivational Quote */}
+          {/* <div className="motivational-quote">
           <FontAwesomeIcon icon={faMagic} className="quote-icon" />
           <div className="quote-content">
             <h3>"Mathematics is not about numbers, equations, or algorithms: it is about understanding!"</h3>
@@ -698,10 +698,10 @@ function StudentDash() {
           </div>
         </div> */}
 
-        <Container className="py-1">
-          {/* Enhanced Learning Adventure Section */}
-          <div className="learning-adventure-section">
-            {/* <div className="section-header">
+          <Container className="py-1">
+            {/* Enhanced Learning Adventure Section */}
+            <div className="learning-adventure-section">
+              {/* <div className="section-header">
               <h2>
                 <FontAwesomeIcon icon={faRocket} className="me-2" />
                 🚀 Start Your Learning Adventure
@@ -709,196 +709,196 @@ function StudentDash() {
               <p>Select your preferences and let's begin this exciting mathematical journey!</p>
             </div> */}
 
-            <div className="form-container">
-              <Form onSubmit={handleSubmit}>
-                <Row className="form-row">
-                  <Col md={6}>
-                    <Form.Group controlId="formClass">
-                      <Form.Label>
-                        <FontAwesomeIcon icon={faSchool} className="me-2" />
-                        Class
-                      </Form.Label>
-                      <Form.Control
-                        as="select"
-                        value={selectedClass}
-                        onChange={(e) => {
-                          // console.log("🏫 Class selection changed to:", e.target.value);
-                          setSelectedClass(e.target.value);
-                        }}
-                        className="form-control-enhanced"
-                      >
-                        <option value="">Select Class</option>
-                        {classes.map((cls) => (
-                          <option key={cls.class_code} value={cls.class_code}>
-                            {cls.class_name}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-                  </Col>
+              <div className="form-container">
+                <Form onSubmit={handleSubmit}>
+                  <Row className="form-row">
+                    <Col md={6}>
+                      <Form.Group controlId="formClass">
+                        <Form.Label>
+                          <FontAwesomeIcon icon={faSchool} className="me-2" />
+                          Class
+                        </Form.Label>
+                        <Form.Control
+                          as="select"
+                          value={selectedClass}
+                          onChange={(e) => {
+                            // console.log("🏫 Class selection changed to:", e.target.value);
+                            setSelectedClass(e.target.value);
+                          }}
+                          className="form-control-enhanced"
+                        >
+                          <option value="">Select Class</option>
+                          {classes.map((cls) => (
+                            <option key={cls.class_code} value={cls.class_code}>
+                              {cls.class_name}
+                            </option>
+                          ))}
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
 
-                  <Col md={6}>
-                    <Form.Group controlId="formSubject">
-                      <Form.Label>
-                        <FontAwesomeIcon icon={faBookOpen} className="me-2" />
-                        Subject
-                      </Form.Label>
-                      <Form.Control
-                        as="select"
-                        value={selectedSubject}
-                        onChange={(e) => {
-                          // console.log("📚 Subject selection changed to:", e.target.value);
-                          setSelectedSubject(e.target.value);
-                        }}
-                        className="form-control-enhanced"
-                        disabled={!selectedClass}
-                      >
-                        <option value="">Select Subject</option>
-                        {subjects.map((subject) => (
-                          <option
-                            key={subject.subject_code}
-                            value={subject.subject_code}
-                          >
-                            {subject.subject_name}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-                  </Col>
-                </Row>
+                    <Col md={6}>
+                      <Form.Group controlId="formSubject">
+                        <Form.Label>
+                          <FontAwesomeIcon icon={faBookOpen} className="me-2" />
+                          Subject
+                        </Form.Label>
+                        <Form.Control
+                          as="select"
+                          value={selectedSubject}
+                          onChange={(e) => {
+                            // console.log("📚 Subject selection changed to:", e.target.value);
+                            setSelectedSubject(e.target.value);
+                          }}
+                          className="form-control-enhanced"
+                          disabled={!selectedClass}
+                        >
+                          <option value="">Select Subject</option>
+                          {subjects.map((subject) => (
+                            <option
+                              key={subject.subject_code}
+                              value={subject.subject_code}
+                            >
+                              {subject.subject_name}
+                            </option>
+                          ))}
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
 
-<Row className="form-row">
-  <Col md={6}>
-    <Form.Group controlId="formChapters">
-      <Form.Label>
-        <FontAwesomeIcon icon={faListAlt} className="me-2" />
-        Chapters (Select Multiple) - {chapters.length} Available
-      </Form.Label>
-      
-      <Select
-        isMulti
-        value={selectedChapters.map(chapterCode => {
-          const chapter = chapters.find(ch => ch.topic_code === chapterCode);
-          return chapter ? { value: chapter.topic_code, label: chapter.name } : null;
-        }).filter(Boolean)}
-        onChange={(selectedOptions) => {
-          const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
-          setSelectedChapters(values);
-          // console.log("Selected chapters:", values);
-        }}
-        options={chapters.map(chapter => ({
-          value: chapter.topic_code,
-          label: chapter.name
-        }))}
-        placeholder="Select chapters..."
-        isDisabled={!selectedSubject || chapters.length === 0}
-        className="chapters-select-final"
-        classNamePrefix="select"
-        closeMenuOnSelect={false}
-        isSearchable={true}
-        isClearable={true}
-        hideSelectedOptions={false}
-        // CRITICAL: Render dropdown at body level to avoid container constraints
-        menuPortalTarget={document.body}
-        styles={{
-          control: (provided, state) => ({
-            ...provided,
-            minHeight: '56px',
-            border: '2px solid #e2e8f0',
-            borderRadius: '12px',
-            backgroundColor: 'white',
-            '&:hover': {
-              borderColor: '#667eea',
-            },
-            boxShadow: state.isFocused ? '0 0 0 3px rgba(102, 126, 234, 0.1)' : 'none',
-          }),
-          // CRITICAL: Portal-specific styling
-          menuPortal: (provided) => ({
-            ...provided,
-            zIndex: 99999,
-          }),
-          menu: (provided) => ({
-            ...provided,
-            borderRadius: '12px',
-            border: '2px solid #667eea',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
-            // FIXED: Use viewport height to ensure dropdown is never cut off
-            maxHeight: 'min(70vh, 500px)',
-            minWidth: '400px',
-            maxWidth: '600px',
-          }),
-          menuList: (provided) => ({
-            ...provided,
-            // CRITICAL: Enough height for all chapters + comfortable scrolling
-            maxHeight: 'min(65vh, 450px)',
-            overflowY: 'auto',
-            padding: '8px',
-            // Enhanced scrollbar
-            scrollbarWidth: 'thin',
-            scrollbarColor: '#667eea #f1f5f9',
-          }),
-          option: (provided, state) => ({
-            ...provided,
-            backgroundColor: state.isFocused 
-              ? '#667eea' 
-              : state.isSelected 
-              ? '#5a67d8' 
-              : 'white',
-            color: state.isFocused || state.isSelected ? 'white' : '#2d3748',
-            padding: '10px 14px',
-            margin: '2px 0',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: state.isSelected ? '600' : '400',
-            // Ensure text wraps for long chapter names
-            whiteSpace: 'normal',
-            wordBreak: 'break-word',
-            lineHeight: '1.4',
-            minHeight: '40px',
-            display: 'flex',
-            alignItems: 'center',
-          }),
-          multiValue: (provided) => ({
-            ...provided,
-            backgroundColor: '#667eea',
-            borderRadius: '6px',
-            margin: '2px',
-          }),
-          multiValueLabel: (provided) => ({
-            ...provided,
-            color: 'white',
-            fontWeight: '600',
-            fontSize: '12px',
-            padding: '3px 6px',
-          }),
-          multiValueRemove: (provided) => ({
-            ...provided,
-            color: 'white',
-            borderRadius: '0 6px 6px 0',
-            '&:hover': {
-              backgroundColor: '#e53e3e',
-              color: 'white',
-            },
-          }),
-          placeholder: (provided) => ({
-            ...provided,
-            color: '#6b7280',
-            fontWeight: '500',
-          }),
-          dropdownIndicator: (provided, state) => ({
-            ...provided,
-            color: '#6b7280',
-            transform: state.selectProps.menuIsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 0.3s ease',
-            padding: '8px',
-          }),
-        }}
-      />
-      
-      {/* Enhanced action buttons */}
-      <div className="mt-2 d-flex gap-2 flex-wrap">
-        {/* <Button
+                  <Row className="form-row">
+                    <Col md={6}>
+                      <Form.Group controlId="formChapters">
+                        <Form.Label>
+                          <FontAwesomeIcon icon={faListAlt} className="me-2" />
+                          Chapters (Select Multiple) - {chapters.length} Available
+                        </Form.Label>
+
+                        <Select
+                          isMulti
+                          value={selectedChapters.map(chapterCode => {
+                            const chapter = chapters.find(ch => ch.topic_code === chapterCode);
+                            return chapter ? { value: chapter.topic_code, label: chapter.name } : null;
+                          }).filter(Boolean)}
+                          onChange={(selectedOptions) => {
+                            const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
+                            setSelectedChapters(values);
+                            // console.log("Selected chapters:", values);
+                          }}
+                          options={chapters.map(chapter => ({
+                            value: chapter.topic_code,
+                            label: chapter.name
+                          }))}
+                          placeholder="Select chapters..."
+                          isDisabled={!selectedSubject || chapters.length === 0}
+                          className="chapters-select-final"
+                          classNamePrefix="select"
+                          closeMenuOnSelect={false}
+                          isSearchable={true}
+                          isClearable={true}
+                          hideSelectedOptions={false}
+                          // CRITICAL: Render dropdown at body level to avoid container constraints
+                          menuPortalTarget={document.body}
+                          styles={{
+                            control: (provided, state) => ({
+                              ...provided,
+                              minHeight: '56px',
+                              border: '2px solid #e2e8f0',
+                              borderRadius: '12px',
+                              backgroundColor: 'white',
+                              '&:hover': {
+                                borderColor: '#667eea',
+                              },
+                              boxShadow: state.isFocused ? '0 0 0 3px rgba(102, 126, 234, 0.1)' : 'none',
+                            }),
+                            // CRITICAL: Portal-specific styling
+                            menuPortal: (provided) => ({
+                              ...provided,
+                              zIndex: 99999,
+                            }),
+                            menu: (provided) => ({
+                              ...provided,
+                              borderRadius: '12px',
+                              border: '2px solid #667eea',
+                              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                              // FIXED: Use viewport height to ensure dropdown is never cut off
+                              maxHeight: 'min(70vh, 500px)',
+                              minWidth: '400px',
+                              maxWidth: '600px',
+                            }),
+                            menuList: (provided) => ({
+                              ...provided,
+                              // CRITICAL: Enough height for all chapters + comfortable scrolling
+                              maxHeight: 'min(65vh, 450px)',
+                              overflowY: 'auto',
+                              padding: '8px',
+                              // Enhanced scrollbar
+                              scrollbarWidth: 'thin',
+                              scrollbarColor: '#667eea #f1f5f9',
+                            }),
+                            option: (provided, state) => ({
+                              ...provided,
+                              backgroundColor: state.isFocused
+                                ? '#667eea'
+                                : state.isSelected
+                                  ? '#5a67d8'
+                                  : 'white',
+                              color: state.isFocused || state.isSelected ? 'white' : '#2d3748',
+                              padding: '10px 14px',
+                              margin: '2px 0',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              fontWeight: state.isSelected ? '600' : '400',
+                              // Ensure text wraps for long chapter names
+                              whiteSpace: 'normal',
+                              wordBreak: 'break-word',
+                              lineHeight: '1.4',
+                              minHeight: '40px',
+                              display: 'flex',
+                              alignItems: 'center',
+                            }),
+                            multiValue: (provided) => ({
+                              ...provided,
+                              backgroundColor: '#667eea',
+                              borderRadius: '6px',
+                              margin: '2px',
+                            }),
+                            multiValueLabel: (provided) => ({
+                              ...provided,
+                              color: 'white',
+                              fontWeight: '600',
+                              fontSize: '12px',
+                              padding: '3px 6px',
+                            }),
+                            multiValueRemove: (provided) => ({
+                              ...provided,
+                              color: 'white',
+                              borderRadius: '0 6px 6px 0',
+                              '&:hover': {
+                                backgroundColor: '#e53e3e',
+                                color: 'white',
+                              },
+                            }),
+                            placeholder: (provided) => ({
+                              ...provided,
+                              color: '#6b7280',
+                              fontWeight: '500',
+                            }),
+                            dropdownIndicator: (provided, state) => ({
+                              ...provided,
+                              color: '#6b7280',
+                              transform: state.selectProps.menuIsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.3s ease',
+                              padding: '8px',
+                            }),
+                          }}
+                        />
+
+                        {/* Enhanced action buttons */}
+                        <div className="mt-2 d-flex gap-2 flex-wrap">
+                          {/* <Button
           variant="outline-primary"
           size="sm"
           onClick={() => setSelectedChapters(chapters.map(ch => ch.topic_code))}
@@ -907,16 +907,16 @@ function StudentDash() {
         >
           Select All ({chapters.length})
         </Button> */}
-        <Button
-          variant="outline-secondary"
-          size="sm"
-          onClick={() => setSelectedChapters([])}
-          disabled={!selectedChapters.length}
-          style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '6px' }}
-        >
-          Clear ({selectedChapters.length})
-        </Button>
-        {/* <Button
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            onClick={() => setSelectedChapters([])}
+                            disabled={!selectedChapters.length}
+                            style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '6px' }}
+                          >
+                            Clear ({selectedChapters.length})
+                          </Button>
+                          {/* <Button
           variant="outline-info"
           size="sm"
           onClick={() => {
@@ -928,36 +928,36 @@ function StudentDash() {
           style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '6px' }}
         >
         </Button> */}
-      </div>
-      
-      
-    </Form.Group>
-  </Col>
+                        </div>
 
-  <Col md={6}>
-    <Form.Group controlId="formQuestionType">
-      <Form.Label>
-        <FontAwesomeIcon icon={faClipboardQuestion} className="me-2" />
-        Question Type
-      </Form.Label>
-      <Form.Control
-        as="select"
-        value={questionType}
-        onChange={(e) => setQuestionType(e.target.value)}
-        className="form-control-enhanced"
-        disabled={selectedChapters.length === 0}
-      >
-        <option value="">Select Question Type</option>
-        <option value="solved">📚 Solved Examples</option>
-        <option value="exercise">💪 Practice Exercises</option>
-        <option value="external">🎯 Set of Questions</option>
-        <option value="worksheets">📄 Worksheets</option>
-      </Form.Control>
-    </Form.Group>
-  </Col>
-</Row>
 
-{/* Debug info - Remove after confirming all chapters work
+                      </Form.Group>
+                    </Col>
+
+                    <Col md={6}>
+                      <Form.Group controlId="formQuestionType">
+                        <Form.Label>
+                          <FontAwesomeIcon icon={faClipboardQuestion} className="me-2" />
+                          Question Type
+                        </Form.Label>
+                        <Form.Control
+                          as="select"
+                          value={questionType}
+                          onChange={(e) => setQuestionType(e.target.value)}
+                          className="form-control-enhanced"
+                          disabled={selectedChapters.length === 0}
+                        >
+                          <option value="">Select Question Type</option>
+                          <option value="solved">📚 Solved Examples</option>
+                          <option value="exercise">💪 Practice Exercises</option>
+                          <option value="external">🎯 Set of Questions</option>
+                          <option value="worksheets">📄 Worksheets</option>
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  {/* Debug info - Remove after confirming all chapters work
 {chapters.length > 0 && (
   <div style={{ 
     background: '#e8f5e8', 
@@ -992,90 +992,91 @@ function StudentDash() {
   </div>
 )} */}
 
-                {questionType === "external" && (
-                  <Row className="form-row">
-                    <Col md={6}>
-                      <Form.Group>
-                        <Form.Label>
-                          <FontAwesomeIcon icon={faBookmark} className="me-2" />
-                          Select The Set
-                        </Form.Label>
-                        <Form.Control
-                          as="select"
-                          value={questionLevel}
-                          onChange={(e) => setQuestionLevel(e.target.value)}
-                          className="form-control-enhanced"
-                        >
-                          <option value="">Select The Set</option>
-                          {subTopics.map((subTopic, index) => (
-                            <option key={subTopic} value={subTopic}>
-                              Exercise {index + 1}
-                            </option>
-                          ))}
-                        </Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                )}
+                  {questionType === "external" && (
+                    <Row className="form-row">
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <FontAwesomeIcon icon={faBookmark} className="me-2" />
+                            Select The Set
+                          </Form.Label>
+                          <Form.Control
+                            as="select"
+                            value={questionLevel}
+                            onChange={(e) => setQuestionLevel(e.target.value)}
+                            className="form-control-enhanced"
+                          >
+                            <option value="">Select The Set</option>
+                            {subTopics.map((subTopic, index) => (
+                              <option key={subTopic} value={subTopic}>
+                                Exercise {index + 1}
+                              </option>
+                            ))}
+                          </Form.Control>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  )}
 
-                {questionType === "worksheets" && (
-                  <Row className="form-row">
-                    <Col md={6}>
-                      <Form.Group>
-                        <Form.Label>
-                          <FontAwesomeIcon icon={faUsers} className="me-2" />
-                          Select Worksheet
-                        </Form.Label>
-                        <Form.Control
-                          as="select"
-                          value={selectedWorksheet}
-                          onChange={(e) => setSelectedWorksheet(e.target.value)}
-                          className="form-control-enhanced"
-                        >
-                          <option value="">Select Worksheet</option>
-                          {worksheets.map((worksheet) => (
-                            <option key={worksheet.id} value={worksheet.worksheet_name}>
-                              {worksheet.worksheet_name}
-                            </option>
-                          ))}
-                        </Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                )}
+                  {questionType === "worksheets" && (
+                    <Row className="form-row">
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <FontAwesomeIcon icon={faUsers} className="me-2" />
+                            Select Worksheet
+                          </Form.Label>
+                          <Form.Control
+                            as="select"
+                            value={selectedWorksheet}
+                            onChange={(e) => setSelectedWorksheet(e.target.value)}
+                            className="form-control-enhanced"
+                          >
+                            <option value="">Select Worksheet</option>
+                            {worksheets.map((worksheet) => (
+                              <option key={worksheet.id} value={worksheet.worksheet_name}>
+                                {worksheet.worksheet_name}
+                              </option>
+                            ))}
+                          </Form.Control>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  )}
 
-                <div className="form-actions">
-                  <Button
-                  
-                    type="submit"
-                    className="btn-generate-enhanced"
-                    disabled={!isGenerateButtonEnabled()}
-                  >
-                    <FontAwesomeIcon icon={faRocket} className="me-2" />
-                    Generate Questions
-                  </Button>
-                </div>
-              </Form>
+                  <div className="new-button form-actions">
+                    <button
+                      type="submit"
+                      className="button button--mimas"
+                      disabled={!isGenerateButtonEnabled()}
+                    >
+                      <span>
+                        <FontAwesomeIcon icon={faRocket} className="me-2" />
+                        Generate Questions
+                      </span>
+                    </button>
+                  </div>
+                </Form>
+              </div>
             </div>
-          </div>
 
-          {/* Recent Sessions */}
-         <UnifiedSessions />
-        </Container>
+            {/* Recent Sessions */}
+            <UnifiedSessions />
+          </Container>
+        </div>
+
+        {/* Enhanced Question List Modal */}
+        <QuestionListModal
+          show={showQuestionList}
+          onHide={() => setShowQuestionList(false)}
+          questionList={questionList}
+          onQuestionClick={handleQuestionClick}
+          isMultipleSelect={questionType === "external"}
+          onMultipleSelectSubmit={handleMultipleSelectSubmit}
+          worksheetName={questionType === "worksheets" ? selectedWorksheet : ""}
+
+        />
       </div>
-
-      {/* Enhanced Question List Modal */}
-      <QuestionListModal
-        show={showQuestionList}
-        onHide={() => setShowQuestionList(false)}
-        questionList={questionList}
-        onQuestionClick={handleQuestionClick}
-        isMultipleSelect={questionType === "external"}
-        onMultipleSelectSubmit={handleMultipleSelectSubmit}
-        worksheetName={questionType === "worksheets" ? selectedWorksheet : ""}
-
-      />
-    </div>
     </>
   );
 }
