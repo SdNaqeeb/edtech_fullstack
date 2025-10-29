@@ -133,8 +133,8 @@ body {
   background: var(--bg-primary) !important;
 }
 
+/* UPDATED: Remove flex layout - no sidebar here anymore */
 .student-dash-wrapper {
-  display: flex;
   min-height: 100vh;
   background: var(--bg-primary);
   position: relative;
@@ -207,441 +207,18 @@ body {
 }
 
 /* ========================================
-   ENHANCED SIDEBAR - MODERN GLASSMORPHISM
+   SIDEBAR REMOVED - NOW IN LAYOUT.JSX
+   Sidebar styles are no longer needed here
 ======================================== */
-.sidebar-fixed {
-  position: fixed;
-  top: 10;
-  left: 0;
-  width: var(--sidebar-width);
-  height: 100vh;
-  background: var(--glass-bg);
-  
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  /* border-right: 1px solid var(--glass-border); */
-  box-shadow: var(--shadow-2xl);
-  z-index: 1000;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  /* FIX 1: Ensure sidebar spacing matches top and bottom */
-  padding-bottom: 0;
-  border-radius: var(--border-radius-lg); 
-}
-
-/* CRITICAL: Enhanced dark mode sidebar fixes */
-.dark-mode .sidebar-fixed {
-  background: rgba(15, 23, 42, 0.98) !important;
-  /* border-right: 2px solid rgba(0, 188, 212, 0.3) !important; */
-  backdrop-filter: blur(25px) !important;
-  -webkit-backdrop-filter: blur(25px) !important;
-  box-shadow: 
-    4px 0 25px rgba(0, 0, 0, 0.8),
-    inset -1px 0 0 rgba(0, 188, 212, 0.1) !important;
-}
-
-/* Animated gradient overlay for sidebar */
-.sidebar-fixed::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--primary-gradient);
-  opacity: 0.02;
-  animation: gradient-shift 8s ease-in-out infinite;
-}
-
-@keyframes gradient-shift {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-10px) scale(1.02); }
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* padding: 2rem 1.5rem; */
-  background: var(--primary-gradient);
-  color: var(--text-inverse);
-  position: relative;
-  overflow: hidden;
-  min-height: var(--header-height);
-}
-
-/* Enhanced sidebar header for dark mode */
-.dark-mode .sidebar-header {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
-  border-bottom: 2px solid rgba(0, 188, 212, 0.3) !important;
-}
-
-.sidebar-header::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  animation: rotate-gradient 10s linear infinite;
-}
-
-@keyframes rotate-gradient {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-weight: 800;
-  font-size: 1.5rem;
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* CRITICAL: Fix AI Educator text visibility in dark mode */
-.sidebar-brand span {
-  /* Default light mode styling */
-  color: var(--text-inverse);
-  font-weight: 800;
-  font-size: 1.5rem;
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-/* FIXED: Dark mode AI Educator with blue gradient */
-.dark-mode .sidebar-brand span {
-  background: linear-gradient(135deg, #00BCD4 0%, #2196F3 50%, #3F51B5 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  font-weight: 900 !important;
-  text-shadow: none !important;
-  filter: drop-shadow(0 2px 4px rgba(0, 188, 212, 0.3)) !important;
-}
-
-.brand-icon {
-  font-size: 2rem;
-  animation: float-icon 3s ease-in-out infinite;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-}
-
-/* Enhanced brand icon in dark mode */
-.dark-mode .brand-icon {
-  color: #00BCD4 !important;
-  filter: drop-shadow(0 4px 8px rgba(0, 188, 212, 0.4)) !important;
-}
-
-@keyframes float-icon {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(5deg); }
-}
-
-.sidebar-content {
-  flex: 1;
-  padding: 2rem 1.5rem 2rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  /* FIX 1: Force equal top and bottom spacing */
-  min-height: calc(100vh - var(--header-height) - 4rem);
-  justify-content: flex-start;
-}
-
-.sidebar-content::-webkit-scrollbar {
-  display: none;
-}
-
-/* ========================================
-   ENHANCED PROGRESS CARDS - 3D GLASSMORPHISM WITH HOVER FIXES
-======================================== */
-.progress-card,
-.streak-card,
-.badges-card {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 2rem;
-  border-radius: var(--border-radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-lg);
-  transition: var(--transition);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transform-style: preserve-3d;
-}
-
-/* CRITICAL: Enhanced sidebar progress cards in dark mode */
-.dark-mode .progress-card,
-.dark-mode .streak-card,
-.dark-mode .badges-card {
-  background: rgba(15, 23, 42, 0.95) !important;
-  border: 2px solid rgba(51, 65, 85, 0.8) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(148, 163, 184, 0.1) !important;
-}
-
-.progress-card::before,
-.streak-card::before,
-.badges-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: var(--border-radius-lg);
-  padding: 1px;
-  background: var(--primary-gradient);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.progress-card:hover::before,
-.streak-card:hover::before,
-.badges-card:hover::before {
-  opacity: 1;
-}
-
-.progress-card {
-  background: linear-gradient(135deg, 
-    rgba(76, 175, 80, 0.1) 0%, 
-    rgba(67, 160, 71, 0.05) 100%);
-  border-color: rgba(76, 175, 80, 0.2);
-}
-
-.streak-card {
-  background: linear-gradient(135deg, 
-    rgba(255, 152, 0, 0.1) 0%, 
-    rgba(245, 124, 0, 0.05) 100%);
-  border-color: rgba(255, 152, 0, 0.2);
-}
-
-.badges-card {
-  background: linear-gradient(135deg, 
-    rgba(0, 188, 212, 0.1) 0%, 
-    rgba(0, 172, 193, 0.05) 100%);
-  border-color: rgba(0, 188, 212, 0.2);
-}
-
-.progress-card:hover,
-.streak-card:hover,
-.badges-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--shadow-2xl);
-}
-
-.progress-icon,
-.streak-icon,
-.badges-icon {
-  font-size: 2.5rem;
-  min-width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
-  transition: var(--transition);
-}
-
-/* FIX 2: Enhanced progress card icons in dark mode with proper hover effects */
-.dark-mode .progress-icon,
-.dark-mode .streak-icon,
-.dark-mode .badges-icon {
-  background: rgba(15, 23, 42, 0.8) !important;
-  border: 2px solid rgba(51, 65, 85, 0.6) !important;
-  color: #94a3b8 !important;
-}
-
-/* FIX 2: Proper hover effects for dark mode icons */
-.dark-mode .progress-card:hover .progress-icon {
-  color: #4CAF50 !important;
-  background: rgba(76, 175, 80, 0.2) !important;
-  transform: scale(1.1) !important;
-  border-color: rgba(76, 175, 80, 0.4) !important;
-  box-shadow: 0 0 20px rgba(76, 175, 80, 0.3) !important;
-}
-
-.dark-mode .streak-card:hover .streak-icon {
-  color: #FF9800 !important;
-  background: rgba(255, 152, 0, 0.2) !important;
-  transform: scale(1.1) !important;
-  border-color: rgba(255, 152, 0, 0.4) !important;
-  box-shadow: 0 0 20px rgba(255, 152, 0, 0.3) !important;
-}
-
-.dark-mode .badges-card:hover .badges-icon {
-  color: #00BCD4 !important;
-  background: rgba(0, 188, 212, 0.2) !important;
-  transform: scale(1.1) !important;
-  border-color: rgba(0, 188, 212, 0.4) !important;
-  box-shadow: 0 0 20px rgba(0, 188, 212, 0.3) !important;
-}
-
-.progress-card:hover .progress-icon {
-  color: var(--success-color);
-  background: rgba(76, 175, 80, 0.1);
-  transform: scale(1.1);
-}
-
-.streak-card:hover .streak-icon {
-  color: var(--warning-color);
-  background: rgba(255, 152, 0, 0.1);
-  transform: scale(1.1);
-}
-
-.badges-card:hover .badges-icon {
-  color: var(--primary-color);
-  background: rgba(0, 188, 212, 0.1);
-  transform: scale(1.1);
-}
-
-.progress-details h4,
-.streak-details h4,
-.badges-details h4 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin: 0 0 0.25rem 0;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
-}
-
-/* Enhanced progress card numbers with gradient */
-.dark-mode .progress-details h4,
-.dark-mode .streak-details h4,
-.dark-mode .badges-details h4 {
-  background: linear-gradient(135deg, #00BCD4 0%, #2196F3 50%, #3F51B5 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  filter: drop-shadow(0 2px 4px rgba(0, 188, 212, 0.3)) !important;
-}
-
-.progress-details span,
-.streak-details span,
-.badges-details span {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-.dark-mode .progress-details span,
-.dark-mode .streak-details span,
-.dark-mode .badges-details span {
-  color: #cbd5e1 !important;
-  font-weight: 600 !important;
-}
-
-/* ========================================
-   REVOLUTIONARY DARK MODE TOGGLE
-======================================== */
-.dark-mode-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  /* FIX 1: Remove margin-top auto to prevent pushing to bottom */
-  margin-top: 1.5rem;
-  margin-bottom: 0;
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 2px solid var(--glass-border);
-  border-radius: var(--border-radius-lg);
-  cursor: pointer;
-  transition: var(--transition);
-  position: relative;
-  overflow: hidden;
-  font-weight: 700;
-  color: var(--text-primary);
-  min-height: 60px;
-}
-
-/* CRITICAL: Enhanced dark mode toggle button */
-.dark-mode .dark-mode-toggle {
-  background: rgba(15, 23, 42, 0.95) !important;
-  border: 2px solid rgba(0, 188, 212, 0.4) !important;
-  color: #f8fafc !important;
-  box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(0, 188, 212, 0.1) !important;
-}
-
-.dark-mode-toggle::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: var(--primary-gradient);
-  transition: left 0.5s ease;
-  z-index: -1;
-}
-
-.dark-mode .dark-mode-toggle::before {
-  background: linear-gradient(90deg, #00BCD4 0%, #2196F3 50%, #3F51B5 100%) !important;
-}
-
-.dark-mode-toggle:hover::before {
-  left: 0;
-}
-
-.dark-mode-toggle:hover {
-  color: var(--text-inverse);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: var(--shadow-xl);
-  border-color: transparent;
-}
-
-.dark-mode-toggle svg {
-  font-size: 1.5rem;
-  transition: var(--transition);
-}
-
-.dark-mode-toggle:hover svg {
-  transform: rotate(180deg) scale(1.1);
-}
-
-.dark-mode-toggle span {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
+/* All sidebar-related styles removed - now handled by Layout.jsx */
 
 /* ========================================
    MAIN CONTENT - SEAMLESS LAYOUT
 ======================================== */
 .main-content-fixed {
-  margin-left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
+  /* UPDATED: No sidebar margin needed - Layout.jsx handles this */
+  margin-left: 0;
+  width: 100%;
   min-height: 100vh;
   background: var(--bg-primary);
   position: relative;
@@ -712,6 +289,90 @@ body {
 .greeting-content:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md) !important;
+}
+
+/* Date wrapper with dark mode toggle */
+.current-date-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Simplified current date display */
+.current-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.dark-mode .current-date {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.date-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dark-mode .date-label {
+  color: #cbd5e1;
+}
+
+.date-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 0.25rem;
+}
+
+.dark-mode .date-value {
+  color: #f8fafc;
+}
+
+/* Modern Dark Mode Toggle Button */
+.dark-mode-toggle-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background: var(--surface-color);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.dark-mode-toggle-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: rotate(180deg) scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+.dark-mode .dark-mode-toggle-btn {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(0, 188, 212, 0.4);
+  color: #00BCD4;
+}
+
+.dark-mode .dark-mode-toggle-btn:hover {
+  background: #00BCD4;
+  color: #0f172a;
+  border-color: #00BCD4;
+  box-shadow: 0 0 20px rgba(0, 188, 212, 0.4);
 }
 
 /* FIX 4: Enhanced greeting with linear gradient and back shadow lighting */
@@ -824,33 +485,7 @@ body {
   border-color: var(--primary-color) !important;
 }
 
-/* Clean current date styling */
-.current-date {
-  text-align: right;
-}
-
-.current-date h2 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-  line-height: 1.2;
-  color: var(--text-primary) !important;
-  text-shadow: none !important;
-}
-
-.dark-mode .current-date h2 {
-  color: #f8fafc !important;
-}
-
-.current-date p {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-secondary) !important;
-}
-
-.dark-mode .current-date p {
-  color: #cbd5e1 !important;
-}
+/* Old current-date styles removed - using new card-based design */
 
 /* ========================================
    ENHANCED MOTIVATIONAL QUOTE CARD
@@ -1758,57 +1393,53 @@ body {
 }
 
 @media (max-width: 768px) {
-  :root {
-    --sidebar-width: 280px;
-  }
-  
-  .sidebar-fixed {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-  
-  .sidebar-fixed.open {
-    transform: translateX(0);
-  }
-  
+  /* Sidebar handled by Layout.jsx */
+
   .main-content-fixed {
     margin-left: 0 !important;
     width: 100% !important;
     padding: 0 !important;
     margin-top: 0 !important;
   }
-  
+
   .greeting-header {
     padding: 2rem 1rem;
   }
-  
+
   .greeting-content {
     padding: 1.5rem;
+    flex-direction: column;
+    gap: 1.5rem;
   }
-  
+
+  .current-date-wrapper {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .greeting-text h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
-  
+
   .section-header {
     padding: 2rem 1.5rem !important;
   }
-  
+
   .section-header h2 {
     font-size: 2.5rem;
   }
-  
+
   .form-container {
     padding: 2rem;
   }
-  
+
   .motivational-quote {
     margin: 1rem 1rem 2rem 1rem !important;
     padding: 1.5rem;
     flex-direction: column;
     text-align: center;
   }
-  
+
   .learning-adventure-section {
     padding: 1rem 1rem 2rem 1rem !important;
   }
@@ -1816,21 +1447,21 @@ body {
 
 @media (max-width: 576px) {
   .greeting-text h1 {
-    font-size: 1.8rem;
+    font-size: 1.25rem;
   }
-  
+
   .section-header h2 {
     font-size: 2rem;
   }
-  
+
   .section-header {
     padding: 1.5rem 1rem !important;
   }
-  
+
   .form-container {
     padding: 1.5rem;
   }
-  
+
   .greeting-content {
     padding: 1.25rem;
   }
@@ -1840,14 +1471,22 @@ body {
     font-size: 0.85rem;
   }
 
-  .sidebar-content {
-    padding: 1.5rem 1rem;
+  .dark-mode-toggle-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
   }
-  
-  .progress-card,
-  .streak-card,
-  .badges-card {
-    padding: 1.5rem;
+
+  .current-date {
+    padding: 0.75rem 1rem;
+  }
+
+  .date-label {
+    font-size: 0.75rem;
+  }
+
+  .date-value {
+    font-size: 1rem;
   }
 }
 

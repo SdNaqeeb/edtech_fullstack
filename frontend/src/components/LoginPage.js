@@ -61,8 +61,8 @@ function LoginPage() {
       console.error("Login error:", err);
       setError(
         err.response?.data?.detail ||
-          err.message ||
-          "Invalid username or password."
+        err.message ||
+        "Invalid username or password."
       );
     }
   };
@@ -101,7 +101,7 @@ function LoginPage() {
       <div className="login-form-container">
         <div className="logo-section">
           <h3 className="platform-name">SMART LEARNERS</h3>
-          
+
         </div>
 
         <div className="portal-section">
@@ -116,6 +116,7 @@ function LoginPage() {
           </p>
         </div>
 
+        
         {error && <div className="error-alert">{error}</div>}
 
         <Form onSubmit={handleSubmit} className="login-form">
@@ -165,8 +166,8 @@ function LoginPage() {
             </a>
           </div>
         </Form>
-
         <div className="copyright">
+       
           © 2025 AI EDUCATOR. All rights reserved.
         </div>
       </div>

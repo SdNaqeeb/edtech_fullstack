@@ -1,221 +1,12 @@
 /* Complete Enhanced Teacher Dashboard CSS - EnhancedTeacherDash.css */
 
 /* Layout Containers */
-.dashboard-container {
+.teacher-dashboard-container {
   min-height: 100vh;
   background-color: #f3f4f6;
-  position: relative;
-}
-
-.dashboard-wrapper {
-  max-width: 100%;
+  width: 100%;
+  padding: 20px;
   margin: 0;
-  padding: 0;
-  position: relative;
-  height: 100%;
-}
-
-/* Main Sidebar Styles - COMPLETELY FIXED */
-.main-sidebar {
-  background-color: #f8fafc;
-  border-right: 1px solid #e5e7eb;
-  display: flex;
-  flex-direction: column;
-  position: fixed; /* Fixed positioning */
-  left: 0;
-  top: 60px; /* Adjust based on your header height */
-  bottom: 0;
-  width: 280px;
-  z-index: 100;
-  height: calc(100vh - 60px); /* Full height minus header */
-  overflow: hidden; /* Prevent sidebar itself from scrolling */
-}
-
-.main-sidebar-container {
-  padding: 20px 15px;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: auto; /* Enable vertical scrolling for content */
-  overflow-x: hidden;
-}
-
-/* Custom scrollbar for sidebar */
-.main-sidebar-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.main-sidebar-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.main-sidebar-container::-webkit-scrollbar-thumb {
-  background: #9ca3af;
-  border-radius: 3px;
-  min-height: 30px; /* Ensure scrollbar thumb is visible */
-}
-
-.main-sidebar-container::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
-}
-
-.main-sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-bottom: 20px;
-  flex-shrink: 0; /* Prevent shrinking */
-}
-
-/* Button styles remain same but ensure they don't shrink */
-.main-sidebar-button {
-  padding: 16px 14px;
-  border: none;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-  color: #6b7280;
-  background-color: #f3f4f6;
-  min-height: 48px;
-  flex-shrink: 0; /* Prevent button shrinking */
-  white-space: nowrap; /* Prevent text wrapping */
-}
-
-/* Sub-navigation items (Upload buttons) */
-.main-sidebar-button.sub-item {
-  margin-left: 20px;
-  font-size: 14px;
-  min-height: 42px;
-  background-color: #f9fafb;
-}
-
-.main-sidebar-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Homework/Exercise - Orange when active */
-.main-sidebar-button.tab-exercise {
-  background-color: #f3f4f6;
-  color: #6b7280;
-}
-
-.main-sidebar-button.tab-exercise.active {
-  background-color: #f59e0b !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-
-.main-sidebar-button.tab-exercise:hover:not(.active) {
-  background-color: #e5e7eb;
-  color: #374151;
-}
-
-/* Classwork - Red when active */
-.main-sidebar-button.tab-classwork {
-  background-color: #f3f4f6;
-  color: #6b7280;
-}
-
-.main-sidebar-button.tab-classwork.active {
-  background-color: #ef4444 !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-.main-sidebar-button.tab-classwork:hover:not(.active) {
-  background-color: #e5e7eb;
-  color: #374151;
-}
-
-/* Worksheets - Green when active */
-.main-sidebar-button.tab-homework {
-  background-color: #f3f4f6;
-  color: #6b7280;
-}
-
-.main-sidebar-button.tab-homework.active {
-  background-color: #22c55e !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-}
-
-.main-sidebar-button.tab-homework:hover:not(.active) {
-  background-color: #e5e7eb;
-  color: #374151;
-}
-
-/* Class Analysis - Blue when active */
-.main-sidebar-button.tab-class {
-  background-color: #f3f4f6;
-  color: #6b7280;
-}
-
-.main-sidebar-button.tab-class.active {
-  background-color: #3b82f6 !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.main-sidebar-button.tab-class:hover:not(.active) {
-  background-color: #e5e7eb;
-  color: #374151;
-}
-
-/* Student Analysis - Purple when active */
-.main-sidebar-button.tab-student {
-  background-color: #f3f4f6;
-  color: #6b7280;
-}
-
-.main-sidebar-button.tab-student.active {
-  background-color: #8b5cf6 !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-}
-
-.main-sidebar-button.tab-student:hover:not(.active) {
-  background-color: #e5e7eb;
-  color: #374151;
-}
-
-/* Ensure all tab buttons remain visible */
-.main-sidebar-button.tab-progress {
-  background-color: #f3f4f6;
-  color: #6b7280;
-}
-
-.main-sidebar-button.tab-progress.active {
-  background-color: #14b8a6 !important; /* Teal for progress */
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
-}
-
-.main-sidebar-button.tab-progress:hover:not(.active) {
-  background-color: #e5e7eb;
-  color: #374151;
-}
-
-/* Main Content Area */
-.main-content-area {
-  flex: 1;
-  margin-left: 280px; /* Offset for fixed sidebar */
-  padding: 20px;
-  min-height: calc(100vh - 60px);
-  overflow-y: auto; /* Allow main content to scroll */
-  background-color: #ffffff;
-}
-
-.content-with-padding {
-  padding: 20px;
 }
 
 /* Empty State Styles */
@@ -365,12 +156,8 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .main-sidebar {
-    width: 240px;
-  }
-
-  .main-content-area {
-    margin-left: 240px;
+  .teacher-dashboard-container {
+    padding: 15px;
   }
 
   .overview-metrics-grid {
@@ -379,22 +166,8 @@
 }
 
 @media (max-width: 768px) {
-  .main-sidebar {
-    width: 200px;
-  }
-
-  .main-content-area {
-    margin-left: 200px;
-  }
-
-  .main-sidebar-button {
-    padding: 16px 12px;
-    font-size: 14px;
-    min-height: 50px;
-  }
-
-  .main-sidebar-nav {
-    gap: 12px;
+  .teacher-dashboard-container {
+    padding: 10px;
   }
 
   .overview-metrics-grid {
@@ -403,26 +176,8 @@
 }
 
 @media (max-width: 640px) {
-  .main-sidebar {
-    width: 60px;
-  }
-
-  .main-content-area {
-    margin-left: 60px;
-  }
-
-  .main-sidebar-button {
-    padding: 12px;
-    justify-content: center;
-    font-size: 0;
-  }
-
-  .main-sidebar-button:before {
-    font-size: 20px;
-  }
-
-  .main-sidebar-container {
-    padding: 20px 10px;
+  .teacher-dashboard-container {
+    padding: 8px;
   }
 }
 
@@ -494,63 +249,3 @@
   border-left: 4px solid #16a34a;
 }
 
-.main-sidebar-header {
-  padding: 15px 10px;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 15px;
-}
-
-.sidebar-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-  text-align: center;
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-height: 768px) {
-  .main-sidebar-button {
-    padding: 14px 14px;
-    min-height: 45px;
-    font-size: 14px;
-  }
-  
-  .main-sidebar-nav {
-    gap: 8px;
-  }
-  
-  .main-sidebar-container {
-    padding: 15px 10px;
-  }
-}
-
-/* For very small height screens */
-@media (max-height: 600px) {
-  .main-sidebar-button {
-    padding: 12px 12px;
-    min-height: 40px;
-    font-size: 13px;
-  }
-  
-  .main-sidebar-nav {
-    gap: 5px;
-  }
-}
-
-/* Exam Correction - Purple when active */
-.main-sidebar-button.tab-exam {
-  background-color: #f3f4f6;
-  color: #6b7280;
-}
-
-.main-sidebar-button.tab-exam.active {
-  background-color: #8b5cf6 !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-}
-
-.main-sidebar-button.tab-exam:hover:not(.active) {
-  background-color: #e5e7eb;
-  color: #374151;
-}

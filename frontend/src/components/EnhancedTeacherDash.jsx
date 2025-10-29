@@ -8,7 +8,7 @@ import StudentDash from './StudentDash';
 import QuickExerciseComponent from './QuickExerciseComponent';
 import ExamAnalytics from './ExamAnalytics';
 import ProgressTab from './ProgressTab';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 
 // Import the separated components
@@ -168,10 +168,17 @@ const classesData = {
 const EnhancedTeacherDash = () => {
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { showAlert, AlertContainer } = useAlert();
 
   const [selectedClass, setSelectedClass] = useState(classesData[1]);
-  const [activeTab, setActiveTab] = useState('homework'); // Now defaults to Worksheets tab
+  // Get activeTab from location state or URL params, default to 'homework'
+  const getInitialTab = () => {
+    if (location.state?.activeTab) return location.state.activeTab;
+    const params = new URLSearchParams(location.search);
+    return params.get('tab') || 'homework';
+  };
+  const [activeTab, setActiveTab] = useState(getInitialTab());
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentData, setStudentData] = useState(null);
   const [assignments, setAssignments] = useState([]);
@@ -182,6 +189,12 @@ const EnhancedTeacherDash = () => {
   useEffect(() => {
     fetchTeacherData();
   }, []);
+
+  // Update activeTab when location changes
+  useEffect(() => {
+    const newTab = getInitialTab();
+    setActiveTab(newTab);
+  }, [location.state, location.search]);
 
   useEffect(() => {
     // Function for ExamCorrection to switch to analytics
@@ -331,83 +344,7 @@ const fetchTeacherData = async () => {
     );
   }
 
-   // Render main sidebar navigation - UPDATED ORDER
-const renderMainSidebar = () => {
-  return (
-    <div className="main-sidebar-container">
-      <div className="main-sidebar-nav">
-        
-        {/* 1. Homework -  First*/}
-        <button 
-          onClick={() => setActiveTab('exercise')}
-          className={`main-sidebar-button tab-exercise ${activeTab === 'exercise' ? 'active' : ''}`}
-        >
-          📝 Homework
-        </button>
-        <button 
-          onClick={() => setActiveTab('upload-homework')}
-          className={`main-sidebar-button tab-exercise ${activeTab === 'upload-homework' ? 'active' : ''}`}
-        >
-          📑Upload Homework
-        </button>
-        {/* 2. Classwork - Second */}
-        <button 
-          onClick={() => setActiveTab('classwork')}
-          className={`main-sidebar-button tab-classwork ${activeTab === 'classwork' ? 'active' : ''}`}
-        >
-          ✏ Classwork
-        </button>
-        <button 
-          onClick={() => setActiveTab('upload-classwork')}
-          className={`main-sidebar-button tab-classwork ${activeTab === 'upload-classwork' ? 'active' : ''}`}
-        >
-          📑Upload Classwork
-        </button>
-
-        {/* 3. Worksheets -  Third*/}
-        <button 
-          onClick={() => setActiveTab('homework')}
-          className={`main-sidebar-button tab-homework ${activeTab === 'homework' ? 'active' : ''}`}
-        >
-          📄 Worksheets
-        </button>
-
-        {/* 4. Exam Correction - Fourth */}
-              <button 
-                onClick={() => setActiveTab('exam-correction')}
-                className={`main-sidebar-button tab-exam ${activeTab === 'exam-correction' ? 'active' : ''}`}
-              >
-                📄 Exam Correction
-              </button>
-        
-        {/* 5. Class Analysis - Fifth */}
-        <button 
-          onClick={() => setActiveTab('class')}
-          className={`main-sidebar-button tab-class ${activeTab === 'class' ? 'active' : ''}`}
-        >
-          📊 Class Analysis
-        </button>
-        
-        {/* 6. Student Analysis - Sixth */}
-        <button 
-          onClick={() => setActiveTab('student')}
-          className={`main-sidebar-button tab-student ${activeTab === 'student' ? 'active' : ''}`}
-        >
-          👤 Student Analysis
-        </button>
-
-        {/* 7. Progress - Seventh*/}
-              <button 
-                onClick={() => setActiveTab('progress')}
-                className={`main-sidebar-button tab-progress ${activeTab === 'progress' ? 'active' : ''}`}
-              >
-                📈 Progress
-              </button>
-      </div>
-    </div>
-  );
-};
-
+ 
   // Loading state
   if (loading) {
     return (
@@ -429,16 +366,7 @@ const renderMainSidebar = () => {
   return (
     <>
       <AlertContainer />
-      <div className="dashboard-container">
-      <div className="dashboard-wrapper">
-        <div className="main-dashboard-layout">
-          {/* Fixed Sidebar */}
-          <div className="main-sidebar">
-            {renderMainSidebar()}
-          </div>
-
-          {/* Main Content */}
-          <div className="main-content-area">
+      <div className="teacher-dashboard-container">
             {activeTab === 'class' ? (
               <ClassAnalysis 
                 selectedClass={selectedClass}
@@ -487,12 +415,9 @@ const renderMainSidebar = () => {
               onClassChange={handleClassChange}
               />
             ) : null}
-          </div>
-        </div>
       </div>
-    </div>
     </>
-  ); 
+  );
 };
 
  

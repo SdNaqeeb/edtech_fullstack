@@ -368,7 +368,7 @@ const res = await api.post("/create_session", formData, {
 
       const transcription = res?.data?.transcription || "(no transcription)";
       const aiText = res?.data?.response || res?.data?.content || "";
-      const audioBase64 = res?.data?.audio || res?.data?.audio_bytes;
+      const audioBase64 = res?.data?.audio_base64 || res?.data?.audio_bytes;
       const aiAudioUrl = audioBase64 ? `data:audio/mp3;base64,${audioBase64}` : null;
 
       // Replace placeholder with actual transcription
@@ -478,14 +478,14 @@ const res = await api.post("/create_session", formData, {
         const res = await api.post("/chat", fd, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        const audioBase64 = res?.data?.audio;
+        const audioBase64 = res?.data?.audio_base64;
         const aiAudioUrl = audioBase64 ? `data:audio/mp3;base64,${audioBase64}` : null;
 
         setMessages((prev) => [
           ...prev,
           {
             id: id + 1,
-            text: res?.data?.reply || "I've analyzed your image!",
+            text: res?.data?.response || "I've analyzed your image!",
             sender: "ai",
             timestamp: new Date(),
             audioUrl: aiAudioUrl,
@@ -507,7 +507,7 @@ const res = await api.post("/create_session", formData, {
         const res = await api.post("/chat-simple", requestBody, {
           headers: { session_token: sessionId },
         });
-        const audioBase64 = res?.data?.audio;
+        const audioBase64 = res?.data?.aiAudioUrl;
         const aiAudioUrl = audioBase64 ? `data:audio/mp3;base64,${audioBase64}` : null;
 
         setMessages((prev) => [
@@ -543,269 +543,269 @@ const res = await api.post("/create_session", formData, {
     <>
       <AlertContainer />
       <div className="chat-box-container">
-      {/* Floating Toggle */}
-      <button
-        className={`chat-toggle-btn ${isOpen ? "open" : ""}`}
-        onClick={toggleChat}
-        title={isOpen ? "Close chat" : "Ask a question"}
-      >
-        <FontAwesomeIcon icon={isOpen ? faTimes : faCommentDots} />
-        {!isOpen && <span className="chat-label">Ask a question</span>}
-      </button>
+        {/* Floating Toggle */}
+        <button
+          className={`chat-toggle-btn ${isOpen ? "open" : ""}`}
+          onClick={toggleChat}
+          title={isOpen ? "Close chat" : "Ask a question"}
+        >
+          <FontAwesomeIcon icon={isOpen ? faTimes : faCommentDots} />
+          {!isOpen && <span className="chat-label">Ask a question</span>}
+        </button>
 
-      {/* Chat Window */}
-      <div className={`chat-box ${isOpen ? "open" : ""}`}>
-        {/* Header */}
-        <div className="chat-header">
-          <h5>
-            🤖 {`${className} Class`} Math Assistant
-          </h5>
-          <div className="flex-grow" />
+        {/* Chat Window */}
+        <div className={`chat-box ${isOpen ? "open" : ""}`}>
+          {/* Header */}
+          <div className="chat-header">
+            <h5>
+              🤖 {`${className} Class`} Math Assistant
+            </h5>
+            <div className="flex-grow" />
 
-          {/* Language Selector */}
-          <Form.Select
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            size="sm"
-            style={{ width: 140, marginRight: 8 }}
-          >
-            <option value="en">English</option>
-            <option value="hi">Hindi</option>
-            <option value="te">Telugu</option>
-          </Form.Select>
-
-          {/* Clear chat */}
-          <Button
-            variant="outline-light"
-            size="sm"
-            onClick={clearChat}
-            disabled={connectionStatus !== "connected" || !sessionId}
-            title="Clear chat & start new session"
-            style={{ marginRight: 8 }}
-          >
-            <FontAwesomeIcon icon={faTrash} /> Clear
-          </Button>
-
-          {/* Connection status */}
-          <Button variant="outline-light" size="sm" disabled>
-            <FontAwesomeIcon icon={faLanguage} />{" "}
-            {connectionStatus === "connected"
-              ? "Connected"
-              : connectionStatus === "checking"
-                ? "Connecting..."
-                : "Disconnected"}
-          </Button>
-
-          <button className="close-btn" onClick={toggleChat}>
-            <FontAwesomeIcon icon={faTimes} />
-          </button>
-        </div>
-
-        {/* Messages */}
-        <div className="chat-messages">
-          {messages.map((m) => (
-            <div
-              key={m.id}
-              className={`message ${m.sender === "user" ? "user-message" : "ai-message"
-                }`}
+            {/* Language Selector */}
+            <Form.Select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              size="sm"
+              style={{ width: 140, marginRight: 8 }}
             >
-              <div className="message-bubble">
-                {formatMessage(m.text)}
-                {m.audioUrl && (
-                  <div className="message-audio-container" style={{ marginTop: 8 }}>
-                    <audio controls src={m.audioUrl} />
-                  </div>
-                )}
-                {m.image && (
-                  <div className="message-image-container">
-                    <img
-                      src={m.image}
-                      alt="User uploaded"
-                      className="message-image"
-                    />
-                  </div>
-                )}
-              </div>
+              <option value="en">English</option>
+              <option value="hi">Hindi</option>
+              <option value="te">Telugu</option>
+            </Form.Select>
 
-              {/* Message footer */}
+            {/* Clear chat */}
+            <Button
+              variant="outline-light"
+              size="sm"
+              onClick={clearChat}
+              disabled={connectionStatus !== "connected" || !sessionId}
+              title="Clear chat & start new session"
+              style={{ marginRight: 8 }}
+            >
+              <FontAwesomeIcon icon={faTrash} /> Clear
+            </Button>
+
+            {/* Connection status */}
+            <Button variant="outline-light" size="sm" disabled>
+              <FontAwesomeIcon icon={faLanguage} />{" "}
+              {connectionStatus === "connected"
+                ? "Connected"
+                : connectionStatus === "checking"
+                  ? "Connecting..."
+                  : "Disconnected"}
+            </Button>
+
+            <button className="close-btn" onClick={toggleChat}>
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+          </div>
+
+          {/* Messages */}
+          <div className="chat-messages">
+            {messages.map((m) => (
               <div
-                className="message-time"
-                style={{ display: "flex", gap: 8, alignItems: "center" }}
+                key={m.id}
+                className={`message ${m.sender === "user" ? "user-message" : "ai-message"
+                  }`}
               >
-                {m.timestamp
-                  ? new Date(m.timestamp).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                  : ""}
-              </div>
-            </div>
-          ))}
+                <div className="message-bubble">
+                  {formatMessage(m.text)}
+                  {m.audioUrl && (
+                    <div className="message-audio-container" style={{ marginTop: 8 }}>
+                      <audio controls src={m.audioUrl} />
+                    </div>
+                  )}
+                  {m.image && (
+                    <div className="message-image-container">
+                      <img
+                        src={m.image}
+                        alt="User uploaded"
+                        className="message-image"
+                      />
+                    </div>
+                  )}
+                </div>
 
-          {isTyping && (
-            <div className="message ai-message">
-              <div className="message-bubble typing">
-                <span className="dot"></span>
-                <span className="dot"></span>
-                <span className="dot"></span>
-              </div>
-            </div>
-          )}
-
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <Form onSubmit={sendMessage} className="chat-input">
-          <InputGroup>
-            <Form.Control
-              type="text"
-              placeholder={
-                connectionStatus === "connected"
-                  ? "Type your question..."
-                  : "Connecting to AI service..."
-              }
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              disabled={connectionStatus !== "connected" || isTyping}
-            />
-
-            {/* Hidden file input */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              style={{ display: "none" }}
-              disabled={connectionStatus !== "connected" || isTyping}
-            />
-
-            {/* Image thumbnail or Upload button */}
-            {previewUrl ? (
-              <div className="input-thumbnail-container">
-                <div className="input-thumbnail">
-                  <img
-                    src={previewUrl}
-                    alt="Thumbnail"
-                    className="thumbnail-image"
-                  />
-                  <button
-                    className="remove-thumbnail-btn"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      clearSelectedFile();
-                    }}
-                    aria-label="Remove image"
-                    type="button"
-                  >
-                    <FontAwesomeIcon icon={faTimes} />
-                  </button>
+                {/* Message footer */}
+                <div
+                  className="message-time"
+                  style={{ display: "flex", gap: 8, alignItems: "center" }}
+                >
+                  {m.timestamp
+                    ? new Date(m.timestamp).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                    : ""}
                 </div>
               </div>
-            ) : (
+            ))}
+
+            {isTyping && (
+              <div className="message ai-message">
+                <div className="message-bubble typing">
+                  <span className="dot"></span>
+                  <span className="dot"></span>
+                  <span className="dot"></span>
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Area */}
+          <Form onSubmit={sendMessage} className="chat-input">
+            <InputGroup>
+              <Form.Control
+                type="text"
+                placeholder={
+                  connectionStatus === "connected"
+                    ? "Type your question..."
+                    : "Connecting to AI service..."
+                }
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                disabled={connectionStatus !== "connected" || isTyping}
+              />
+
+              {/* Hidden file input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                style={{ display: "none" }}
+                disabled={connectionStatus !== "connected" || isTyping}
+              />
+
+              {/* Image thumbnail or Upload button */}
+              {previewUrl ? (
+                <div className="input-thumbnail-container">
+                  <div className="input-thumbnail">
+                    <img
+                      src={previewUrl}
+                      alt="Thumbnail"
+                      className="thumbnail-image"
+                    />
+                    <button
+                      className="remove-thumbnail-btn"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        clearSelectedFile();
+                      }}
+                      aria-label="Remove image"
+                      type="button"
+                    >
+                      <FontAwesomeIcon icon={faTimes} />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  className="ms-1 d-flex align-items-center justify-content-center"
+                  type="button"
+                  onClick={handleFileButtonClick}
+                  title="Upload image"
+                  disabled={connectionStatus !== "connected" || isTyping}
+                >
+                  <FontAwesomeIcon icon={faUpload} />
+                </Button>
+              )}
+
+              {/* Audio record button */}
               <Button
                 className="ms-1 d-flex align-items-center justify-content-center"
                 type="button"
-                onClick={handleFileButtonClick}
-                title="Upload image"
+                onClick={toggleRecording}
+                title={isRecording ? "Stop recording" : "Record audio"}
                 disabled={connectionStatus !== "connected" || isTyping}
+                variant={isRecording ? "danger" : "primary"}
               >
-                <FontAwesomeIcon icon={faUpload} />
+                <FontAwesomeIcon icon={isRecording ? faStop : faMicrophone} />
               </Button>
-            )}
 
-            {/* Audio record button */}
-            <Button
-              className="ms-1 d-flex align-items-center justify-content-center"
-              type="button"
-              onClick={toggleRecording}
-              title={isRecording ? "Stop recording" : "Record audio"}
-              disabled={connectionStatus !== "connected" || isTyping}
-              variant={isRecording ? "danger" : "primary"}
-            >
-              <FontAwesomeIcon icon={isRecording ? faStop : faMicrophone} />
-            </Button>
-
-            {/* Send button */}
-            <Button
-              className="ms-1 d-flex align-items-center justify-content-center"
-              type="submit"
-              disabled={
-                connectionStatus !== "connected" ||
-                isTyping ||
-                (!newMessage.trim() && !selectedFile)
-              }
-              title="Send message"
-            >
-              <FontAwesomeIcon icon={faPaperPlane} />
-            </Button>
-          </InputGroup>
-        </Form>
-      </div>
-
-      {/* Image Action Modal */}
-      <Modal show={showImageModal} onHide={clearSelectedFile} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>📸 Choose Analysis</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {previewUrl && (
-            <div style={{ textAlign: "center", marginBottom: 12 }}>
-              <img
-                src={previewUrl}
-                alt="preview"
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: 240,
-                  borderRadius: 8,
-                  objectFit: "contain",
-                }}
-              />
-            </div>
-          )}
-          <div className="upload d-grid gap-2">
-            <Button
-              variant="primary"
-              onClick={() => sendImageWithCommand("solve it")}
-              disabled={connectionStatus !== "connected"}
-            >
-              🧮 Solve It
-            </Button>
-            <Button
-              variant="success"
-              onClick={() => sendImageWithCommand("correct it")}
-              disabled={connectionStatus !== "connected"}
-            >
-              ✅ Correct It
-            </Button>
-            <div className="input-container">
-              <input
-                type="text"
-                className="custom-input"
-                onChange={handleText}
-                accept="image/*"
-                placeholder="Type your message..."
-
-                disabled={connectionStatus !== "connected" || isTyping}
-              />
+              {/* Send button */}
               <Button
-                className="send-btn"
-                onClick={() => sendImageWithCommand(inputText)}
+                className="ms-1 d-flex align-items-center justify-content-center"
+                type="submit"
+                disabled={
+                  connectionStatus !== "connected" ||
+                  isTyping ||
+                  (!newMessage.trim() && !selectedFile)
+                }
+                title="Send message"
+              >
+                <FontAwesomeIcon icon={faPaperPlane} />
+              </Button>
+            </InputGroup>
+          </Form>
+        </div>
+
+        {/* Image Action Modal */}
+        <Modal show={showImageModal} onHide={clearSelectedFile} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>📸 Choose Analysis</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {previewUrl && (
+              <div style={{ textAlign: "center", marginBottom: 12 }}>
+                <img
+                  src={previewUrl}
+                  alt="preview"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: 240,
+                    borderRadius: 8,
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
+            )}
+            <div className="upload d-grid gap-2">
+              <Button
+                variant="primary"
+                onClick={() => sendImageWithCommand("solve it")}
                 disabled={connectionStatus !== "connected"}
               >
-                Send Input
+                🧮 Solve It
               </Button>
-            </div>
-          </div>
+              <Button
+                variant="success"
+                onClick={() => sendImageWithCommand("correct it")}
+                disabled={connectionStatus !== "connected"}
+              >
+                ✅ Correct It
+              </Button>
+              <div className="input-container">
+                <input
+                  type="text"
+                  className="custom-input"
+                  onChange={handleText}
+                  accept="image/*"
+                  placeholder="Type your message..."
 
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={clearSelectedFile}>
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+                  disabled={connectionStatus !== "connected" || isTyping}
+                />
+                <Button
+                  className="send-btn"
+                  onClick={() => sendImageWithCommand(inputText)}
+                  disabled={connectionStatus !== "connected"}
+                >
+                  Send Input
+                </Button>
+              </div>
+            </div>
+
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={clearSelectedFile}>
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
     </>
   );
 };

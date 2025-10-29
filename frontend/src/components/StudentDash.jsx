@@ -603,88 +603,33 @@ function StudentDash() {
     <>
       <AlertContainer />
       <div className={`student-dash-wrapper ${isDarkMode ? 'dark-mode' : ''}`}>
-        {/* Enhanced Fixed Sidebar */}
-        <div className="sidebar-fixed">
-          {/* <div className="sidebar-header">
-          <div className="sidebar-brand">
-            <FontAwesomeIcon icon={faGraduationCap} className="brand-icon" />
-            <span>AI Educator</span>
-          </div>
-        </div> */}
-
-          <div className="sidebar-content">
-            {/* Enhanced Progress Card with Animation */}
-            <div className="progress-card">
-              <div className="progress-icon">
-                <FontAwesomeIcon icon={faBrain} />
-              </div>
-              <div className="progress-details">
-                <h4>89%</h4>
-                <span>Progress</span>
-              </div>
-            </div>
-
-            {/* Enhanced Streak Card */}
-            <div className="streak-card">
-              <div className="streak-icon">
-                <FontAwesomeIcon icon={faFire} />
-              </div>
-              <div className="streak-details">
-                <h4>5</h4>
-                <span>Day Streak</span>
-              </div>
-            </div>
-
-            {/* Enhanced Badges Card */}
-            <div className="badges-card">
-              <div className="badges-icon">
-                <FontAwesomeIcon icon={faTrophy} />
-              </div>
-              <div className="badges-details">
-                <h4>3</h4>
-                <span>Badges</span>
-              </div>
-            </div>
-
-            {/* Enhanced Dark Mode Toggle */}
-            <div className="dark-mode-toggle" onClick={toggleDarkMode}>
-              <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
-              <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Enhanced Main Content */}
+        {/* Main Content - Sidebar removed (now in Layout.jsx) */}
         <div className="main-content-fixed">
-          {/* Enhanced Greeting Header with Dynamic Content */}
+          {/* Enhanced Greeting Header with Dynamic Content & Dark Mode Toggle */}
           <div className="greeting-header">
             <div className="greeting-content">
               <div className="greeting-text">
                 <h1>
-
-                  <FontAwesomeIcon icon={faGraduationCap} className="me-1" />
-                  {getTimeBasedGreeting()}, {localStorage.getItem("fullName")}!
-                  <span className="graduation-emoji">🎓</span>
+                  {getTimeBasedGreeting()}, {localStorage.getItem("fullName") || username}! 👋
                 </h1>
-                {/* <p>Class 10 Student • {getMotivationalMessage()}</p> */}
-                <div className="motivation-buttons">
-                  <Button variant="warning" size="sm" className="motivation-btn">
-                    <FontAwesomeIcon icon={faStar} className="me-1" />
-                    Keep Going!
-                  </Button>
-                  <Button variant="info" size="sm" className="motivation-btn">
-                    <FontAwesomeIcon icon={faTrophy} className="me-1" />
-                    You're Awesome!
-                  </Button>
-                </div>
               </div>
-              <div className="current-date">
-                <h2>{new Date().toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric'
-                })}</h2>
-                {/* <p>{new Date().getFullYear()}</p> */}
+              <div className="current-date-wrapper">
+                <div className="current-date">
+                  <span className="date-label">Today</span>
+                  <span className="date-value">{new Date().toLocaleDateString('en-US', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                  })}</span>
+                </div>
+                {/* Dark Mode Toggle Button */}
+                <button
+                  className="dark-mode-toggle-btn"
+                  onClick={toggleDarkMode}
+                  title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                >
+                  <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
+                </button>
               </div>
             </div>
           </div>

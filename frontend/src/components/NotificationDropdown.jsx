@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { NotificationContext } from '../contexts/NotificationContext';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
 
 const NotificationDropdown = () => {
   const {
@@ -15,9 +16,17 @@ const NotificationDropdown = () => {
 
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [oldNotifications, setOldNotifications] = useState([]);
+  const [loadingOldNotifications, setLoadingOldNotifications] = useState(false);
+  const [oldNotificationsLoaded, setOldNotificationsLoaded] = useState(false);
   const navigate = useNavigate();
 
   const unreadCount = getUnreadCount();
+
+  // Combine current and old notifications
+  const allNotifications = oldNotificationsLoaded
+    ? [...notifications, ...oldNotifications]
+    : notifications;
 
   const getNotificationIcon = (type) => {
     const iconMap = {
@@ -30,6 +39,29 @@ const NotificationDropdown = () => {
     return iconMap[type] || '🔔';
   };
 
+  // Fetch old notifications
+  const fetchOldNotifications = async () => {
+    setLoadingOldNotifications(true);
+    try {
+      const response = await axiosInstance.get('/old-notifications/');
+      setOldNotifications(response.data);
+      setOldNotificationsLoaded(true);
+    } catch (error) {
+      console.error('Error fetching old notifications:', error);
+    } finally {
+      setLoadingOldNotifications(false);
+    }
+  };
+
+  // Handle dropdown toggle (clear old notifications when closed)
+  const handleDropdownToggle = (isOpen) => {
+    if (!isOpen) {
+      // Dropdown is closing, clear old notifications
+      setOldNotifications([]);
+      setOldNotificationsLoaded(false);
+    }
+  };
+
   const handleNotificationClick = (notification) => {
 
     console.log("Notification clicked:", notification);
@@ -37,14 +69,13 @@ const NotificationDropdown = () => {
     markNotificationAsRead(notification.id);
     
     // If it's a homework notification with homework details, redirect to submission page
-    if (notification.type === 'homework' && notification.homework) {
-      console.log("Navigating to homework submission with details:", notification.homework);
+    if (notification.type === 'homework' && notification._notification.id) {
+      console.log("Navigating to homework submission with details:", notification._notification.id);
       
       navigate('/homework', {
         state: {
-          homeworkCode: notification.homework.homework_code,
-          homeworkDetails: notification.homework,
-          homeworkImages: notification.homework.images || [],
+          notificationId: notification._notification.id,
+          
         }
       });
     } else {
@@ -61,16 +92,16 @@ const NotificationDropdown = () => {
 
   return (
     <>
-      <Dropdown align="end" className="position-relative">
+      <Dropdown align="end" className="position-relative" onToggle={handleDropdownToggle}>
         <Dropdown.Toggle
           variant="link"
           id="notifications-dropdown"
           className="nav-link position-relative"
         >
-          <FontAwesomeIcon icon={faBell} size="lg" />
+          <FontAwesomeIcon icon={faBell} size="lg" /> Notifications
           {unreadCount > 0 && (
             <Badge
-              
+
               bg="danger"
               className="position-absolute top-10 start-1 translate-down p-1"
               style={{ fontSize: '0.7rem' }}
@@ -95,10 +126,24 @@ const NotificationDropdown = () => {
             )}
           </Dropdown.Header>
 
-          {notifications.length === 0 ? (
+          {/* Old Notifications Button */}
+          {/* {!oldNotificationsLoaded && (
+            <div className="px-3 py-2">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-primary w-100"
+                onClick={fetchOldNotifications}
+                disabled={loadingOldNotifications}
+              >
+                {loadingOldNotifications ? 'Loading...' : 'Load Old Notifications'}
+              </button>
+            </div>
+          )} */}
+
+          {allNotifications.length === 0 ? (
             <Dropdown.Item disabled>No notifications</Dropdown.Item>
           ) : (
-            notifications.map((notification) => (
+            allNotifications.map((notification) => (
               <Dropdown.Item
                 key={notification.id}
                 onClick={() => handleNotificationClick(notification)}
@@ -109,7 +154,7 @@ const NotificationDropdown = () => {
                     {getNotificationIcon(notification.type)}
                   </span>
                   <div>
-                    <div className="fw-bold">{notification.title}</div>
+                    {/* <div className="fw-bold">{notification.title}</div> */}
                     <div className="text-muted" style={{ fontSize: '0.85rem' }}>
                       {notification.message}
                       
