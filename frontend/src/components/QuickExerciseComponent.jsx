@@ -69,6 +69,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
   // State for homework list modal
   const [showHomeworkListModal, setShowHomeworkListModal] = useState(false);
   const [homeworkList, setHomeworkList] = useState([]);
+  const [homeworkListData, setHomeworkListData] = useState([]); // Store full homework data with counts
   const [isLoadingHomeworkList, setIsLoadingHomeworkList] = useState(false);
   const [homeworkListError, setHomeworkListError] = useState(null);
 
@@ -254,13 +255,27 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
     setIsLoadingHomeworkList(true);
     setHomeworkListError(null);
     setHomeworkList([]);
+    setHomeworkListData([]);
 
     try {
       const response = await axiosInstance.get("/homework-list/");
       console.log("Homework list:", response.data);
 
       if (response.data && response.data.homework_codes && Array.isArray(response.data.homework_codes)) {
-        setHomeworkList(response.data.homework_codes);
+        // Check if it's the new format (array of objects) or old format (array of strings)
+        if (response.data.homework_codes.length > 0 && typeof response.data.homework_codes[0] === 'object') {
+          // New format: array of objects with homework_code, submissions_count, non_submitted_count
+          setHomeworkListData(response.data.homework_codes);
+          setHomeworkList(response.data.homework_codes.map(item => item.homework_code));
+        } else {
+          // Old format: array of strings
+          setHomeworkList(response.data.homework_codes);
+          setHomeworkListData(response.data.homework_codes.map(code => ({
+            homework_code: code,
+            submissions_count: null,
+            non_submitted_count: null
+          })));
+        }
       } else {
         setHomeworkListError("No homework codes found or invalid response format.");
       }
@@ -269,6 +284,7 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
       console.error("Error fetching homework list:", error);
       setHomeworkListError(error.response?.data?.message || "Failed to fetch homework list.");
       setHomeworkList([]);
+      setHomeworkListData([]);
       setShowHomeworkListModal(true);
     } finally {
       setIsLoadingHomeworkList(false);
@@ -1461,14 +1477,26 @@ const QuickExerciseComponent = ({ onCreateHomework, mode = "homework" }) => {
           </div>
         ) : (
           <div className="list-group">
-            {homeworkList.map((homeworkCode, index) => (
+            {homeworkListData.map((homework, index) => (
               <button
                 key={index}
                 className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                onClick={() => handleHomeworkSelection(homeworkCode)}
+                onClick={() => handleHomeworkSelection(homework.homework_code)}
               >
-                <span>{homeworkCode}</span>
-                <Badge bg="light" text="dark">
+                <div>
+                  <span className="fw-bold">{homework.homework_code}</span>
+                  {homework.submissions_count !== null && (
+                    <div className="small text-muted mt-1">
+                      <span className="text-success me-3">
+                        ✓ {homework.submissions_count} submitted
+                      </span>
+                      <span className="text-warning">
+                        ⏳ {homework.non_submitted_count} not submitted
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <Badge bg="primary" text="white">
                   View Report
                 </Badge>
               </button>

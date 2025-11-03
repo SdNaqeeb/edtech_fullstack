@@ -21,8 +21,24 @@ const UploadHomework = () => {
       setFetchingHomework(true);
       setError(null);
       const response = await axiosInstance.get('/homework-list/');
-      setHomeworkList(response.data.homework_codes);
-      console.log('homework-list data', response.data.homework_codes);
+
+      // Handle both response formats
+      let homeworkCodes = [];
+      if (response.data.homework_codes) {
+        // Check if it's an array of strings or objects
+        if (Array.isArray(response.data.homework_codes)) {
+          if (typeof response.data.homework_codes[0] === 'string') {
+            // Old format: array of strings
+            homeworkCodes = response.data.homework_codes;
+          } else if (typeof response.data.homework_codes[0] === 'object') {
+            // New format: array of objects
+            homeworkCodes = response.data.homework_codes.map(item => item.homework_code);
+          }
+        }
+      }
+
+      setHomeworkList(homeworkCodes);
+      console.log('homework-list data', homeworkCodes);
     } catch (error) {
       console.error('Error fetching homework list:', error);
       setError('Failed to fetch homework list. Please try again.');

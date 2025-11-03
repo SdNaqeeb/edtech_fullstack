@@ -23,9 +23,9 @@ const NotificationDropdown = () => {
 
   const unreadCount = getUnreadCount();
 
-  // Combine current and old notifications
+  // Show only old notifications when loaded, otherwise show current notifications
   const allNotifications = oldNotificationsLoaded
-    ? [...notifications, ...oldNotifications]
+    ? oldNotifications
     : notifications;
 
   const getNotificationIcon = (type) => {
@@ -43,7 +43,7 @@ const NotificationDropdown = () => {
   const fetchOldNotifications = async () => {
     setLoadingOldNotifications(true);
     try {
-      const response = await axiosInstance.get('/old-notifications/');
+      const response = await axiosInstance.get('studentnotifications/');
       setOldNotifications(response.data);
       setOldNotificationsLoaded(true);
     } catch (error) {
@@ -63,19 +63,24 @@ const NotificationDropdown = () => {
   };
 
   const handleNotificationClick = (notification) => {
-
     console.log("Notification clicked:", notification);
     // Mark notification as read
     markNotificationAsRead(notification.id);
-    
-    // If it's a homework notification with homework details, redirect to submission page
-    if (notification.type === 'homework' && notification._notification.id) {
-      console.log("Navigating to homework submission with details:", notification._notification.id);
-      
+
+    // Determine if this is a homework notification and get the notification ID
+    const isHomeworkNotification =
+      (notification.type === 'homework' && notification._notification?.id) || // New format
+      notification.homework; // Old format
+
+    if (isHomeworkNotification) {
+      // Get notification ID based on format
+      const notificationId = notification._notification?.id || notification.id;
+
+      console.log("Navigating to homework submission with notification ID:", notificationId);
+
       navigate('/homework', {
         state: {
-          notificationId: notification._notification.id,
-          
+          notificationId: notificationId,
         }
       });
     } else {
@@ -127,7 +132,7 @@ const NotificationDropdown = () => {
           </Dropdown.Header>
 
           {/* Old Notifications Button */}
-          {/* {!oldNotificationsLoaded && (
+          {!oldNotificationsLoaded && (
             <div className="px-3 py-2">
               <button
                 type="button"
@@ -138,7 +143,7 @@ const NotificationDropdown = () => {
                 {loadingOldNotifications ? 'Loading...' : 'Load Old Notifications'}
               </button>
             </div>
-          )} */}
+          )}
 
           {allNotifications.length === 0 ? (
             <Dropdown.Item disabled>No notifications</Dropdown.Item>
