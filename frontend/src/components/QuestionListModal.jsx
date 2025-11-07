@@ -182,10 +182,10 @@ const handleQuestionClick = (questionData, index) => {
   return (
     <>
       <AlertContainer />
-      <Modal 
-        show={show} 
-        onHide={handleModalClose} 
-        size="lg" 
+      <Modal
+        show={show}
+        onHide={handleModalClose}
+        size="xl"
         className="question-modal"
         backdrop="static"
       >
@@ -256,11 +256,11 @@ const handleQuestionClick = (questionData, index) => {
       <Modal.Footer>
         <div className="d-flex justify-content-between w-200">
           <div>
-            {selectedQuestions.length > 0 && (
+            {/* {selectedQuestions.length > 0 && (
               <span className="text-muted">
                 {selectedQuestions.length}/20 questions selected
               </span>
-            )}
+            )} */}
           </div>
           <div>
             {worksheetName && !isTeacherMode && (

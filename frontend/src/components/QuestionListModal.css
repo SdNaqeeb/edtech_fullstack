@@ -1,22 +1,58 @@
 /* QuestionListModal.css - Fixed Layout Issues */
 
+/* Slide in from bottom animation */
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Fade in backdrop animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Modal base styling */
 .question-modal .modal-content {
-  border-radius: 15px;
+  border-radius: 1.5rem;
   border: none;
-  background: rgba(255, 255, 255, 0.667);
+
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  max-width: 90vw; /* Prevent modal from being too wide */
+  max-width: 95vw; /* Increased width for better display */
   max-height: 90vh; /* Prevent modal from being too tall */
+  animation: slideInFromBottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Modal dialog animation with increased width */
+.question-modal .modal-dialog {
+  max-width: 1400px; /* Much wider for better question display */
+  width: 95%;
+  margin: 1.75rem auto;
+  animation: slideInFromBottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Backdrop animation */
+.question-modal.show {
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .question-list-container {
   max-height: 70vh;
   overflow-y: auto;
   overflow-x: hidden; /* FIXED: Prevent horizontal scroll */
-  padding: 15px;
+  padding: 20px 30px; /* Increased padding for better spacing with wider modal */
 }
 
 .question-list {
@@ -35,18 +71,19 @@
   backdrop-filter: blur(5px);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.281);
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: skewX(-2deg);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  /* transform: skewX(-2deg); */
   position: relative; /* FIXED: For absolute positioning of level badge */
   width: 100%; /* FIXED: Full width */
   box-sizing: border-box; /* FIXED: Include padding in width calculation */
 }
 
 .question-item:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: skewX(-2deg) translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  background: rgba(62, 233, 255, 0.067);
+  /* transform: skewX(-2deg) translateY(-3px); */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.473);
 }
 
 .question-item.selected {
@@ -64,9 +101,9 @@
   margin-right: 15px;
   margin-top: 5px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  transform: skewX(2deg);
+  /* transform: skewX(2deg); */
   flex-shrink: 0; /* FIXED: Prevent checkbox from shrinking */
 }
 
@@ -97,7 +134,7 @@
   justify-content: center;
   margin-right: 15px;
   flex-shrink: 0; /* FIXED: Prevent number from shrinking */
-  transform: skewX(2deg);
+  /* transform: skewX(2deg); */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   font-weight: bold;
   font-size: 14px;
@@ -106,7 +143,7 @@
 /* FIXED: Question content with proper overflow handling */
 .question-content {
   flex: 1;
-  transform: skewX(2deg);
+  /* transform: skewX(2deg); */
   position: relative;
   padding-right: 100px; /* FIXED: Make space for level badge */
   min-width: 0; /* FIXED: Allow flex item to shrink */
@@ -202,7 +239,7 @@
   height: auto;
   object-fit: contain;
   border-radius: 8px;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .preview-image:hover {
@@ -225,12 +262,12 @@
   border-radius: 8px;
   padding: 8px 20px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: skewX(-2deg);
+  /* transform: skewX(-2deg); */
   margin: 2px; /* FIXED: Small margin for wrapped buttons */
 }
 
 .modal-footer .btn:hover {
-  transform: skewX(-2deg) translateY(-2px);
+  /* transform: skewX(-2deg) translateY(-2px); */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -323,10 +360,23 @@
 }
 
 /* Responsive design fixes */
+@media (max-width: 1200px) {
+  .question-modal .modal-dialog {
+    max-width: 95vw;
+    width: 95%;
+  }
+}
+
 @media (max-width: 768px) {
   .question-modal .modal-content {
-    max-width: 95vw;
+    max-width: 98vw;
     margin: 10px auto;
+  }
+
+  .question-modal .modal-dialog {
+    max-width: 98vw;
+    width: 98%;
+    margin: 0.5rem auto;
   }
   
   .question-item {

@@ -154,28 +154,133 @@
   text-align: center;
 }
 
+/* Dark Mode Styles */
+.similar-questions-wrapper.dark-mode {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  min-height: 100vh;
+}
+
+.dark-mode .similar-questions-container {
+  background-color: transparent;
+}
+
+.dark-mode .page-title {
+  color: #e2e8f0;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark-mode .notification-alert {
+  background-color: rgba(234, 179, 8, 0.2);
+  border-color: rgba(234, 179, 8, 0.4);
+  color: #fbbf24;
+}
+
+.dark-mode .question-card {
+  background-color: #1e293b;
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .question-header {
+  background: linear-gradient(to right, #8b5cf6, #6366f1);
+  color: white;
+}
+
+.dark-mode .card-body {
+  background-color: #1e293b;
+  color: #cbd5e1;
+}
+
+.dark-mode .theory-content {
+  color: #cbd5e1;
+}
+
+.dark-mode .concept-title {
+  color: #a78bfa;
+}
+
+.dark-mode .concept-point {
+  color: #cbd5e1;
+}
+
+.dark-mode .concept-point::before {
+  color: #8b5cf6;
+}
+
+.dark-mode .theory-card .card-body {
+  background-color: #1e293b;
+}
+
+.dark-mode .practice-card .card-body {
+  background-color: #1e293b;
+}
+
+.dark-mode .solve-button {
+  background: linear-gradient(to right, #8b5cf6, #6366f1);
+}
+
+.dark-mode .solve-button:hover {
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.4);
+}
+
+.dark-mode .back-button {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #8b5cf6;
+}
+
+.dark-mode .back-button:hover {
+  background: rgba(139, 92, 246, 0.2);
+  color: #e2e8f0;
+  border-color: #8b5cf6;
+}
+
+.dark-mode .question-image {
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+/* Dark mode loading spinner */
+.dark-mode.loading-view {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.dark-mode .loading-spinner {
+  color: #e2e8f0;
+}
+
+.dark-mode .loading-spinner p {
+  color: #cbd5e1;
+}
+
+.dark-mode .spinner-border {
+  color: #8b5cf6;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .similar-questions-container {
     width: 95%;
     padding: 15px;
   }
-  
+
   .page-title {
     font-size: 24px;
     margin-bottom: 20px;
   }
-  
+
   .question-header {
     padding: 10px 15px;
     font-size: 16px;
   }
-  
+
   .back-button {
     min-width: 150px;
     padding: 8px 15px;
   }
-  
+
   .concept-point {
     margin-left: 15px;
   }

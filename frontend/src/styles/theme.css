@@ -130,12 +130,9 @@
 }
 
 .question-item {
-  border: 1px solid #00c1d4;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 193, 212, 0.1),
-    rgba(0, 27, 108, 0.05)
-  );
+  
+ 
+
 }
 
 /* ProgressDashboard.css */

@@ -100,12 +100,12 @@
    SIDEBAR LOGO/BRAND
 ======================================== */
 .sidebar-brand {
-  padding: var(--spacing-xl);
+  
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+ 
   position: relative;
   z-index: 1;
 }
@@ -249,7 +249,7 @@
 ======================================== */
 .sidebar-footer {
   padding: var(--spacing-lg) var(--spacing-md);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
   position: relative;
   z-index: 1;
 }
@@ -390,7 +390,7 @@ nav.navbar {
   border: none;
   width: 100%;
   position: relative;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .sidebar-notification-wrapper .dropdown-toggle::before {

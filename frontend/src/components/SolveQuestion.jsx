@@ -54,10 +54,33 @@ function SolveQuestion() {
   });
   const [isContextExpanded, setIsContextExpanded] = useState(false);
 
+  // Dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
+
   // Ensure context sharing starts enabled when entering SolveQuestion
   useEffect(() => {
     setShareWithChat(true);
     localStorage.setItem("include_question_context", "true");
+  }, []);
+
+  // Apply dark mode on component mount and listen for changes
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
+      setIsDarkMode(darkModeEnabled);
+      document.body.classList.toggle('dark-mode', darkModeEnabled);
+    };
+
+    checkDarkMode();
+
+    // Listen for storage events (dark mode changes in other tabs/components)
+    window.addEventListener('storage', checkDarkMode);
+
+    return () => {
+      window.removeEventListener('storage', checkDarkMode);
+    };
   }, []);
 
   // Extract data from location state
@@ -577,7 +600,7 @@ function SolveQuestion() {
   }, [images]);
 
   return (
-    <div className="solve-question-wrapper">
+    <div className={`solve-question-wrapper ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="solve-question-container">
         {/* Header section with timer */}
         <div className="solve-question-header d-flex justify-content-between align-items-center mb-3">
@@ -632,6 +655,7 @@ function SolveQuestion() {
               <div className="context-scroll-view" style={{
                 maxHeight: '400px',
                 overflowY: 'auto',
+                overflowX: 'auto',
                 padding: '0'
               }}>
                 <div className="context-text-container" style={{
@@ -893,7 +917,7 @@ function SolveQuestion() {
                     Processing...
                   </>
                 ) : (
-                  "Solved-Solution"
+                  "AI-Solution"
                 )}
               </Button>
             </Col>
@@ -917,7 +941,7 @@ function SolveQuestion() {
                     Processing...
                   </>
                 ) : (
-                  "Auto-Correct"
+                  "AI-Correct"
                 )}
               </Button>
             </Col>

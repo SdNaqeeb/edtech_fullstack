@@ -13,6 +13,11 @@ const ResultPage = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [isCalculatingScore, setIsCalculatingScore] = useState(false);
   const [autoCalculatedScore, setAutoCalculatedScore] = useState(null);
+
+  // Dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
   
   const { state } = location;
   const { 
@@ -80,6 +85,24 @@ const ResultPage = () => {
   };
 
   const allStudentImages = getAllStudentImages();
+
+  // Apply dark mode on component mount and listen for changes
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
+      setIsDarkMode(darkModeEnabled);
+      document.body.classList.toggle('dark-mode', darkModeEnabled);
+    };
+
+    checkDarkMode();
+
+    // Listen for storage events (dark mode changes in other tabs/components)
+    window.addEventListener('storage', checkDarkMode);
+
+    return () => {
+      window.removeEventListener('storage', checkDarkMode);
+    };
+  }, []);
 
   // Cleanup object URLs when component unmounts
   useEffect(() => {
@@ -620,7 +643,7 @@ const ResultPage = () => {
       </div>
 
       {/* Main Content Container */}
-      <Container fluid className="result-page-container">
+      <Container fluid className={`result-page-container ${isDarkMode ? 'dark-mode' : ''}`}>
         <Row className="result-row">
           {/* Left Column - Sticky Image Container */}
           {allStudentImages.length > 0 && (

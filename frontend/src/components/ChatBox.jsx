@@ -11,6 +11,9 @@ import {
   faLanguage,
   faMicrophone,
   faStop,
+  faChartLine,
+  faExclamationTriangle,
+  faBook,
 } from "@fortawesome/free-solid-svg-icons";
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
@@ -101,6 +104,22 @@ const ChatBox = () => {
   const hasInitialized = useRef(false);
 
   const [inputText, setInputText] = useState("");
+
+  // ====== Suggestion Questions ======
+  const suggestionQuestions = [
+    {
+      text: "What is my progress?",
+      icon: faChartLine
+    },
+    {
+      text: "What are my weaknesses?",
+      icon: faExclamationTriangle
+    },
+    {
+      text: "Give remedial program for 1 week as per my weaknesses",
+      icon: faBook
+    },
+  ];
 
   // ====== Effects ======
   useEffect(() => {
@@ -408,6 +427,11 @@ const res = await api.post("/create_session", formData, {
   };
 
   // ====== Message senders ======
+  const handleSuggestionClick = async (suggestionText) => {
+    if (!sessionId || connectionStatus !== "connected" || isTyping) return;
+    await sendMessageBase(suggestionText, null);
+  };
+
   const sendImageWithCommand = async (command) => {
     setShowImageModal(false);
     await sendMessageBase(command, selectedFile);
@@ -654,6 +678,24 @@ const res = await api.post("/create_session", formData, {
 
             <div ref={messagesEndRef} />
           </div>
+
+          {/* Suggestion Chips - Above Input */}
+          {!isTyping && (
+            <div className="suggestion-container">
+              {suggestionQuestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  className="suggestion-chip"
+                  onClick={() => handleSuggestionClick(suggestion.text)}
+                  disabled={connectionStatus !== "connected" || isTyping}
+                  title={`Ask: ${suggestion.text}`}
+                >
+                  <FontAwesomeIcon icon={suggestion.icon} className="suggestion-icon" />
+                  <span>{suggestion.text}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Input Area */}
           <Form onSubmit={sendMessage} className="chat-input">

@@ -183,7 +183,9 @@ const Layout = ({ children }) => {
         {/* Sidebar Footer */}
         <div className="sidebar-footer">
           {/* User Info */}
-          <div className="sidebar-user-info">
+
+          
+      { role==='student' && (<div className="sidebar-user-info">
             <div className="sidebar-user-avatar">
               {getUserInitials()}
             </div>
@@ -191,7 +193,7 @@ const Layout = ({ children }) => {
               <p className="sidebar-user-name">{fullName || username}</p>
               <p className="sidebar-user-role">{role === 'student' ? 'Student' : 'Teacher'}</p>
             </div>
-          </div>
+          </div>)}
 
           {/* Logout Button */}
           <button

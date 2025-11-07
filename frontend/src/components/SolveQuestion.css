@@ -477,7 +477,6 @@
   }
 }
 
-/* Dark mode support (optional) */
 /* Context Section Styles */
 .context-section {
   margin: 16px 0;
@@ -557,7 +556,7 @@
 .context-scroll-view {
   max-height: 35vh;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 .context-scroll-view::-webkit-scrollbar {
@@ -591,54 +590,215 @@
   margin-bottom: 12px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .extracted-text {
-    background: #333;
-    color: #f8f9fa;
-    border-color: #555;
-  }
+/* Dark Mode Styles */
+.solve-question-wrapper.dark-mode {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
 
-  .extracted-text-container {
-    background: #222;
-    border-color: #444;
-  }
+.dark-mode .solve-question-container {
+  background: rgba(30, 41, 59, 0.95);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
 
-  .progress {
-    background-color: #444;
-  }
+.dark-mode .solve-question-container::before {
+  background: linear-gradient(90deg, #8b5cf6, #6366f1);
+}
 
-  .form-text.text-muted {
-    color: #adb5bd;
-  }
+.dark-mode .question-text-container {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
 
-  .alert-danger {
-    background-color: rgba(220, 53, 69, 0.2);
-    border-color: #dc3545;
-    color: #f8d7da;
-  }
+.dark-mode .question-title {
+  color: #e2e8f0;
+}
 
-  /* Dark mode for context section */
-  .context-section {
-    background-color: rgba(30, 41, 59, 0.8);
-    border-color: rgba(139, 92, 246, 0.3);
-  }
+.dark-mode .question-title::after {
+  background: linear-gradient(90deg, #8b5cf6, #6366f1);
+}
 
-  .context-header {
-    background-color: rgba(139, 92, 246, 0.15);
-    border-bottom-color: rgba(139, 92, 246, 0.2);
-  }
+.dark-mode .question-text {
+  color: #cbd5e1;
+}
 
-  .context-header:hover {
-    background-color: rgba(139, 92, 246, 0.2);
-  }
+.dark-mode .image-preview-container {
+  background: #1e293b;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
 
-  .context-header-title {
-    color: #e2e8f0;
-  }
+.dark-mode .image-preview-container:hover {
+  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.3);
+}
 
-  .context-content-wrapper {
-    background-color: rgba(15, 23, 42, 0.5);
-  }
+.dark-mode .extracted-text {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #475569;
+}
 
-  
+.dark-mode .extracted-text-container {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.dark-mode .progress {
+  background-color: #334155;
+}
+
+.dark-mode .progress-bar {
+  background: linear-gradient(to right, #8b5cf6, #6366f1);
+}
+
+.dark-mode .form-text.text-muted {
+  color: #94a3b8;
+}
+
+.dark-mode .form-control {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+.dark-mode .form-control:focus {
+  background-color: #1e293b;
+  border-color: #8b5cf6;
+  color: #e2e8f0;
+}
+
+.dark-mode .form-label {
+  color: #cbd5e1;
+}
+
+.dark-mode .alert-danger {
+  background-color: rgba(220, 53, 69, 0.2) !important;
+  border-color: rgba(220, 53, 69, 0.4) !important;
+  color: #fecaca !important;
+}
+
+/* Dark mode for context section */
+.dark-mode .context-section {
+  background-color: rgba(15, 23, 42, 0.8);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.dark-mode .context-header {
+  background-color: rgba(139, 92, 246, 0.15);
+  border-bottom-color: rgba(139, 92, 246, 0.2);
+}
+
+.dark-mode .context-header:hover {
+  background-color: rgba(139, 92, 246, 0.25);
+}
+
+.dark-mode .context-header-title {
+  color: #e2e8f0;
+}
+
+.dark-mode .context-icon-wrapper {
+  background-color: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+}
+
+.dark-mode .context-content-wrapper {
+  background-color: rgba(15, 23, 42, 0.6);
+}
+
+.dark-mode .context-text-container {
+  background-color: #1e293b;
+  color: #cbd5e1;
+}
+
+.dark-mode .context-text-container p {
+  color: #cbd5e1;
+}
+
+.dark-mode .context-scroll-view::-webkit-scrollbar-track {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.dark-mode .context-scroll-view::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.4);
+}
+
+.dark-mode .context-scroll-view::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+}
+
+/* Dark mode button styles */
+.dark-mode .btn-primary {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%) !important;
+}
+
+.dark-mode .btn-secondary {
+  background: linear-gradient(135deg, #475569 0%, #334155 100%) !important;
+}
+
+.dark-mode .btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+.dark-mode .btn-info {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;
+}
+
+.dark-mode .btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+}
+
+/* Dark mode for image source buttons */
+.dark-mode .image-source-buttons .btn-outline-primary {
+  border-color: #8b5cf6;
+  color: #a78bfa;
+}
+
+.dark-mode .image-source-buttons .btn-outline-primary:hover {
+  background-color: #8b5cf6;
+  color: white;
+}
+
+.dark-mode .image-source-buttons .btn-primary {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%) !important;
+}
+
+/* Dark mode for camera capture area */
+.dark-mode .image-source-buttons + div {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+}
+
+/* Dark mode for uploaded images section */
+.dark-mode .uploaded-images h6 {
+  color: #e2e8f0;
+}
+
+/* Dark mode for Bootstrap switch */
+.dark-mode .form-check-input {
+  background-color: #475569;
+  border-color: #64748b;
+}
+
+.dark-mode .form-check-input:checked {
+  background-color: #8b5cf6;
+  border-color: #8b5cf6;
+}
+
+.dark-mode .form-check-label {
+  color: #cbd5e1;
+}
+
+/* Dark mode for upload progress */
+.dark-mode .upload-progress p {
+  color: #94a3b8;
+}
+
+/* Dark mode for tutorial button */
+.dark-mode .restart-tutorial-btn {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #e2e8f0;
+}
+
+.dark-mode .restart-tutorial-btn:hover {
+  background: rgba(30, 41, 59, 0.95);
 }

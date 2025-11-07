@@ -14,6 +14,29 @@ const SimilarQuestions = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
+
+  // Apply dark mode on component mount and listen for changes
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
+      setIsDarkMode(darkModeEnabled);
+      document.body.classList.toggle('dark-mode', darkModeEnabled);
+    };
+
+    checkDarkMode();
+
+    // Listen for storage events (dark mode changes in other tabs/components)
+    window.addEventListener('storage', checkDarkMode);
+
+    return () => {
+      window.removeEventListener('storage', checkDarkMode);
+    };
+  }, []);
+
   // Fetch similar questions when component mounts
   useEffect(() => {
     console.log("Location state:", location.state);
@@ -147,7 +170,7 @@ const SimilarQuestions = () => {
   // Show loading spinner while fetching data
   if (loading) {
     return (
-      <div className="similar-questions-container loading-view">
+      <div className={`similar-questions-container loading-view ${isDarkMode ? 'dark-mode' : ''}`}>
         <div className="loading-spinner">
           <Spinner animation="border" role="status" variant="primary" />
           <p className="mt-3">Loading similar questions...</p>
@@ -157,7 +180,7 @@ const SimilarQuestions = () => {
   }
 
   return (
-    <div className="similar-questions-wrapper">
+    <div className={`similar-questions-wrapper ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="similar-questions-container">
         <h2 className="page-title">Similar Practice Questions</h2>
         
