@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import "./QuestionListModal.css";
 import MarkdownWithMath from "./MarkdownWithMath";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClipboardCheck, faCheckCircle, faBookOpenReader } from "@fortawesome/free-solid-svg-icons";
+import { faClipboardCheck, faCheckCircle, faBookOpenReader, faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 import { useAlert } from './AlertBox';
+import Tutorial from './Tutorial';
+import { useTutorial } from '../contexts/TutorialContext';
 
 const QuestionListModal = ({
   show,
@@ -21,6 +23,36 @@ const QuestionListModal = ({
   const navigate = useNavigate();
   const { showAlert, AlertContainer } = useAlert();
   const [selectedQuestions, setSelectedQuestions] = useState([]);
+
+  // Tutorial context
+  const {
+    shouldShowTutorialForPage,
+    continueTutorialFlow,
+    startTutorialFromToggle,
+    startTutorialForPage,
+    completedPages,
+    tutorialFlow,
+  } = useTutorial();
+
+  // Tutorial steps for QuestionListModal
+  const tutorialSteps = [
+
+    {
+      target: '.question-item:nth-child(2) ',
+      content: 'Each question is displayed as a card. You can see the question text, difficulty level, and sometimes an image or reading context.',
+      disableBeacon: true,
+    },
+    {
+      target: '.question-item:nth-child(3)',
+      content: 'Click on any question card to start solving it! Try clicking on the first question now to continue the tutorial.',
+    },
+  ];
+
+  // Handle tutorial completion for QuestionListModal
+  const handleTutorialComplete = () => {
+    console.log("QuestionListModal tutorial completed");
+    // Tutorial will continue when user clicks on a question
+  };
 
   // In QuestionListModal.jsx, update the handleQuestionClick function:
 
@@ -53,7 +85,9 @@ const handleQuestionClick = (questionData, index) => {
       question_id: questionData.question_id || questionData.id || index,
       context: questionData.context || null,
     };
-  
+
+    // Tutorial no longer auto-continues to other pages (manual mode only)
+
     onQuestionClick(
       selectedQuestion.question,
       index,
@@ -191,6 +225,32 @@ const handleQuestionClick = (questionData, index) => {
       >
       <Modal.Header closeButton>
         <Modal.Title>{getModalTitle()}</Modal.Title>
+        {/* Tutorial Toggle Button */}
+        <button
+          className="tutorial-toggle-btn-modal"
+          onClick={(e) => {
+            e.stopPropagation();
+            startTutorialForPage("questionListModal");
+          }}
+          title="Start Tutorial"
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '6px 12px',
+            color: 'white',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: '500',
+            marginLeft: '10px',
+            transition: 'transform 0.2s',
+          }}
+          onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+        >
+          <FontAwesomeIcon icon={faQuestionCircle} style={{ marginRight: '5px' }} />
+          Tutorial
+        </button>
       </Modal.Header>
       <Modal.Body>
         <div className="question-list-container">
@@ -290,6 +350,14 @@ const handleQuestionClick = (questionData, index) => {
         </div>
       </Modal.Footer>
     </Modal>
+
+    {/* Tutorial Component */}
+    {shouldShowTutorialForPage("questionListModal") && show && (
+      <Tutorial
+        steps={tutorialSteps}
+        onComplete={handleTutorialComplete}
+      />
+    )}
     </>
   );
 };

@@ -45,7 +45,7 @@ const Tutorial = ({ steps, onComplete }) => {
         styles={{
           options: {
             primaryColor: "#00C1D4",
-            zIndex: 1000,
+            zIndex: 10001,
           },
           tooltip: {
             className: "tutorial-tooltip",
@@ -83,7 +83,7 @@ const Tutorial = ({ steps, onComplete }) => {
         }}
       />
 
-      {isButtonVisible && showTutorial && (
+      {/* {isButtonVisible && showTutorial && (
         <div className="tutorial-toggle">
           <Button
             variant="danger"
@@ -94,7 +94,7 @@ const Tutorial = ({ steps, onComplete }) => {
             <FontAwesomeIcon icon={faTimes} /> Close Tutorial
           </Button>
         </div>
-      )}
+      )} */}
     </>
   );
 };

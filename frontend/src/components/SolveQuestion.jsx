@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Form, Button, Spinner, Alert, Row, Col } from "react-bootstrap";
 import axiosInstance from "../api/axiosInstance";
 import "./SolveQuestion.css";
-import { faBookOpenReader,faArrowDown ,faCaretDown} from "@fortawesome/free-solid-svg-icons";
+import { faBookOpenReader, faArrowDown, faCaretDown, faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 import QuestionListModal from "./QuestionListModal";
 import { ProgressContext } from "../contexts/ProgressContext";
 import { NotificationContext } from "../contexts/NotificationContext";
@@ -18,6 +18,8 @@ import "./StudyTimer.css";
 import { useCurrentQuestion } from "../contexts/CurrentQuestionContext";
 import MarkdownWithMath from "./MarkdownWithMath";
 import CameraCapture from "./CameraCapture";
+import Tutorial from "./Tutorial";
+import { useTutorial } from "../contexts/TutorialContext";
 
 
 function SolveQuestion() {
@@ -38,6 +40,16 @@ function SolveQuestion() {
 
   // Sound feedback hook
   const { playQuestionSolvedSound, playAchievementSound } = useSoundFeedback();
+
+  // Tutorial context
+  const {
+    shouldShowTutorialForPage,
+    continueTutorialFlow,
+    startTutorialFromToggle,
+    startTutorialForPage,
+    tutorialFlow,
+    completedPages,
+  } = useTutorial();
 
   // State for tracking study session
   const [studyTime, setStudyTime] = useState(0);
@@ -82,6 +94,57 @@ function SolveQuestion() {
       window.removeEventListener('storage', checkDarkMode);
     };
   }, []);
+
+  // Tutorial steps for SolveQuestion
+  const tutorialSteps = [
+    {
+      target: '.question-text-container',
+      content: 'Welcome to the question solving page! This is your question. Read it carefully and try to solve it on paper or in your notebook.',
+      disableBeacon: true,
+      placement: 'bottom',
+    },
+    {
+      target: '.solve-question-header',
+      content: 'The timer tracks how long you spend on this question. This helps you manage your time better.',
+      placement: 'bottom',
+    },
+    {
+      target: '.image-source-buttons',
+      content: 'Take a photo of your solution using your camera. Make sure your handwriting is clear!',
+      placement: 'top',
+    },
+    {
+      target: '.explain-btn',
+      content: 'Click "Concepts-Required" to understand what concepts you need to solve this question.',
+      placement: 'top',
+    },
+    {
+      target: '.solve-btn',
+      content: 'Click "AI-Solution" to see the complete step-by-step solution from our AI tutor.',
+      placement: 'top',
+    },
+    {
+      target: '.btn-correct',
+      content: 'After taking a photo of your solution, click "AI-Correct" to get feedback and corrections from AI!',
+      placement: 'top',
+    },
+  ];
+
+  // Handle tutorial completion for SolveQuestion
+  const handleTutorialComplete = () => {
+    console.log("SolveQuestion tutorial completed");
+    // Tutorial will continue when user navigates to result page
+  };
+
+  // Debug logging for tutorial
+  useEffect(() => {
+    const shouldShow = shouldShowTutorialForPage("solveQuestion");
+    console.log("=== SolveQuestion Tutorial Debug ===");
+    console.log("Should show tutorial for solveQuestion:", shouldShow);
+    console.log("Tutorial flow:", tutorialFlow);
+    console.log("Completed pages:", completedPages);
+    console.log("Tutorial steps:", tutorialSteps);
+  }, [shouldShowTutorialForPage, tutorialFlow, completedPages]);
 
   // Extract data from location state
   const {
@@ -293,7 +356,7 @@ function SolveQuestion() {
     formData.append("class_id", class_id);
     formData.append("subject_id", subject_id);
     formData.append("topic_ids", topic_ids);
-    formData.append("question", currentQuestion.question);
+   
     formData.append("subtopic", subtopic);
     formData.append("correct", true);
     formData.append("study_time_seconds", Math.floor((timeSpentMs % 60000) / 1000));
@@ -330,6 +393,8 @@ function SolveQuestion() {
         // Update quest progress
         updateQuestProgress("daily_solve_questions", 1, QUEST_TYPES.DAILY);
 
+        // Tutorial no longer auto-continues to other pages (manual mode only)
+
         // Navigate to result page
         navigate("/resultpage", {
           state: {
@@ -342,6 +407,8 @@ function SolveQuestion() {
             subtopic,
             questionImage: currentQuestion.image,
             questionNumber: currentQuestion.questionNumber,
+            question_id: currentQuestion.question_id || currentQuestion.id,
+            context: currentQuestion.context,
             // Add the student's uploaded/captured images
             studentImages: images.map(img => URL.createObjectURL(img)),
 
@@ -438,8 +505,8 @@ function SolveQuestion() {
     formData.append("class_id", class_id);
     formData.append("subject_id", subject_id);
     formData.append("topic_ids", topic_ids);
-    formData.append("question", currentQuestion.question);
-    formData.append("ques_img", currentQuestion.image || "");
+    // formData.append("question", currentQuestion.question);
+    // formData.append("ques_img", currentQuestion.image || "");
     formData.append("subtopic", subtopic);
     formData.append("question_id", currentQuestion.question_id || currentQuestion.id);
     // console.log("Sending form data with flags:", formData);
@@ -481,6 +548,8 @@ function SolveQuestion() {
         );
       }
 
+      // Tutorial no longer auto-continues to other pages (manual mode only)
+
       // Navigate to results page
       navigate("/resultpage", {
         state: {
@@ -493,7 +562,8 @@ function SolveQuestion() {
           subtopic,
           questionImage: currentQuestion.image,
           questionNumber: currentQuestion.questionNumber,
-          question_id: currentQuestion.question_id,
+          question_id: currentQuestion.question_id || currentQuestion.id,
+          context: currentQuestion.context,
         },
       });
     } catch (error) {
@@ -605,12 +675,34 @@ function SolveQuestion() {
         {/* Header section with timer */}
         <div className="solve-question-header d-flex justify-content-between align-items-center mb-3">
           {/* Study Timer */}
-          <StudyTimer 
+          <StudyTimer
             isActive={isTimerActive}
             questionId={currentQuestion.id}
             onTimerComplete={handleTimerComplete}
             className={processingButton ? "stopped" : ""}
           />
+          {/* Tutorial Toggle Button */}
+          <button
+            className="tutorial-toggle-btn"
+            onClick={() => startTutorialForPage("solveQuestion")}
+            title="Start Tutorial"
+            style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'transform 0.2s',
+            }}
+            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+          >
+            <FontAwesomeIcon icon={faQuestionCircle} style={{ marginRight: '5px' }} />
+            Tutorial
+          </button>
         </div>
 
         {/* Context Section - Only show if context exists */}
@@ -969,6 +1061,14 @@ function SolveQuestion() {
         isMultipleSelect={false}
         onMultipleSelectSubmit={null}
       />
+
+      {/* Tutorial Component */}
+      {shouldShowTutorialForPage("solveQuestion") && (
+        <Tutorial
+          steps={tutorialSteps}
+          onComplete={handleTutorialComplete}
+        />
+      )}
     </div>
   );
 }

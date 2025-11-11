@@ -36,11 +36,24 @@ import {
 import UnifiedSessions from "./UnifiedSessions";
 import StreakTracker from "./StreakTracker";
 import LiveNotifications from "./LiveNotifications";
+import Tutorial from "./Tutorial";
+import { useTutorial } from "../contexts/TutorialContext";
 
 function StudentDash() {
   const navigate = useNavigate();
   const { username, fullName } = useContext(AuthContext);
   const { showAlert, AlertContainer } = useAlert();
+
+  // Tutorial context
+  const {
+    shouldShowTutorialForPage,
+    continueTutorialFlow,
+    completeTutorialFlow,
+    startTutorialFromToggle,
+    startTutorialForPage,
+    tutorialFlow,
+    completedPages,
+  } = useTutorial();
 
   // Dark mode state with improved persistence
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -116,6 +129,41 @@ function StudentDash() {
     setIsDarkMode(newMode);
     localStorage.setItem('darkMode', newMode.toString());
     document.body.classList.toggle('dark-mode', newMode);
+  };
+
+  // Tutorial steps for StudentDash
+  const tutorialSteps = [
+    {
+      target: '.greeting-content',
+      content: 'Welcome to your Student Dashboard! Let me guide you through how to get started with solving questions.',
+      disableBeacon: true,
+    },
+    {
+      target: '#formClass',
+      content: 'First, select your class from this dropdown. Your class should be pre-selected based on your username.',
+    },
+    {
+      target: '#formSubject',
+      content: 'Next, choose the subject you want to study. Mathematics is usually selected by default.',
+    },
+    {
+      target: '.chapters-select-final',
+      content: 'Select one or more chapters you want to practice. You can select multiple chapters at once!',
+    },
+    {
+      target: '#formQuestionType',
+      content: 'Choose the type of questions: Solved Examples (to learn), Exercises (to practice), or Worksheets (for tests).',
+    },
+    {
+      target: '.button--mimas',
+      content: 'Finally, click this button to generate questions based on your selections. You\'ll see a list of available questions!',
+    },
+  ];
+
+  // Handle tutorial completion for StudentDash
+  const handleTutorialComplete = () => {
+    console.log("StudentDash tutorial completed");
+    // Don't mark as complete yet - will continue to next page when user clicks generate
   };
 
   // Apply dark mode on component mount
@@ -391,6 +439,8 @@ function StudentDash() {
 
     setShowQuestionList(false);
 
+    // Tutorial no longer auto-continues to other pages (manual mode only)
+
     navigate("/solvequestion", {
       state: {
         question,
@@ -467,13 +517,13 @@ function StudentDash() {
     }),
     menuPortal: (provided) => ({
       ...provided,
-      zIndex: 10000,
+      zIndex: 9990,
       position: 'fixed',
     }),
     menu: (provided) => ({
       ...provided,
       backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
-      zIndex: 10000,
+      zIndex: 9990,
       borderRadius: '12px',
       border: `2px solid ${isDarkMode ? '#7c3aed' : '#667eea'}`,
       boxShadow: isDarkMode
@@ -641,6 +691,27 @@ function StudentDash() {
                         year: 'numeric'
                       })}</span>
                     </div>
+                    {/* Tutorial Toggle Button */}
+                    <button
+                      className="tutorial-toggle-btn"
+                      onClick={() => startTutorialForPage("studentDash")}
+                      title="Start Tutorial"
+                      style={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        color: 'white',
+                        cursor: 'pointer',
+                        marginRight: '8px',
+                        transition: 'transform 0.2s',
+                      }}
+                      onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                      onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                    >
+                      <FontAwesomeIcon icon={faQuestionCircle} style={{ marginRight: '5px' }} />
+                      Tutorial
+                    </button>
                     {/* Dark Mode Toggle Button */}
                     <button
                       className="dark-mode-toggle-btn"
@@ -723,7 +794,7 @@ function StudentDash() {
                         <Col md={6}>
                           <Form.Group controlId="formChapters">
                             <Form.Label>
-                              <FontAwesomeIcon icon={faListAlt} className="me-2" />
+                              <FontAwesomeIcon icon={faListAlt} className="chapter-select me-2" />
                               Chapters (Select Multiple) - {chapters.length} Available
                             </Form.Label>
 
@@ -767,7 +838,7 @@ function StudentDash() {
                                 // CRITICAL: Portal-specific styling
                                 menuPortal: (provided) => ({
                                   ...provided,
-                                  zIndex: 99999,
+                                  zIndex: 9990,
                                 }),
                                 menu: (provided) => ({
                                   ...provided,
@@ -1037,6 +1108,14 @@ function StudentDash() {
           worksheetName={questionType === "worksheets" ? selectedWorksheet : ""}
 
         />
+
+        {/* Tutorial Component */}
+        {shouldShowTutorialForPage("studentDash") && (
+          <Tutorial
+            steps={tutorialSteps}
+            onComplete={handleTutorialComplete}
+          />
+        )}
       </div>
     </>
   );

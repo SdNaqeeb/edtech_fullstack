@@ -1,0 +1,160 @@
+/* ThreeDBackground.css - Futuristic 3D Background Styling */
+
+.threejs-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.threejs-background canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Animated Overlay Effects */
+.overlay-effects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Scanning Line Effect */
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(0, 188, 212, 0.8) 50%,
+      transparent 100%);
+  box-shadow: 0 0 20px rgba(0, 188, 212, 0.8),
+    0 0 40px rgba(0, 188, 212, 0.5);
+  animation: scan 8s linear infinite;
+  z-index: 2;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+/* Glowing Orbs */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  animation: float-orb 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.glow-orb-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0, 188, 212, 0.8) 0%, transparent 70%);
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.glow-orb-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(33, 150, 243, 0.6) 0%, transparent 70%);
+  bottom: 20%;
+  right: 15%;
+  animation-delay: 7s;
+}
+
+.glow-orb-3 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(63, 81, 181, 0.7) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 14s;
+}
+
+@keyframes float-orb {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  25% {
+    transform: translate(50px, -50px) scale(1.1);
+  }
+
+  50% {
+    transform: translate(-30px, 40px) scale(0.9);
+  }
+
+  75% {
+    transform: translate(40px, 30px) scale(1.05);
+  }
+}
+
+/* Dark Mode Adjustments */
+.dark-mode .scan-line {
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(0, 188, 212, 1) 50%,
+      transparent 100%);
+  box-shadow: 0 0 30px rgba(0, 188, 212, 1),
+    0 0 60px rgba(0, 188, 212, 0.7);
+}
+
+.dark-mode .glow-orb {
+  opacity: 0.5;
+}
+
+.dark-mode .glow-orb-1 {
+  background: radial-gradient(circle, rgba(0, 188, 212, 1) 0%, transparent 70%);
+}
+
+.dark-mode .glow-orb-2 {
+  background: radial-gradient(circle, rgba(33, 150, 243, 0.9) 0%, transparent 70%);
+}
+
+.dark-mode .glow-orb-3 {
+  background: radial-gradient(circle, rgba(63, 81, 181, 1) 0%, transparent 70%);
+}
+
+/* Performance optimization */
+.threejs-background,
+.overlay-effects * {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}

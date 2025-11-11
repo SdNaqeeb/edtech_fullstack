@@ -26,13 +26,14 @@
 .question-modal .modal-content {
   border-radius: 1.5rem;
   border: none;
-
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   border: 1px solid rgba(255, 255, 255, 0.18);
   max-width: 95vw; /* Increased width for better display */
   max-height: 90vh; /* Prevent modal from being too tall */
   animation: slideInFromBottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  position: relative;
+  z-index: 9980; /* Below tutorial overlay */
 }
 
 /* Modal dialog animation with increased width */
@@ -41,6 +42,13 @@
   width: 95%;
   margin: 1.75rem auto;
   animation: slideInFromBottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  position: relative;
+  z-index: 9980; /* Below tutorial overlay */
+}
+
+/* Modal backdrop z-index */
+.question-modal .modal-backdrop {
+  z-index: 9970 !important; /* Below modal and tutorial */
 }
 
 /* Backdrop animation */

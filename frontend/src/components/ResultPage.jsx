@@ -5,6 +5,10 @@ import './ResultPage.css';
 import QuestionListModal from './QuestionListModal';
 import axiosInstance from '../api/axiosInstance';
 import MarkdownWithMath from './MarkdownWithMath';
+import Tutorial from './Tutorial';
+import { useTutorial } from '../contexts/TutorialContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 
 const ResultPage = () => {
   const location = useLocation();
@@ -14,25 +18,34 @@ const ResultPage = () => {
   const [isCalculatingScore, setIsCalculatingScore] = useState(false);
   const [autoCalculatedScore, setAutoCalculatedScore] = useState(null);
 
+  // Tutorial context
+  const {
+    shouldShowTutorialForPage,
+    completeTutorialFlow,
+    startTutorialFromToggle,
+    startTutorialForPage,
+  } = useTutorial();
+
   // Dark mode state
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('darkMode') === 'true';
   });
   
   const { state } = location;
-  const { 
-    message, 
-    ai_data, 
-    actionType, 
-    questionList, 
-    class_id, 
-    subject_id, 
-    topic_ids, 
+  const {
+    message,
+    ai_data,
+    actionType,
+    questionList,
+    class_id,
+    subject_id,
+    topic_ids,
     subtopic,
     questionImage,
     questionNumber,
     studentImages = [],
-    question_id// Get student images from state
+    question_id,// Get student images from state
+    context
   } = state || {};
   console.log('question_id from explain state:', question_id);
   const { 
@@ -85,6 +98,42 @@ const ResultPage = () => {
   };
 
   const allStudentImages = getAllStudentImages();
+
+  // Tutorial steps for ResultPage
+  const tutorialSteps = [
+    {
+      target: '.result-title',
+      content: 'Congratulations! This is your result page where you can see AI feedback on your solution.',
+      disableBeacon: true,
+    },
+    {
+      target: '.student-images',
+      content: 'Here you can see your uploaded solution images. The AI has analyzed your work!',
+      skipIfMissing: true,
+    },
+    {
+      target: '.result-question',
+      content: 'This section shows the AI\'s feedback, solution steps, and corrections for your answer.',
+    },
+    {
+      target: '.practice-btn-fixed',
+      content: 'Click here to practice similar questions and improve your understanding!',
+    },
+    {
+      target: '.dashboard-btn-fixed',
+      content: 'Use the Question List button to try other questions from your selection.',
+    },
+    {
+      target: '.back-btn-fixed',
+      content: 'You can go back to modify your answer or try a different approach. That completes the tutorial!',
+    },
+  ];
+
+  // Handle tutorial completion for ResultPage
+  const handleTutorialComplete = () => {
+    console.log("ResultPage tutorial completed - marking entire flow as complete");
+    completeTutorialFlow();
+  };
 
   // Apply dark mode on component mount and listen for changes
   useEffect(() => {
@@ -230,7 +279,8 @@ const ResultPage = () => {
         image: questionImage,
         index: questionNumber ? questionNumber - 1 : 0,
         selectedQuestions: questionList,
-        question_id: question_id
+        question_id: question_id,
+        context: context
       }
     });
   };
@@ -242,19 +292,20 @@ const ResultPage = () => {
     setShowQuestionListModal(false);
   };
 
-  const handleQuestionSelect = (selectedQuestion, index, selectedImage, question_id) => {
-    navigate('/solvequestion', { 
-      state: { 
-        question: selectedQuestion, 
-        questionNumber: index + 1, 
-        questionList, 
+  const handleQuestionSelect = (selectedQuestion, index, selectedImage, question_id, questionContext = null) => {
+    navigate('/solvequestion', {
+      state: {
+        question: selectedQuestion,
+        questionNumber: index + 1,
+        questionList,
         class_id,
         subject_id,
         topic_ids,
         subtopic,
         image: selectedImage,
-        question_id: question_id || `question_${index}_${Date.now()}`
-      } 
+        question_id: question_id || `question_${index}_${Date.now()}`,
+        context: questionContext
+      }
     });
   };
 
@@ -622,6 +673,29 @@ const ResultPage = () => {
         >
           ← Back
         </Button>
+        {/* Tutorial Toggle Button */}
+        {/* <button
+          className="tutorial-toggle-btn-result"
+          onClick={() => startTutorialForPage("resultPage")}
+          title="Start Tutorial"
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            color: 'white',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '500',
+            marginLeft: '10px',
+            transition: 'transform 0.2s',
+          }}
+          onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+        >
+          <FontAwesomeIcon icon={faQuestionCircle} style={{ marginRight: '5px' }} />
+          Tutorial
+        </button> */}
       </div>
 
       {/* Fixed Bottom Buttons */}
@@ -722,13 +796,21 @@ const ResultPage = () => {
           </Col>
         </Row>
 
-        <QuestionListModal 
-          show={showQuestionListModal} 
-          onHide={handleCloseQuestionList} 
-          questionList={questionList} 
-          onQuestionClick={handleQuestionSelect} 
+        <QuestionListModal
+          show={showQuestionListModal}
+          onHide={handleCloseQuestionList}
+          questionList={questionList}
+          onQuestionClick={handleQuestionSelect}
         />
       </Container>
+
+      {/* Tutorial Component */}
+      {/* {shouldShowTutorialForPage("resultPage") && (
+        <Tutorial
+          steps={tutorialSteps}
+          onComplete={handleTutorialComplete}
+        />
+      )} */}
     </>
   );
 };
