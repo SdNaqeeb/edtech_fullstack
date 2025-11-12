@@ -228,7 +228,7 @@ const ExamCorrection = () => {
             </svg>
           </div>
           <div>
-            <h1 className="header-title">📝 Exam Correction Hub</h1>
+            <h1 className="correction-header-title">📝 Exam Correction Hub</h1>
             <p className="header-subtitle">Upload question papers and answer sheets for automated grading</p>
           </div>
         </div>

@@ -64,20 +64,30 @@ const UnifiedSessions = () => {
 
   const navigate = useNavigate();
 
-  // Detect dark mode changes
-  useEffect(() => {
+  // Fetch all data on component mount
+useEffect(() => {
+  // Fetch all tab data immediately on mount
+  fetchRecentSessions();
+  fetchHomeworkSubmissions();
+  fetchClassworkSubmissions();
+  fetchExamResults();
+}, []);
+
+// Detect dark mode changes
+useEffect(() => {
+  setIsDarkMode(document.body.classList.contains('dark-mode'));
+  
+  const observer = new MutationObserver(() => {
     setIsDarkMode(document.body.classList.contains('dark-mode'));
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          const darkModeActive = document.body.classList.contains('dark-mode');
-          setIsDarkMode(darkModeActive);
-        }
-      });
-    });
-    observer.observe(document.body, { attributes: true });
-    return () => observer.disconnect();
-  }, []);
+  });
+  
+  observer.observe(document.body, {
+    attributes: true,
+    attributeFilter: ['class']
+  });
+  
+  return () => observer.disconnect();
+}, []);
 
   // Fetch based on active tab
   useEffect(() => {

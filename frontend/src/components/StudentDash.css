@@ -338,8 +338,8 @@ body {
 
 /* Modern Dark Mode Toggle Button */
 .dark-mode-toggle-btn {
-  width: 6vw;
-  height: 6vh;
+  width: 54px;
+  height: 48px;
   border-radius: 100%;
   border: 2px solid var(--border-color);
   background: var(--surface-color);

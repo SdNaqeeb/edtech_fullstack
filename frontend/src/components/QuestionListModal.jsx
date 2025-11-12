@@ -38,12 +38,12 @@ const QuestionListModal = ({
   const tutorialSteps = [
 
     {
-      target: '.question-item:nth-child(2) ',
+      target: '.question-list ',
       content: 'Each question is displayed as a card. You can see the question text, difficulty level, and sometimes an image or reading context.',
       disableBeacon: true,
     },
     {
-      target: '.question-item:nth-child(3)',
+      target: '.question-level',
       content: 'Click on any question card to start solving it! Try clicking on the first question now to continue the tutorial.',
     },
   ];
@@ -297,7 +297,15 @@ const handleQuestionClick = (questionData, index) => {
                     {questionData.question_image && (
                       <div className="question-image-preview">
                         <img
-                          src={`data:image/png;base64,${questionData.question_image}`}
+                           src={
+                            questionData.question_image?.startsWith("data:image")
+                              ? questionData.question_image // already base64 format
+                              : questionData.question_image?.startsWith("http")
+                              ? questionData.question_image // direct URL
+                              : questionData.question_image
+                              ? `data:image/png;base64,${questionData.question_image}` // plain base64 without prefix
+                              : "" // fallback if null
+                          }
                           alt={`Question ${index + 1}`}
                           className="preview-image"
                         />

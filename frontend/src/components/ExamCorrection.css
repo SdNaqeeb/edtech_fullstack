@@ -36,7 +36,7 @@
   color: white;
 }
 
-.header-title {
+.correction-header-title {
   font-size: 1.75rem;
   font-weight: 700;
   color: #1f2937;
@@ -750,7 +750,7 @@
 }
 
 @media (max-width: 480px) {
-  .header-title {
+  .correction-header-title {
     font-size: 1.5rem;
   }
 
