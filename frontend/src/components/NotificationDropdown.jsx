@@ -5,6 +5,7 @@ import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { NotificationContext } from '../contexts/NotificationContext';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
+import { AuthContext } from './AuthContext';
 
 const NotificationDropdown = () => {
   const {
@@ -13,6 +14,9 @@ const NotificationDropdown = () => {
     clearAllNotifications,
     getUnreadCount,
   } = useContext(NotificationContext);
+
+  const { username, fullName, role } = useContext(AuthContext);
+  
 
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -63,7 +67,7 @@ const NotificationDropdown = () => {
   };
 
   const handleNotificationClick = (notification) => {
-    console.log("Notification clicked:", notification);
+    // console.log("Notification clicked:", notification);
     // Mark notification as read
     markNotificationAsRead(notification.id);
 
@@ -76,7 +80,7 @@ const NotificationDropdown = () => {
       // Get notification ID based on format
       const notificationId = notification._notification?.id || notification.id;
 
-      console.log("Navigating to homework submission with notification ID:", notificationId);
+      // console.log("Navigating to homework submission with notification ID:", notificationId);
 
       navigate('/homework', {
         state: {
@@ -132,7 +136,7 @@ const NotificationDropdown = () => {
           </Dropdown.Header>
 
           {/* Old Notifications Button */}
-          {!oldNotificationsLoaded && (
+          {!oldNotificationsLoaded && role==="student" && (
             <div className="px-3 py-2">
               <button
                 type="button"

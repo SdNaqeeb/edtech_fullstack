@@ -177,15 +177,13 @@ const ExamCorrection = () => {
         },
       });
 
-      console.log('Exam correction response:', response.data);
+      // console.log('Exam correction response:', response.data);
       
       setSuccess(true);
       setProcessingStatus('Processing exam in background...');
       
       // Show success message for 30 seconds, then redirect
-      setTimeout(() => {
-        navigate('/exam-analytics');
-      }, 30000);
+    
 
     } catch (error) {
       console.error('Error submitting exam correction:', error);

@@ -2,10 +2,10 @@
 import React from 'react';
 import { Modal, Button, Badge, ProgressBar } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faCalendarAlt, 
-  faGraduationCap, 
-  faChartLine, 
+import {
+  faCalendarAlt,
+  faGraduationCap,
+  faChartLine,
   faCheckCircle,
   faTimesCircle,
   faExclamationTriangle,
@@ -13,6 +13,7 @@ import {
   faBrain
 } from '@fortawesome/free-solid-svg-icons';
 import MarkdownWithMath from './MarkdownWithMath';
+import './ClassworkDetailsModal.css';
 
 const ClassworkDetailsModal = ({ show, onHide, submission }) => {
   const questions = submission?.questions || [];
@@ -54,7 +55,7 @@ const ClassworkDetailsModal = ({ show, onHide, submission }) => {
   };
 
   return (
-    <Modal show={show} onHide={onHide} size="lg" scrollable centered>
+    <Modal show={show} onHide={onHide} size="lg" scrollable centered className="classwork-details-modal">
       <Modal.Header closeButton className="bg-primary text-white">
         <Modal.Title>
           <FontAwesomeIcon icon={faGraduationCap} className="me-2" />
@@ -171,7 +172,7 @@ const ClassworkDetailsModal = ({ show, onHide, submission }) => {
                   {q.mistakes_made && q.mistakes_made !== "Question not attempted" && (
                     <div className="mb-3">
                       <strong className="text-danger">Mistakes Made:</strong>
-                      <p className="mb-0 mt-1"><MarkdownWithMath content={q.mistakes_made} /></p>
+                      <MarkdownWithMath content={q.mistakes_made} />
                     </div>
                   )}
 
@@ -182,7 +183,7 @@ const ClassworkDetailsModal = ({ show, onHide, submission }) => {
                         <FontAwesomeIcon icon={faBrain} className="me-2" />
                         Feedback:
                       </strong>
-                      <p className="mb-0 mt-2"><MarkdownWithMath content={q.gap_analysis} /></p>
+                     <MarkdownWithMath content={q.gap_analysis} />
                     </div>
                   )}
                 </div>

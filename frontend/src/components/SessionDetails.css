@@ -135,10 +135,95 @@
     color: #333;
   }
   
-  /* Dark mode support */
-  @media (prefers-color-scheme: dark) {
-    .ai-answer {
-      background-color: #343a40;
-      color: #f8f9fa;
-    }
+  /* ========================================
+     DARK MODE SUPPORT
+  ======================================== */
+
+  /* Dark Mode Variables */
+  .dark-mode .session-details-modal .modal-content {
+    background-color: #1e293b;
+    color: #f8fafc;
+  }
+
+  .dark-mode .session-details-modal .modal-header {
+    background: linear-gradient(to right, #0891b2, #1e3a8a);
+    border-bottom: 1px solid #334155;
+  }
+
+  .dark-mode .session-details-modal .modal-body {
+    background-color: #1e293b;
+    color: #f8fafc;
+  }
+
+  .dark-mode .session-details-modal .modal-footer {
+    background-color: #1e293b;
+    border-top: 1px solid #334155;
+  }
+
+  .dark-mode .session-title {
+    color: #00C1D4;
+  }
+
+  .dark-mode .session-date {
+    color: #94a3b8;
+  }
+
+  .dark-mode .session-meta .badge {
+    background-color: #334155 !important;
+    color: #f8fafc;
+  }
+
+  .dark-mode .question-text {
+    color: #cbd5e1;
+  }
+
+  .dark-mode .student-answer {
+    background-color: #0f172a;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+  }
+
+  .dark-mode .ai-answer {
+    background-color: #0f172a;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+  }
+
+  .dark-mode .correct-answer {
+    color: #cbd5e1;
+  }
+
+  .dark-mode .step-number {
+    color: #00C1D4;
+  }
+
+  .dark-mode .teacher-comment {
+    color: #cbd5e1;
+  }
+
+  .dark-mode .card {
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+  }
+
+  .dark-mode .card-header {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-bottom: 1px solid #334155 !important;
+  }
+
+  .dark-mode .card-body {
+    background-color: #0f172a !important;
+    color: #cbd5e1 !important;
+  }
+
+  .dark-mode .btn-secondary {
+    background-color: #334155;
+    border-color: #475569;
+    color: #f8fafc;
+  }
+
+  .dark-mode .btn-secondary:hover {
+    background-color: #475569;
+    border-color: #64748b;
   }

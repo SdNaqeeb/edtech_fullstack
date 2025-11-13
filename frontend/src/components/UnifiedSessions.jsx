@@ -27,7 +27,10 @@ import ExamDetailsModal from './ExamDetailsModal';
 const UnifiedSessions = () => {
   // State for active tab
   const [activeTab, setActiveTab] = useState('self');
-  
+
+  // Track which tabs have been loaded
+  const [loadedTabs, setLoadedTabs] = useState(new Set(['self']));
+
   // Dark mode detection
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('darkMode') === 'true';
@@ -64,15 +67,6 @@ const UnifiedSessions = () => {
 
   const navigate = useNavigate();
 
-  // Fetch all data on component mount
-useEffect(() => {
-  // Fetch all tab data immediately on mount
-  fetchRecentSessions();
-  fetchHomeworkSubmissions();
-  fetchClassworkSubmissions();
-  fetchExamResults();
-}, []);
-
 // Detect dark mode changes
 useEffect(() => {
   setIsDarkMode(document.body.classList.contains('dark-mode'));
@@ -91,6 +85,9 @@ useEffect(() => {
 
   // Fetch based on active tab
   useEffect(() => {
+    // Mark the current tab as loaded
+    setLoadedTabs(prev => new Set([...prev, activeTab]));
+
     if (activeTab === 'self') {
       fetchRecentSessions();
     } else if (activeTab === 'classwork') {
@@ -282,8 +279,12 @@ useEffect(() => {
     return homeworkSubmissions;
   };
 
-  // Get count for tab badges
+  // Get count for tab badges - only show if tab has been loaded
   const getTabCount = (tabType) => {
+    if (!loadedTabs.has(tabType)) {
+      return null; // Don't show count if tab hasn't been loaded yet
+    }
+
     if (tabType === 'self') {
       return recentSessions.length;
     }
@@ -663,7 +664,7 @@ useEffect(() => {
       {/* Tabs */}
       <Nav variant="tabs" className="unified-tabs">
         <Nav.Item>
-          <Nav.Link 
+          <Nav.Link
             active={activeTab === 'self'}
             onClick={() => setActiveTab('self')}
             className={`d-flex align-items-center ${activeTab === 'self' ? 'active' : ''}`}
@@ -671,14 +672,16 @@ useEffect(() => {
           >
             <FontAwesomeIcon icon={faUser} className="me-2" />
             Self
-            <Badge pill className="ms-2 tab-badge">
-              {getTabCount('self')}
-            </Badge>
+            {getTabCount('self') !== null && (
+              <Badge pill className="ms-2 tab-badge">
+                {getTabCount('self')}
+              </Badge>
+            )}
           </Nav.Link>
         </Nav.Item>
         
         <Nav.Item>
-          <Nav.Link 
+          <Nav.Link
             active={activeTab === 'classwork'}
             onClick={() => setActiveTab('classwork')}
             className={`d-flex align-items-center ${activeTab === 'classwork' ? 'active' : ''}`}
@@ -686,9 +689,11 @@ useEffect(() => {
           >
             <FontAwesomeIcon icon={faSchool} className="me-2" />
             Classwork
-            <Badge pill className="ms-2 tab-badge">
-              {getTabCount('classwork')}
-            </Badge>
+            {getTabCount('classwork') !== null && (
+              <Badge pill className="ms-2 tab-badge">
+                {getTabCount('classwork')}
+              </Badge>
+            )}
           </Nav.Link>
         </Nav.Item>
         
@@ -701,9 +706,11 @@ useEffect(() => {
           >
             <FontAwesomeIcon icon={faFileAlt} className="me-2" />
             Exams
-            <Badge pill className="ms-2 tab-badge">
-              {getTabCount('exams')}
-            </Badge>
+            {getTabCount('exams') !== null && (
+              <Badge pill className="ms-2 tab-badge">
+                {getTabCount('exams')}
+              </Badge>
+            )}
           </Nav.Link>
         </Nav.Item>
 
@@ -716,9 +723,11 @@ useEffect(() => {
           >
             <FontAwesomeIcon icon={faHome} className="me-2" />
             Homework
-            <Badge pill className="ms-2 tab-badge">
-              {getTabCount('homework')}
-            </Badge>
+            {getTabCount('homework') !== null && (
+              <Badge pill className="ms-2 tab-badge">
+                {getTabCount('homework')}
+              </Badge>
+            )}
           </Nav.Link>
         </Nav.Item>
       </Nav>

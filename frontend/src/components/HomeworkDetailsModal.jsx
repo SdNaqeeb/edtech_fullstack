@@ -2,10 +2,10 @@
 import React, { useMemo } from 'react';
 import { Modal, Button, Badge, ProgressBar, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faCalendarAlt, 
+import {
+  faCalendarAlt,
   faBookOpen,
-  faChartLine, 
+  faChartLine,
   faCheckCircle,
   faTimesCircle,
   faExclamationTriangle,
@@ -21,6 +21,7 @@ import {
   faClipboardCheck
 } from '@fortawesome/free-solid-svg-icons';
 import MarkdownWithMath from './MarkdownWithMath';
+import './HomeworkDetailsModal.css';
 
 const HomeworkDetailsModal = ({ show, onHide, submission }) => {
   const questions = useMemo(() => submission?.result_json?.questions || [], [submission]);
@@ -106,7 +107,7 @@ const HomeworkDetailsModal = ({ show, onHide, submission }) => {
   const grade = getGrade(overallPercentage);
 
   return (
-    <Modal show={show} onHide={onHide} size="lg" scrollable centered>
+    <Modal show={show} onHide={onHide} size="lg" scrollable centered className="homework-details-modal">
       <Modal.Header closeButton className="bg-primary text-white">
         <Modal.Title>
           <FontAwesomeIcon icon={faBookOpen} className="me-2" />
@@ -292,9 +293,9 @@ const HomeworkDetailsModal = ({ show, onHide, submission }) => {
                         <FontAwesomeIcon icon={faEdit} className="me-2" />
                         Corrections Needed:
                       </strong>
-                      <p className="mb-0 mt-2">
+                   
                         <MarkdownWithMath content={q.correction_comment || q.mistakes_made} />
-                      </p>
+                  
                     </Alert>
                   )}
 
@@ -305,9 +306,9 @@ const HomeworkDetailsModal = ({ show, onHide, submission }) => {
                         <FontAwesomeIcon icon={faCommentDots} className="me-2" />
                         Teacher's Feedback:
                       </strong>
-                      <p className="mb-0 mt-2">
+               
                         <MarkdownWithMath content={q.comment || q.gap_analysis} />
-                      </p>
+                
                     </Alert>
                   )}
                 </div>

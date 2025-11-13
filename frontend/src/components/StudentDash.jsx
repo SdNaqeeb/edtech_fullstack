@@ -41,7 +41,7 @@ import { useTutorial } from "../contexts/TutorialContext";
 
 function StudentDash() {
   const navigate = useNavigate();
-  const { username, fullName } = useContext(AuthContext);
+  const { username, fullName, role } = useContext(AuthContext);
   const { showAlert, AlertContainer } = useAlert();
 
   // Tutorial context
@@ -162,7 +162,7 @@ function StudentDash() {
 
   // Handle tutorial completion for StudentDash
   const handleTutorialComplete = () => {
-    console.log("StudentDash tutorial completed");
+    // console.log("StudentDash tutorial completed");
     // Don't mark as complete yet - will continue to next page when user clicks generate
   };
 
@@ -345,7 +345,7 @@ function StudentDash() {
             topicid: selectedChapters[0], // Using first chapter for subtopics
             external: true,
           });
-          console.log("Subtopics response:", response);
+          // console.log("Subtopics response:", response);
           setSubTopics(response.data.subtopics || []);
         } catch (error) {
           console.error("Error fetching subtopics:", error);
@@ -372,7 +372,7 @@ function StudentDash() {
             topicid: selectedChapters[0], // Using first chapter for worksheets
             worksheets: true,
           });
-          console.log("Worksheets response:", response);
+          // console.log("Worksheets response:", response);
           setWorksheets(response.data.worksheets || []);
         } catch (error) {
           console.error("Error fetching worksheets:", error);
@@ -421,7 +421,7 @@ function StudentDash() {
           ? `data:image/png;base64,${question.question_image}`
           : null,
       }));
-      console.log("Processed questions with images:", questionsWithImages);
+      // console.log("Processed questions with images:", questionsWithImages);
       setQuestionList(questionsWithImages);
       setSelectedQuestions([]);
 
@@ -435,7 +435,7 @@ function StudentDash() {
 
   // Enhanced question click handler
   const handleQuestionClick = (question, index, image, question_id, context) => {
-    console.log("Question clicked:", { question, index, image, question_id, context });
+    // console.log("Question clicked:", { question, index, image, question_id, context });
 
     setShowQuestionList(false);
 
@@ -1083,7 +1083,7 @@ function StudentDash() {
                 </div>
 
                 {/* Recent Sessions */}
-                <UnifiedSessions />
+          { role==="student" &&   ( <UnifiedSessions />)}
               </div>
               {/* Right Side - Sidebar (1 part) */}
               <div className="dashboard-right-sidebar">

@@ -151,16 +151,16 @@ const ChatBox = () => {
   // ====== Session handling ======
   const fetchStudentData = async () => {
     try {
-      console.log("Fetching student data for:", username)
+      // console.log("Fetching student data for:", username)
       const response = await axiosInstance.post("dummy/", {
         homework: "true",
         agentic_data: "true",
       })
 
-      console.log("✅ Student Data Response:", response.data)
+      // console.log("✅ Student Data Response:", response.data)
 
       if (response.data && response.data[username]) {
-        console.log("📦 Student data found for", username)
+        // console.log("📦 Student data found for", username)
         return response.data[username]
       } else {
         console.warn("⚠ No student data found for", username)
@@ -174,10 +174,10 @@ const ChatBox = () => {
 
   const fetchExamData = async () => {
     try {
-      console.log("Fetching student data for:", username)
+      // console.log("Fetching student data for:", username)
       const response = await axiosInstance.get("questions-evaluated/")
 
-      console.log("✅ Student Data Response:", response.data)
+      // console.log("✅ Student Data Response:", response.data)
 
       if (response.data) {
         console.log("📦 Student data found for", username)
@@ -194,18 +194,18 @@ const ChatBox = () => {
 
   const fetchStudentDataAndCreateSession = async () => {
     setConnectionStatus("checking")
-    console.log("Fetching student data and creating session for:", username)
+    // console.log("Fetching student data and creating session for:", username)
 
     try {
       const data = await fetchStudentData()
       const examdata = await fetchExamData()
-      console.log("Fetched exam data:", examdata)
+      // console.log("Fetched exam data:", examdata)
 
       let filteredData = null
       if (data) {
         filteredData = data
         setStudentInfo(filteredData)
-        console.log("✅ Student data fetched:", filteredData)
+        // console.log("✅ Student data fetched:", filteredData)
       } else {
         console.warn("⚠️ No student data found for", username)
       }
@@ -230,10 +230,10 @@ const ChatBox = () => {
         data: studentData || {},
       }
 
-     console.log("Creating session with student info:", filteredStudentInfo);
-console.log("Student ID:", localStorage.getItem("fullName") || username || "guest_user");
-console.log("Exam data:", examData);
-console.log("Class name:", className || "default_class");
+    //  console.log("Creating session with student info:", filteredStudentInfo);
+// console.log("Student ID:", localStorage.getItem("fullName") || username || "guest_user");
+// console.log("Exam data:", examData);
+// console.log("Class name:", className || "default_class");
 
 // Create FormData object
 const formData = new FormData();
@@ -244,7 +244,7 @@ formData.append("class_name", className || "default_class");
 
 // Log formData entries for debugging
 for (let [key, value] of formData.entries()) {
-  console.log(`${key}:`, value);
+  // console.log(`${key}:`, value);
 }
 
 // Send the request using FormData
@@ -255,13 +255,13 @@ const res = await api.post("/create_session", formData, {
 });
 
 
-      console.log("create_session response:", res.data)
+      // console.log("create_session response:", res.data)
 
       if (!res.data?.session_id) throw new Error("No session_id")
 
       setSessionId(res.data.session_id)
       setConnectionStatus("connected")
-      console.log("Session created successfully:", res.data.session_id)
+      // console.log("Session created successfully:", res.data.session_id)
 
     } catch (e) {
       console.error("create_session error:", e)

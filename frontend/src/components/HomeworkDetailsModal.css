@@ -1,0 +1,304 @@
+/* HomeworkDetailsModal.css */
+
+/* ========================================
+   MODAL BASE STYLES
+======================================== */
+.homework-details-modal .modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+.homework-details-modal .modal-header {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 15px 20px;
+  border-bottom: none;
+}
+
+.homework-details-modal .modal-header .btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+
+.homework-details-modal .modal-header .btn-close:hover {
+  opacity: 1;
+}
+
+.homework-details-modal .modal-body {
+  padding: 20px;
+  background: #f8fafc;
+}
+
+.homework-details-modal .modal-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 15px 20px;
+  background: #ffffff;
+}
+
+/* ========================================
+   SUBMISSION OVERVIEW
+======================================== */
+.homework-details-modal .bg-light {
+  background-color: #f8f9fa !important;
+  border-radius: 8px;
+}
+
+/* ========================================
+   QUESTION CARDS
+======================================== */
+.homework-details-modal .border {
+  border: 1px solid #dee2e6 !important;
+}
+
+.homework-details-modal .shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+/* ========================================
+   BADGES
+======================================== */
+.homework-details-modal .badge {
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+
+/* ========================================
+   PROGRESS BARS
+======================================== */
+.homework-details-modal .progress {
+  border-radius: 8px;
+  height: 25px;
+  background-color: #e9ecef;
+}
+
+/* ========================================
+   ALERTS
+======================================== */
+.homework-details-modal .alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.homework-details-modal .alert-info {
+  background-color: #e7f5ff;
+  color: #0c5692;
+}
+
+.homework-details-modal .alert-danger {
+  background-color: #fff5f5;
+  color: #c53030;
+}
+
+.homework-details-modal .alert-warning {
+  background-color: #fffaf0;
+  color: #c05621;
+}
+
+/* ========================================
+   SUMMARY STATS
+======================================== */
+.homework-details-modal .text-center {
+  transition: transform 0.3s ease;
+}
+
+.homework-details-modal .text-center:hover {
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   DARK MODE SUPPORT
+======================================== */
+
+.dark-mode .homework-details-modal .modal-content {
+  background-color: #1e293b;
+  color: #f8fafc;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .homework-details-modal .modal-header {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  border-bottom: 1px solid #334155;
+}
+
+.dark-mode .homework-details-modal .modal-body {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.dark-mode .homework-details-modal .modal-footer {
+  background: #1e293b;
+  border-top: 1px solid #334155;
+}
+
+/* Submission Overview Dark Mode */
+.dark-mode .homework-details-modal .bg-light {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+.dark-mode .homework-details-modal .rounded {
+  background-color: #1e293b !important;
+}
+
+/* Question Cards Dark Mode */
+.dark-mode .homework-details-modal .border {
+  border-color: #334155 !important;
+}
+
+.dark-mode .homework-details-modal .border-bottom {
+  border-bottom-color: #334155 !important;
+}
+
+.dark-mode .homework-details-modal .shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Badges Dark Mode */
+.dark-mode .homework-details-modal .badge {
+  color: #ffffff;
+}
+
+.dark-mode .homework-details-modal .badge.bg-secondary {
+  background-color: #475569 !important;
+}
+
+.dark-mode .homework-details-modal .badge.bg-success {
+  background-color: #065f46 !important;
+}
+
+.dark-mode .homework-details-modal .badge.bg-danger {
+  background-color: #b91c1c !important;
+}
+
+.dark-mode .homework-details-modal .badge.bg-warning {
+  background-color: #b45309 !important;
+}
+
+.dark-mode .homework-details-modal .badge.bg-info {
+  background-color: #1e40af !important;
+}
+
+/* Progress Bars Dark Mode */
+.dark-mode .homework-details-modal .progress {
+  background-color: #334155;
+}
+
+/* Alerts Dark Mode */
+.dark-mode .homework-details-modal .alert-info {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  color: #bfdbfe;
+  border: 1px solid #3b82f6;
+}
+
+.dark-mode .homework-details-modal .alert-danger {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  color: #fecaca;
+  border: 1px solid #ef4444;
+}
+
+.dark-mode .homework-details-modal .alert-warning {
+  background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  color: #fde68a;
+  border: 1px solid #f59e0b;
+}
+
+/* Text Colors Dark Mode */
+.dark-mode .homework-details-modal .text-muted {
+  color: #94a3b8 !important;
+}
+
+.dark-mode .homework-details-modal .text-danger {
+  color: #fca5a5 !important;
+}
+
+.dark-mode .homework-details-modal .text-primary {
+  color: #60a5fa !important;
+}
+
+.dark-mode .homework-details-modal .text-info {
+  color: #7dd3fc !important;
+}
+
+.dark-mode .homework-details-modal .text-warning {
+  color: #fbbf24 !important;
+}
+
+.dark-mode .homework-details-modal .small {
+  color: #94a3b8 !important;
+}
+
+/* Buttons Dark Mode */
+.dark-mode .homework-details-modal .btn-secondary {
+  background-color: #334155;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.dark-mode .homework-details-modal .btn-secondary:hover {
+  background-color: #475569;
+  border-color: #64748b;
+}
+
+.dark-mode .homework-details-modal .btn-primary {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  border: none;
+}
+
+.dark-mode .homework-details-modal .btn-primary:hover {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+}
+
+.dark-mode .homework-details-modal .btn-info {
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+  border: none;
+}
+
+.dark-mode .homework-details-modal .btn-info:hover {
+  background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);
+}
+
+/* Additional Elements Dark Mode */
+.dark-mode .homework-details-modal h5,
+.dark-mode .homework-details-modal h6,
+.dark-mode .homework-details-modal strong {
+  color: #f8fafc;
+}
+
+.dark-mode .homework-details-modal p {
+  color: #cbd5e1;
+}
+
+/* Question Text Section Dark Mode */
+.dark-mode .homework-details-modal .p-3.bg-light.rounded {
+  background-color: #1e293b !important;
+  border: 1px solid #334155;
+}
+
+/* Summary Stats Dark Mode */
+.dark-mode .homework-details-modal .row.mt-3 {
+  color: #f8fafc;
+}
+
+.dark-mode .homework-details-modal .fw-bold {
+  color: #f8fafc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .homework-details-modal .modal-body {
+    padding: 15px;
+  }
+
+  .homework-details-modal .badge {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .homework-details-modal .progress {
+    height: 20px;
+  }
+}

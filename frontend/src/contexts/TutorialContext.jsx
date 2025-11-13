@@ -29,12 +29,12 @@ export const TutorialProvider = ({ children }) => {
     if (completed) {
       // Add to completed pages if not already there
       if (!completedPages.includes(pageName)) {
-        console.log(`Marking page ${pageName} as completed`);
+        // console.log(`Marking page ${pageName} as completed`);
         setCompletedPages([...completedPages, pageName]);
       }
     } else {
       // Remove from completed pages
-      console.log(`Marking page ${pageName} as not completed`);
+      // console.log(`Marking page ${pageName} as not completed`);
       setCompletedPages(completedPages.filter((page) => page !== pageName));
     }
   };
@@ -49,7 +49,7 @@ export const TutorialProvider = ({ children }) => {
     setTutorialFlow("manual");
     localStorage.removeItem("completedTutorialPages");
     localStorage.removeItem("hasCompletedTutorial");
-    console.log("Tutorial state reset to defaults");
+    // console.log("Tutorial state reset to defaults");
   };
 
   // Function to start tutorial from toggle button (deprecated - use startTutorialForPage)
@@ -91,19 +91,18 @@ export const TutorialProvider = ({ children }) => {
     // In manual mode, only show tutorial for the specific page that was clicked
     if (tutorialFlow === "manual") {
       const shouldShow = showTutorial && activeTutorialPage === pageName;
-      console.log(`Tutorial check for ${pageName}: ${shouldShow} (activeTutorialPage: ${activeTutorialPage})`);
+      // Only log when tutorial state changes, not on every render
       return shouldShow;
     }
 
     // Legacy support for old "active" flow mode (deprecated)
     if (tutorialFlow === "active") {
-      console.log(`Checking tutorial for ${pageName} in active flow (legacy mode)`);
-      console.log(`Current completed pages:`, completedPages);
+      // Reduced logging for legacy mode
 
       // If we're in StudentDash, always show tutorial
       if (pageName === "studentDash") {
         const shouldShow = showTutorial && !completedPages.includes(pageName);
-        console.log(`StudentDash tutorial check: ${shouldShow}`);
+        // console.log(`StudentDash tutorial check: ${shouldShow}`);
         return shouldShow;
       }
 
@@ -111,7 +110,7 @@ export const TutorialProvider = ({ children }) => {
       if (pageName === "questionListModal") {
         const shouldShow =
           showTutorial && completedPages.includes("studentDash");
-        console.log(`QuestionListModal tutorial check: ${shouldShow}`);
+        // console.log(`QuestionListModal tutorial check: ${shouldShow}`);
         return shouldShow;
       }
 
@@ -119,24 +118,24 @@ export const TutorialProvider = ({ children }) => {
       if (pageName === "solveQuestion") {
         const shouldShow =
           showTutorial && completedPages.includes("questionListModal");
-        console.log(`SolveQuestion tutorial check: ${shouldShow}`);
+        // console.log(`SolveQuestion tutorial check: ${shouldShow}`);
         return shouldShow;
       }
     }
 
     // Default fallback - don't show
-    console.log(`Default tutorial check for ${pageName}: false`);
+    // console.log(`Default tutorial check for ${pageName}: false`);
     return false;
   };
 
   // Function to continue the tutorial flow (disabled in manual mode)
   const continueTutorialFlow = (fromPage, toPage) => {
-    console.log(`Attempting to continue tutorial flow from ${fromPage} to ${toPage}`);
-    console.log(`Current tutorial flow state:`, tutorialFlow);
+    // console.log(`Attempting to continue tutorial flow from ${fromPage} to ${toPage}`);
+    // console.log(`Current tutorial flow state:`, tutorialFlow);
 
     // In manual mode, do NOT auto-continue to other pages
     if (tutorialFlow === "manual") {
-      console.log(`Manual mode: Tutorial will NOT auto-continue to ${toPage}`);
+      // console.log(`Manual mode: Tutorial will NOT auto-continue to ${toPage}`);
       setShowTutorial(false); // Stop tutorial when leaving the page
       setActiveTutorialPage(""); // Clear active page
       return;
@@ -148,15 +147,15 @@ export const TutorialProvider = ({ children }) => {
       setCurrentPage(toPage);
       setCurrentStep(0); // Reset step count for the new page
       setShowTutorial(true); // Ensure tutorial is shown for the next page
-      console.log(`Tutorial flow continued to ${toPage} (legacy mode)`);
+      // console.log(`Tutorial flow continued to ${toPage} (legacy mode)`);
     } else {
-      console.log(`Cannot continue tutorial flow: flow is ${tutorialFlow}`);
+      // console.log(`Cannot continue tutorial flow: flow is ${tutorialFlow}`);
     }
   };
 
   // Function to exit the tutorial flow
   const exitTutorialFlow = () => {
-    console.log("Tutorial flow: exiting flow");
+    // console.log("Tutorial flow: exiting flow");
     setShowTutorial(false);
     setActiveTutorialPage(""); // Clear active tutorial page
     setTutorialFlow("manual"); // Reset to manual mode
@@ -165,7 +164,7 @@ export const TutorialProvider = ({ children }) => {
 
   // Function to complete the entire tutorial
   const completeTutorialFlow = () => {
-    console.log("Tutorial flow: completing tutorial");
+    // console.log("Tutorial flow: completing tutorial");
     setShowTutorial(false);
     setActiveTutorialPage(""); // Clear active tutorial page
     setTutorialFlow("manual"); // Reset to manual mode

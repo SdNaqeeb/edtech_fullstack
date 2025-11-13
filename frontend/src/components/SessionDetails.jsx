@@ -216,7 +216,7 @@ const SessionDetails = ({ show, onHide, session }) => {
             <strong>Question</strong>
           </Card.Header>
           <Card.Body>
-            <p className="question-text"><MarkdownWithMath content={session.question_text} /></p>
+            <MarkdownWithMath content={session.question_text} />
             {session.question_image_base64 && session.question_image_base64 !== "No image for question" && (
               <div className="text-center">
                 <img 
