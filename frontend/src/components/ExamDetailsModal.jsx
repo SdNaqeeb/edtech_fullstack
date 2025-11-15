@@ -726,7 +726,7 @@ useEffect(() => {
                 <div className="info-content">
                   <span className="info-label">Score</span>
                   <span className="info-value score-highlight">
-                    {result?.total_marks_obtained || 0} / {result?.total_marks || 0}
+                    {result?.total_marks_obtained || 0} / {result?.total_max_marks || 0}
                   </span>
                 </div>
               </div>

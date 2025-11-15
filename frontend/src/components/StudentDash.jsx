@@ -78,6 +78,8 @@ function StudentDash() {
   const [questionList, setQuestionList] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
 
+  const [scienceSubtopics, setScienceSubtopics] = useState([]);
+
   // Extract class from username (e.g., 10HPS24 -> 10, 12ABC24 -> 12)
   const extractClassFromUsername = (username) => {
     if (!username) return "";
@@ -130,8 +132,6 @@ function StudentDash() {
     localStorage.setItem('darkMode', newMode.toString());
     document.body.classList.toggle('dark-mode', newMode);
   };
-
-  // Tutorial steps for StudentDash
   const tutorialSteps = [
     {
       target: '.greeting-content',
@@ -166,40 +166,116 @@ function StudentDash() {
     // Don't mark as complete yet - will continue to next page when user clicks generate
   };
 
+
   // Apply dark mode on component mount
   useEffect(() => {
     document.body.classList.toggle('dark-mode', isDarkMode);
   }, [isDarkMode]);
 
-  // Determine if generate button should be enabled
+
+// Helper function to check if selected subject is Science
+const isScienceSubject = () => {
+  if (!selectedSubject || !subjects.length) return false;
+  const subject = subjects.find(s => s.subject_code === selectedSubject);
+  return subject && subject.subject_name.toLowerCase().includes('science');
+};
+
+// Complete mapping of question types with IDs
+const QUESTION_TYPE_MAPPING = [
+  { id: "1", value: 'activity_based_questions', label: 'Activity Based Questions' },
+  { id: "2", value: 'conceptual_questions', label: 'Conceptual Questions' },
+  { id: "3", value: 'diagram_based_questions', label: 'Diagram Based Questions' },
+  { id: "4", value: 'fill_in_the_blanks', label: 'Fill in the Blanks' },
+  { id: "5", value: 'matching_questions', label: 'Matching Questions' },
+  { id: "6", value: 't_f_questions', label: 'True/False Questions' }
+];
+
+// Get question type options based on subject
+const getQuestionTypeOptions = () => {
+  if (isScienceSubject()) {
+    // Filter question types based on available subtopics from backend
+    if (scienceSubtopics.length > 0) {
+      return QUESTION_TYPE_MAPPING.filter(type => 
+        scienceSubtopics.includes(type.id)
+      );
+    }
+    // If no subtopics loaded yet, show all options
+    return QUESTION_TYPE_MAPPING;
+  } else {
+    return [
+      { value: 'solved', label: 'Solved Examples' },
+      { value: 'external', label: 'Exercises' },
+      { value: 'worksheets', label: 'Worksheets' }
+    ];
+  }
+};
+
+// Reset question type when subject changes
+useEffect(() => {
+  if (selectedSubject) {
+    setQuestionType("");
+    setQuestionLevel("");
+    setSelectedWorksheet("");
+    setScienceSubtopics([]); // Reset science subtopics
+  }
+}, [selectedSubject]);
+
+// Fetch available Science subtopics when Science subject is selected with chapters
+useEffect(() => {
+  async function fetchScienceSubtopics() {
+    if (
+      isScienceSubject() &&
+      selectedClass &&
+      selectedSubject &&
+      selectedChapters.length > 0
+    ) {
+      try {
+        console.log("🔬 Fetching Science subtopics...");
+        const response = await axiosInstance.post("/question-images/", {
+          classid: selectedClass,
+          subjectid: selectedSubject,
+          topicid: selectedChapters,
+          external: true,
+        });
+        
+        console.log("📊 Science subtopics response:", response.data);
+        
+        if (response.data && response.data.subtopics) {
+          setScienceSubtopics(response.data.subtopics);
+          console.log("✅ Available Science subtopics:", response.data.subtopics);
+        } else {
+          setScienceSubtopics([]);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching Science subtopics:", error);
+        setScienceSubtopics([]);
+      }
+    } else if (!isScienceSubject()) {
+      // Clear science subtopics if not science subject
+      setScienceSubtopics([]);
+    }
+  }
+  fetchScienceSubtopics();
+}, [selectedClass, selectedSubject, selectedChapters]);
+
   const isGenerateButtonEnabled = () => {
-    if (questionType === "external") {
-      return (
-        selectedClass !== "" &&
-        selectedSubject !== "" &&
-        selectedChapters.length > 0 &&
-        questionType !== "" &&
-        questionLevel !== ""
-      );
-    }
+  // Basic validations
+  if (!selectedClass || !selectedSubject || selectedChapters.length === 0 || !questionType) {
+    return false;
+  }
 
-    if (questionType === "worksheets") {
-      return (
-        selectedClass !== "" &&
-        selectedSubject !== "" &&
-        selectedChapters.length > 0 &&
-        questionType !== "" &&
-        selectedWorksheet !== ""
-      );
-    }
+  // For Science subject with its specific question types
+  if (isScienceSubject()) {
+    return true; // All Science question types can be generated immediately
+  }
 
-    return (
-      selectedClass !== "" &&
-      selectedSubject !== "" &&
-      selectedChapters.length > 0 &&
-      questionType !== ""
-    );
-  };
+  // For non-Science subjects
+  if (questionType === "worksheets") return selectedWorksheet !== "";
+  if (questionType === "external") return questionLevel !== "";
+  if (questionType === "solved") return true;
+  
+  return false;
+};
 
   // Fetch classes and set defaults with debugging
   useEffect(() => {
@@ -329,7 +405,7 @@ function StudentDash() {
     fetchChapters();
   }, [selectedSubject, selectedClass]);
 
-  // Effect for fetching subtopics when External question type is selected
+ // Effect for fetching subtopics when External question type is selected
   useEffect(() => {
     async function fetchSubTopics() {
       if (
@@ -384,62 +460,74 @@ function StudentDash() {
   }, [questionType, selectedClass, selectedSubject, selectedChapters]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!isGenerateButtonEnabled()) {
-      console.error("Please select all required fields");
-      return;
-    }
+  if (!isGenerateButtonEnabled()) {
+    console.error("Please select all required fields");
+    return;
+  }
 
-    // API request structure
-    const requestData = {
-      classid: Number(selectedClass),
-      subjectid: Number(selectedSubject),
-      topicid: selectedChapters,
-      solved: questionType === "solved",
-      exercise: questionType === "exercise",
-      // external: questionType === "external",
-      // worksheets: questionType === "worksheets",
-      subtopic: questionType === "external" ? questionLevel : null,
-      worksheet_name: questionType === "worksheets" ? selectedWorksheet : null,
-    };
-
-    // console.log("Request data for question generation:", requestData);
-
-    try {
-      const response = await axiosInstance.post("/question-images/", requestData);
-      // console.log("the response data is :", response.data);
-
-      // Process questions with images and context
-      const questionsWithImages = (response.data.questions || []).map((question, index) => ({
-        ...question,
-        id: index,
-        question_id: question.id,
-        question: question.question,
-        context: question.context || null,
-        image: question.question_image
-          ? `data:image/png;base64,${question.question_image}`
-          : null,
-      }));
-      // console.log("Processed questions with images:", questionsWithImages);
-      setQuestionList(questionsWithImages);
-      setSelectedQuestions([]);
-
-      // Show the modal
-      setShowQuestionList(true);
-    } catch (error) {
-      console.error("Error generating questions:", error);
-      showAlert("Failed to generate questions. Please try again.", "error");
-    }
+  // API request structure
+  const requestData = {
+    classid: Number(selectedClass),
+    subjectid: Number(selectedSubject),
+    topicid: selectedChapters,
   };
+
+  // ✅ UPDATED: Add question type flags based on whether it's Science or not
+  if (isScienceSubject()) {
+    // For Science, send subtopicid based on selected question type
+    const selectedQuestionType = QUESTION_TYPE_MAPPING.find(
+      type => type.value === questionType
+    );
+    
+    if (selectedQuestionType) {
+      requestData.subtopic = selectedQuestionType.id;
+      console.log("🔬 Sending Science request with subtopic:", selectedQuestionType.id);
+    }
+  } else {
+    // For other subjects, use the existing logic
+    requestData.solved = questionType === "solved";
+    requestData.exercise = questionType === "exercise";
+    requestData.subtopic = questionType === "external" ? questionLevel : null;
+    requestData.worksheet_name = questionType === "worksheets" ? selectedWorksheet : null;
+  }
+
+  // console.log("📤 Request data for question generation:", requestData);
+
+  try {
+    const response = await axiosInstance.post("/question-images/", requestData);
+    // console.log("📥 Response data:", response.data);
+
+    // Process questions with images and context
+    const questionsWithImages = (response.data.questions || []).map((question, index) => ({
+      ...question,
+      id: index,
+      question_id: question.id,
+      question: question.question,
+      context: question.context || null,
+      image: question.question_image
+        ? `data:image/png;base64,${question.question_image}`
+        : null,
+    }));
+    
+    // console.log("✅ Processed questions with images:", questionsWithImages);
+    setQuestionList(questionsWithImages);
+    setSelectedQuestions([]);
+
+    // Show the modal
+    setShowQuestionList(true);
+  } catch (error) {
+    console.error("❌ Error generating questions:", error);
+    showAlert("Failed to generate questions. Please try again.", "error");
+  }
+};
 
   // Enhanced question click handler
   const handleQuestionClick = (question, index, image, question_id, context) => {
     // console.log("Question clicked:", { question, index, image, question_id, context });
 
     setShowQuestionList(false);
-
-    // Tutorial no longer auto-continues to other pages (manual mode only)
 
     navigate("/solvequestion", {
       state: {
@@ -517,13 +605,13 @@ function StudentDash() {
     }),
     menuPortal: (provided) => ({
       ...provided,
-      zIndex: 9990,
+      zIndex: 10000,
       position: 'fixed',
     }),
     menu: (provided) => ({
       ...provided,
       backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
-      zIndex: 9990,
+      zIndex: 10000,
       borderRadius: '12px',
       border: `2px solid ${isDarkMode ? '#7c3aed' : '#667eea'}`,
       boxShadow: isDarkMode
@@ -971,9 +1059,11 @@ function StudentDash() {
                               disabled={selectedChapters.length === 0}
                             >
                               <option value="">Select Question Type</option>
-                              <option value="solved">Solved Examples</option>
-                              <option value="external">Exercises</option>
-                              <option value="worksheets">Worksheets</option>
+                              {getQuestionTypeOptions().map(option => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
                             </Form.Control>
                           </Form.Group>
                         </Col>
@@ -1014,57 +1104,59 @@ function StudentDash() {
   </div>
 )} */}
 
-                      {questionType === "external" && (
-                        <Row className="form-row">
-                          <Col md={6}>
-                            <Form.Group>
-                              <Form.Label>
-                                <FontAwesomeIcon icon={faBookmark} className="me-2" />
-                                Select The Set
-                              </Form.Label>
-                              <Form.Control
-                                as="select"
-                                value={questionLevel}
-                                onChange={(e) => setQuestionLevel(e.target.value)}
-                                className="form-control-enhanced"
-                              >
-                                <option value="">Select The Set</option>
-                                {subTopics.map((subTopic, index) => (
-                                  <option key={subTopic} value={subTopic}>
-                                    Exercise {index + 1}
-                                  </option>
-                                ))}
-                              </Form.Control>
-                            </Form.Group>
-                          </Col>
-                        </Row>
-                      )}
+                      {/* Only show this for non-Science subjects with external question type */}
+                    {!isScienceSubject() && questionType === "external" && (
+                      <Row className="form-row">
+                        <Col md={6}>
+                          <Form.Group>
+                            <Form.Label>
+                              <FontAwesomeIcon icon={faBookmark} className="me-2" />
+                              Select The Set
+                            </Form.Label>
+                            <Form.Control
+                              as="select"
+                              value={questionLevel}
+                              onChange={(e) => setQuestionLevel(e.target.value)}
+                              className="form-control-enhanced"
+                            >
+                              <option value="">Select The Set</option>
+                              {subTopics.map((subTopic, index) => (
+                                <option key={subTopic} value={subTopic}>
+                                  Exercise {index + 1}
+                                </option>
+                              ))}
+                            </Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                    )}
 
-                      {questionType === "worksheets" && (
-                        <Row className="form-row">
-                          <Col md={6}>
-                            <Form.Group>
-                              <Form.Label>
-                                <FontAwesomeIcon icon={faUsers} className="me-2" />
-                                Select Worksheet
-                              </Form.Label>
-                              <Form.Control
-                                as="select"
-                                value={selectedWorksheet}
-                                onChange={(e) => setSelectedWorksheet(e.target.value)}
-                                className="form-control-enhanced"
-                              >
-                                <option value="">Select Worksheet</option>
-                                {worksheets.map((worksheet) => (
-                                  <option key={worksheet.id} value={worksheet.worksheet_name}>
-                                    {worksheet.worksheet_name}
-                                  </option>
-                                ))}
-                              </Form.Control>
-                            </Form.Group>
-                          </Col>
-                        </Row>
-                      )}
+                    {/* Only show this for non-Science subjects with worksheets question type */}
+                    {!isScienceSubject() && questionType === "worksheets" && (
+                      <Row className="form-row">
+                        <Col md={6}>
+                          <Form.Group>
+                            <Form.Label>
+                              <FontAwesomeIcon icon={faUsers} className="me-2" />
+                              Select Worksheet
+                            </Form.Label>
+                            <Form.Control
+                              as="select"
+                              value={selectedWorksheet}
+                              onChange={(e) => setSelectedWorksheet(e.target.value)}
+                              className="form-control-enhanced"
+                            >
+                              <option value="">Select Worksheet</option>
+                              {worksheets.map((worksheet) => (
+                                <option key={worksheet.id} value={worksheet.worksheet_name}>
+                                  {worksheet.worksheet_name}
+                                </option>
+                              ))}
+                            </Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                    )}
 
                       <div className="new-button form-actions">
                         <button
