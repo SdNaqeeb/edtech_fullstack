@@ -38,6 +38,8 @@ import StreakTracker from "./StreakTracker";
 import LiveNotifications from "./LiveNotifications";
 import Tutorial from "./Tutorial";
 import { useTutorial } from "../contexts/TutorialContext";
+import Mascot from "./Mascot";
+// import { useMascot } from "../contexts/MascotContext";
 
 function StudentDash() {
   const navigate = useNavigate();
@@ -54,6 +56,9 @@ function StudentDash() {
     tutorialFlow,
     completedPages,
   } = useTutorial();
+
+  // Mascot context
+  // const { setWaving, setIdle, setHappy, setCelebrating } = useMascot();
 
   // Dark mode state with improved persistence
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -79,6 +84,10 @@ function StudentDash() {
   const [selectedQuestions, setSelectedQuestions] = useState([]);
 
   const [scienceSubtopics, setScienceSubtopics] = useState([]);
+
+  // Resume Learning state
+  const [lastSession, setLastSession] = useState(null);
+  const [canResume, setCanResume] = useState(false);
 
   // Extract class from username (e.g., 10HPS24 -> 10, 12ABC24 -> 12)
   const extractClassFromUsername = (username) => {
@@ -171,6 +180,45 @@ function StudentDash() {
   useEffect(() => {
     document.body.classList.toggle('dark-mode', isDarkMode);
   }, [isDarkMode]);
+
+  // Set mascot to waving on component mount
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setWaving();
+  //   }, 1000);
+
+  //   return () => clearTimeout(timer);
+  // }, [setWaving]);
+
+  // Load last session on component mount
+  useEffect(() => {
+    const loadLastSession = () => {
+      try {
+        const savedSession = localStorage.getItem(`lastSession_${username}`);
+        if (savedSession) {
+          const sessionData = JSON.parse(savedSession);
+          // Check if session is recent (within last 7 days)
+          const sessionDate = new Date(sessionData.timestamp);
+          const daysSinceSession = (new Date() - sessionDate) / (1000 * 60 * 60 * 24);
+
+          if (daysSinceSession <= 7 && sessionData.questionList && sessionData.questionList.length > 0) {
+            setLastSession(sessionData);
+            setCanResume(true);
+            console.log("✅ Last session loaded:", sessionData);
+          } else {
+            // Session too old or invalid, clear it
+            localStorage.removeItem(`lastSession_${username}`);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading last session:", error);
+      }
+    };
+
+    if (username) {
+      loadLastSession();
+    }
+  }, [username]);
 
 
 // Helper function to check if selected subject is Science
@@ -523,28 +571,72 @@ useEffect(() => {
   }
 };
 
+  // Save session data to localStorage
+  const saveSessionData = (sessionData) => {
+    try {
+      const dataToSave = {
+        ...sessionData,
+        timestamp: new Date().toISOString(),
+        username: username,
+      };
+      localStorage.setItem(`lastSession_${username}`, JSON.stringify(dataToSave));
+      console.log("💾 Session saved:", dataToSave);
+    } catch (error) {
+      console.error("Error saving session:", error);
+    }
+  };
+
+  // Resume learning from last session
+  const handleResumeLearning = () => {
+    if (!lastSession) return;
+
+    console.log("▶️ Resuming learning from:", lastSession);
+
+    navigate("/solvequestion", {
+      state: {
+        question: lastSession.question,
+        question_id: lastSession.question_id,
+        questionNumber: lastSession.questionNumber,
+        questionList: lastSession.questionList,
+        class_id: lastSession.class_id,
+        subject_id: lastSession.subject_id,
+        topic_ids: lastSession.topic_ids,
+        subtopic: lastSession.subtopic,
+        worksheet_id: lastSession.worksheet_id,
+        image: lastSession.image,
+        context: lastSession.context,
+        selectedQuestions: lastSession.selectedQuestions || [],
+        isResuming: true, // Flag to indicate this is a resume
+      },
+    });
+  };
+
   // Enhanced question click handler
   const handleQuestionClick = (question, index, image, question_id, context) => {
     // console.log("Question clicked:", { question, index, image, question_id, context });
 
     setShowQuestionList(false);
 
-    navigate("/solvequestion", {
-      state: {
-        question,
-        question_id: question_id,
-        questionNumber: index + 1,
-        questionList,
-        class_id: selectedClass,
-        subject_id: selectedSubject,
-        topic_ids: selectedChapters,
-        subtopic: questionType === "external" ? questionLevel : "",
-        worksheet_id: questionType === "worksheets" ? selectedWorksheet : "",
-        image,
-        context: context || null,
-        selectedQuestions: selectedQuestions,
+    const sessionData = {
+      question,
+      question_id: question_id,
+      questionNumber: index + 1,
+      questionList,
+      class_id: selectedClass,
+      subject_id: selectedSubject,
+      topic_ids: selectedChapters,
+      subtopic: questionType === "external" ? questionLevel : "",
+      worksheet_id: questionType === "worksheets" ? selectedWorksheet : "",
+      image,
+      context: context || null,
+      selectedQuestions: selectedQuestions,
+    };
 
-      },
+    // Save session before navigating
+    saveSessionData(sessionData);
+
+    navigate("/solvequestion", {
+      state: sessionData,
     });
   };
 
@@ -553,21 +645,26 @@ useEffect(() => {
     setShowQuestionList(false);
 
     const firstQuestion = selectedQuestionsData[0];
+    const sessionData = {
+      question: firstQuestion.question,
+      question_id: firstQuestion.question_id,
+      questionNumber: firstQuestion.index + 1,
+      questionList,
+      class_id: selectedClass,
+      subject_id: selectedSubject,
+      topic_ids: selectedChapters,
+      subtopic: questionType === "external" ? questionLevel : "",
+      worksheet_id: questionType === "worksheets" ? selectedWorksheet : "",
+      image: firstQuestion.image,
+      context: firstQuestion.context || null,
+      selectedQuestions: selectedQuestionsData,
+    };
+
+    // Save session before navigating
+    saveSessionData(sessionData);
+
     navigate("/solvequestion", {
-      state: {
-        question: firstQuestion.question,
-        question_id: firstQuestion.question_id,
-        questionNumber: firstQuestion.index + 1,
-        questionList,
-        class_id: selectedClass,
-        subject_id: selectedSubject,
-        topic_ids: selectedChapters,
-        subtopic: questionType === "external" ? questionLevel : "",
-        worksheet_id: questionType === "worksheets" ? selectedWorksheet : "",
-        image: firstQuestion.image,
-        context: firstQuestion.context || null,
-        selectedQuestions: selectedQuestionsData,
-      },
+      state: sessionData,
     });
   };
 
@@ -810,6 +907,205 @@ useEffect(() => {
                     </button>
                   </div>
                 </div>
+
+                {/* Resume Learning Section */}
+                {canResume && lastSession && (
+                  <div className="resume-learning-section" style={{
+                    background: isDarkMode
+                      ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
+                      : 'linear-gradient(135deg, rgb(95 123 248) 0%, rgb(97 111 242) 100%)',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    marginBottom: '24px',
+                    boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)',
+                    border: `2px solid ${isDarkMode ? '#7c3aed' : '#667eea'}`,
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}>
+                    {/* Background decoration */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '-50px',
+                      right: '-50px',
+                      width: '200px',
+                      height: '200px',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '50%',
+                      filter: 'blur(40px)',
+                    }} />
+
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '16px',
+                      }}>
+                        <div style={{ flex: 1, minWidth: '250px' }}>
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginBottom: '12px',
+                            color: '#ffffff',
+                          }}>
+                            <FontAwesomeIcon
+                              icon={faRocket}
+                              style={{
+                                fontSize: '24px',
+                                marginRight: '12px',
+                                animation: 'pulse 2s infinite',
+                              }}
+                            />
+                            <span style={{
+                              margin: 0,
+                              fontSize: '22px',
+                              fontWeight: '700',
+                              color: 'white',
+                            }}>
+                              Continue Your Learning Journey
+                            </span>
+                          </div>
+
+                          <div style={{
+                            color: '#ffffff',
+                            opacity: 0.95,
+                            fontSize: '15px',
+                            marginBottom: '16px',
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                              <FontAwesomeIcon icon={faBookOpen} style={{ marginRight: '8px', width: '16px' }} />
+                              <span>
+                                <strong>Subject:</strong> {subjects.find(s => s.subject_code === lastSession.subject_id)?.subject_name || 'Unknown'}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
+                              <FontAwesomeIcon icon={faListAlt} style={{ marginRight: '8px', width: '16px', marginTop: '3px' }} />
+                              <span>
+                                <strong>Chapter:</strong>{' '}
+                                {lastSession.topic_ids && lastSession.topic_ids.length > 0 ? (
+                                  <span>
+                                    {lastSession.topic_ids.map((topicId, index) => {
+                                      const chapter = chapters.find(ch => ch.topic_code === topicId);
+                                      return chapter ? (
+                                        <span key={topicId}>
+                                          {chapter.name}
+                                          {index < lastSession.topic_ids.length - 1 ? ', ' : ''}
+                                        </span>
+                                      ) : null;
+                                    }).filter(Boolean)}
+                                    {lastSession.topic_ids.length > 1 && ` (${lastSession.topic_ids.length} chapters)`}
+                                  </span>
+                                ) : 'N/A'}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                              <FontAwesomeIcon icon={faClipboardQuestion} style={{ marginRight: '8px', width: '16px' }} />
+                              <span>
+                                <strong>Progress:</strong> Question {lastSession.questionNumber} of {lastSession.questionList?.length || 0}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                              <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: '8px', width: '16px' }} />
+                              <span>
+                                <strong>Last active:</strong> {new Date(lastSession.timestamp).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Progress bar */}
+                          <div style={{
+                            width: '100%',
+                            height: '8px',
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderRadius: '4px',
+                            overflow: 'hidden',
+                            marginBottom: '16px',
+                          }}>
+                            <div style={{
+                              width: `${(lastSession.questionNumber / (lastSession.questionList?.length || 1)) * 100}%`,
+                              height: '100%',
+                              background: 'linear-gradient(90deg, rgb(84 250 195) 0%, rgb(21 188 136) 100%)',
+                              borderRadius: '4px',
+                              transition: 'width 0.3s ease',
+                            }} />
+                          </div>
+                        </div>
+
+                        <div>
+                          <button
+                            onClick={handleResumeLearning}
+                            style={{
+                              background: 'linear-gradient(135deg, rgb(84 250 195) 0%, rgb(21 188 136) 100%)',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '12px',
+                              padding: '16px 32px',
+                              fontSize: '16px',
+                              fontWeight: '700',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              boxShadow: '0 8px 20px rgba(16, 185, 129, 0.4)',
+                              transition: 'all 0.3s ease',
+                              whiteSpace: 'nowrap',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.transform = 'translateY(-2px)';
+                              e.target.style.boxShadow = '0 12px 28px rgba(16, 185, 129, 0.5)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.transform = 'translateY(0)';
+                              e.target.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.4)';
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faRocket} />
+                            Resume Learning
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              localStorage.removeItem(`lastSession_${username}`);
+                              setCanResume(false);
+                              setLastSession(null);
+                              showAlert('Session cleared successfully', 'success');
+                            }}
+                            style={{
+                              background: 'transparent',
+                              color: '#ffffff',
+                              border: '2px solid rgba(255, 255, 255, 0.3)',
+                              borderRadius: '8px',
+                              padding: '8px 16px',
+                              fontSize: '13px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              marginTop: '12px',
+                              width: '100%',
+                              transition: 'all 0.2s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                              e.target.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.background = 'transparent';
+                              e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                            }}
+                          >
+                            Start Fresh
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Enhanced Learning Adventure Section */}
                 <div className="learning-adventure-section">
                   {/* <div className="section-header">
@@ -1208,6 +1504,9 @@ useEffect(() => {
             onComplete={handleTutorialComplete}
           />
         )}
+
+        {/* Mascot Component */}
+        {/* <Mascot position="bottom-right" mode="3d" /> */}
       </div>
     </>
   );

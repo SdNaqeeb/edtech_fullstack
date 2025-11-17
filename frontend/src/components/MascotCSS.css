@@ -1,0 +1,948 @@
+/* src/components/MascotCSS.css - Cute Robot Design */
+
+/* ========== Main Container ========== */
+.cute-mascot-container {
+  width: 120px;
+  height: 168px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* ========== Cute Robot Container ========== */
+.cute-robot {
+  width: 108px;
+  height: 144px;
+  position: relative;
+  animation: floatGentle 3s ease-in-out infinite;
+}
+
+/* Overall floating animation */
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* ========== Robot Glow Effect ========== */
+.robot-glow {
+  position: absolute;
+  width: 84px;
+  height: 84px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  opacity: 0.2;
+  filter: blur(15px);
+  animation: glowPulse 2.5s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 0.35;
+  }
+}
+
+/* ========== Sparkles (for happy emotions) ========== */
+.sparkles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 12px;
+  animation: sparkleTwinkle 1.5s ease-in-out infinite;
+}
+
+.sparkle-1 {
+  top: 10%;
+  left: 5%;
+  animation-delay: 0s;
+}
+
+.sparkle-2 {
+  top: 20%;
+  right: 8%;
+  animation-delay: 0.3s;
+}
+
+.sparkle-3 {
+  top: 45%;
+  left: 0%;
+  animation-delay: 0.6s;
+}
+
+.sparkle-4 {
+  top: 50%;
+  right: 2%;
+  animation-delay: 0.9s;
+}
+
+.sparkle-5 {
+  top: 75%;
+  left: 10%;
+  animation-delay: 1.2s;
+}
+
+.sparkle-6 {
+  top: 70%;
+  right: 12%;
+  animation-delay: 1.5s;
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+/* ========== Cute Antenna ========== */
+.cute-antenna {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+.antenna-wire {
+  width: 4px;
+  height: 30px;
+  background: linear-gradient(to bottom, #FFD700, #FFA500);
+  margin: 0 auto;
+  border-radius: 3px;
+  animation: antennaWiggle 2.5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.antenna-ball {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin: -4px auto 0;
+  position: relative;
+  animation: antennaBounce 2s ease-in-out infinite;
+}
+
+.antenna-pulse {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: inherit;
+  opacity: 0.6;
+  animation: antennaPulseRing 1.5s ease-out infinite;
+}
+
+@keyframes antennaWiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes antennaBounce {
+  0%, 100% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.15) translateY(-3px);
+  }
+}
+
+@keyframes antennaPulseRing {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* ========== Cute Head - Big and Round ========== */
+.cute-head {
+  width: 57px;
+  height: 57px;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+/* ========== Rosy Cheeks ========== */
+.cheek {
+  position: absolute;
+  width: 12px;
+  height: 10px;
+  background: radial-gradient(circle, rgba(255, 182, 193, 0.8), rgba(255, 182, 193, 0));
+  border-radius: 50%;
+  top: 60%;
+  animation: cheekBlush 3s ease-in-out infinite;
+}
+
+.cheek-left {
+  left: 5px;
+}
+
+.cheek-right {
+  right: 5px;
+}
+
+@keyframes cheekBlush {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ========== Big Expressive Eyes ========== */
+.cute-eyes {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.cute-eye {
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.eye-white {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #ffffff;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.pupil {
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle at 30% 30%, #2c3e50, #000);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+}
+
+.eye-shine {
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  box-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+/* ========== Eye Emotions ========== */
+
+/* Happy/Celebrating/Excited - Squinty happy eyes */
+.cute-eye.happy,
+.cute-eye.celebrating,
+.cute-eye.excited {
+  width: 16px;
+  height: 10px;
+  border-radius: 50% 50% 45% 45%;
+  animation: eyeBlink 4s ease-in-out infinite;
+}
+
+.cute-eye.happy .pupil,
+.cute-eye.celebrating .pupil,
+.cute-eye.excited .pupil {
+  width: 7px;
+  height: 6px;
+}
+
+/* Sad - Droopy eyes */
+.cute-eye.sad {
+  width: 12px;
+  height: 16px;
+  border-radius: 45% 45% 50% 50%;
+}
+
+.cute-eye.sad .pupil {
+  top: 60%;
+}
+
+/* Thinking - Moving eyes */
+.cute-eye.thinking {
+  animation: eyeThinking 3s ease-in-out infinite;
+}
+
+@keyframes eyeBlink {
+  0%, 90%, 100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes eyeThinking {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+/* Waving - Bright excited eyes */
+.cute-eye.waving {
+  animation: eyeSparkle 2s ease-in-out infinite;
+}
+
+@keyframes eyeSparkle {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* ========== Cute Mouth - Expressive ========== */
+.cute-mouth {
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+/* Big Smile (for happy emotions) */
+.smile-big {
+  position: relative;
+  width: 30px;
+  height: 17px;
+}
+
+.smile-curve {
+  width: 30px;
+  height: 13px;
+  border: 2px solid #2c3e50;
+  border-top: none;
+  border-radius: 0 0 30px 30px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 182, 193, 0.3));
+  position: relative;
+  overflow: hidden;
+}
+
+.smile-tooth {
+  width: 5px;
+  height: 6px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px 1px 2px 2px;
+  position: absolute;
+  top: 1px;
+}
+
+.smile-tooth-1 {
+  left: 8px;
+}
+
+.smile-tooth-2 {
+  left: 16px;
+}
+
+/* Sad Mouth */
+.mouth-sad {
+  width: 24px;
+  height: 11px;
+  border: 2px solid #2c3e50;
+  border-bottom: none;
+  border-radius: 30px 30px 0 0;
+  transform: translateY(5px);
+}
+
+/* Thinking Mouth (emoji) */
+.mouth-thinking {
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Waving Mouth (emoji) */
+.mouth-wave {
+  font-size: 11px;
+  text-align: center;
+}
+
+/* Neutral Mouth */
+.mouth-neutral {
+  width: 21px;
+  height: 2px;
+  background: #2c3e50;
+  border-radius: 2px;
+}
+
+/* ========== Cute Body - Chubby and Round ========== */
+.cute-body {
+  width: 60px;
+  height: 66px;
+  border-radius: 45% 45% 40% 40%;
+  position: absolute;
+  top: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 6px;
+}
+
+/* ========== Heart Display ========== */
+.heart-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.heart-icon {
+  font-size: 13px;
+  animation: heartBeat 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.15);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.2);
+  }
+}
+
+.heart-beat-line {
+  width: 39px;
+  height: 15px;
+}
+
+.beat-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 2px #00ffff);
+}
+
+.beat-svg polyline {
+  animation: beatPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes beatPulse {
+  0%, 100% {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 20;
+  }
+}
+
+/* ========== Energy Bar ========== */
+.energy-bar {
+  width: 42px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  margin-top: 2px;
+}
+
+.energy-fill {
+  height: 100%;
+  width: 85%;
+  border-radius: 10px;
+  animation: energyPulse 2s ease-in-out infinite;
+}
+
+@keyframes energyPulse {
+  0%, 100% {
+    width: 85%;
+    opacity: 0.9;
+  }
+  50% {
+    width: 92%;
+    opacity: 1;
+  }
+}
+
+/* ========== Cute Arms - Stumpy with Fingers ========== */
+.cute-arm {
+  width: 12px;
+  height: 41px;
+  border-radius: 7px;
+  position: absolute;
+  top: 54px;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.2);
+  transform-origin: top center;
+  z-index: 1;
+}
+
+.arm-left {
+  left: 11px;
+  animation: armIdleLeft 2.5s ease-in-out infinite;
+}
+
+.arm-right {
+  right: 11px;
+  animation: armIdleRight 2.5s ease-in-out infinite;
+}
+
+.cute-hand {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1px;
+  padding-top: 2px;
+}
+
+.finger {
+  width: 2px;
+  height: 6px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+  border-radius: 1px 1px 2px 2px;
+}
+
+/* Arm Idle Animations */
+@keyframes armIdleLeft {
+  0%, 100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes armIdleRight {
+  0%, 100% {
+    transform: rotate(8deg);
+  }
+  50% {
+    transform: rotate(-8deg);
+  }
+}
+
+/* ========== Arm Emotion Animations ========== */
+
+/* Happy/Celebrating/Excited - Arms up celebrating */
+.cute-arm.arm-left.happy,
+.cute-arm.arm-left.celebrating,
+.cute-arm.arm-left.excited {
+  animation: armCelebrateLeft 0.7s ease-in-out infinite;
+}
+
+.cute-arm.arm-right.happy,
+.cute-arm.arm-right.celebrating,
+.cute-arm.arm-right.excited {
+  animation: armCelebrateRight 0.7s ease-in-out infinite;
+}
+
+@keyframes armCelebrateLeft {
+  0%, 100% {
+    transform: rotate(-35deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-55deg) translateY(-12px);
+  }
+}
+
+@keyframes armCelebrateRight {
+  0%, 100% {
+    transform: rotate(35deg) translateY(0);
+  }
+  50% {
+    transform: rotate(55deg) translateY(-12px);
+  }
+}
+
+/* Waving - Right arm waves */
+.cute-arm.arm-right.waving {
+  animation: armWave 1.2s ease-in-out infinite;
+}
+
+@keyframes armWave {
+  0%, 100% {
+    transform: rotate(15deg);
+  }
+  25% {
+    transform: rotate(-25deg);
+  }
+  50% {
+    transform: rotate(-45deg);
+  }
+  75% {
+    transform: rotate(-25deg);
+  }
+}
+
+/* Sad - Arms droop down */
+.cute-arm.arm-left.sad,
+.cute-arm.arm-right.sad {
+  animation: none;
+  transform: rotate(15deg);
+}
+
+/* Thinking - Hand on chin gesture */
+.cute-arm.arm-right.thinking {
+  animation: armThinking 2.5s ease-in-out infinite;
+}
+
+@keyframes armThinking {
+  0%, 100% {
+    transform: rotate(75deg) translateY(-25px) translateX(-5px);
+  }
+  50% {
+    transform: rotate(80deg) translateY(-23px) translateX(-5px);
+  }
+}
+
+/* Teaching - Pointing gesture */
+.cute-arm.arm-right.teaching {
+  animation: armTeaching 2s ease-in-out infinite;
+}
+
+@keyframes armTeaching {
+  0%, 100% {
+    transform: rotate(-15deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-25deg) translateY(-5px);
+  }
+}
+
+/* Encouraging - Thumbs up motion */
+.cute-arm.arm-left.encouraging,
+.cute-arm.arm-right.encouraging {
+  animation: armEncourage 1.5s ease-in-out infinite;
+}
+
+@keyframes armEncourage {
+  0%, 100% {
+    transform: rotate(-20deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-30deg) translateY(-8px);
+  }
+}
+
+/* ========== Cute Legs - Short and Cute ========== */
+.cute-legs {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  z-index: 1;
+}
+
+.cute-leg {
+  width: 13px;
+  height: 25px;
+  border-radius: 7px;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.cute-foot {
+  width: 19px;
+  height: 8px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+  border-radius: 4px;
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shoe-detail {
+  width: 11px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 1px;
+  margin-top: 1px;
+}
+
+/* ========== Cute Shadow ========== */
+.cute-shadow {
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 66px;
+  height: 11px;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.3), transparent 70%);
+  border-radius: 50%;
+  animation: shadowPulse 3s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes shadowPulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.1);
+    opacity: 0.4;
+  }
+}
+
+/* ========== Overall Robot Emotion Animations ========== */
+
+/* Idle/Neutral - Gentle floating */
+.cute-robot.emotion-idle,
+.cute-robot.emotion-neutral {
+  animation: floatGentle 3s ease-in-out infinite;
+}
+
+/* Happy/Celebrating/Excited - Bouncing */
+.cute-robot.emotion-happy,
+.cute-robot.emotion-celebrating,
+.cute-robot.emotion-excited {
+  animation: robotBounce 0.7s ease-in-out infinite;
+}
+
+@keyframes robotBounce {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-18px) scale(1.03);
+  }
+}
+
+/* Sad - Drooping down */
+.cute-robot.emotion-sad {
+  animation: robotDroop 2.5s ease-in-out infinite;
+}
+
+@keyframes robotDroop {
+  0%, 100% {
+    transform: translateY(6px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}
+
+/* Waving - Side tilt */
+.cute-robot.emotion-waving {
+  animation: floatGentle 3s ease-in-out infinite, robotTilt 2s ease-in-out infinite;
+}
+
+@keyframes robotTilt {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+/* Thinking - Head tilting */
+.cute-robot.emotion-thinking {
+  animation: floatGentle 3s ease-in-out infinite, robotThink 2.5s ease-in-out infinite;
+}
+
+@keyframes robotThink {
+  0%, 100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+/* Teaching - Nodding */
+.cute-robot.emotion-teaching {
+  animation: floatGentle 3s ease-in-out infinite, robotNod 1.8s ease-in-out infinite;
+}
+
+@keyframes robotNod {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/* Encouraging - Gentle pulse */
+.cute-robot.emotion-encouraging {
+  animation: floatGentle 3s ease-in-out infinite, robotEncourage 1.5s ease-in-out infinite;
+}
+
+@keyframes robotEncourage {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+/* ========== Responsive Design ========== */
+@media (max-width: 768px) {
+  .cute-mascot-container {
+    width: 180px;
+    height: 260px;
+  }
+
+  .cute-robot {
+    width: 160px;
+    height: 220px;
+  }
+
+  .cute-head {
+    width: 85px;
+    height: 85px;
+  }
+
+  .cute-body {
+    width: 90px;
+    height: 100px;
+  }
+
+  .sparkle {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cute-mascot-container {
+    width: 160px;
+    height: 240px;
+  }
+
+  .cute-robot {
+    width: 140px;
+    height: 200px;
+  }
+
+  .cute-head {
+    width: 75px;
+    height: 75px;
+  }
+
+  .cute-body {
+    width: 80px;
+    height: 90px;
+  }
+
+  .sparkle {
+    font-size: 14px;
+  }
+}
+
+/* ========== Accessibility - Reduced Motion ========== */
+@media (prefers-reduced-motion: reduce) {
+  .cute-robot,
+  .robot-glow,
+  .sparkle,
+  .antenna-wire,
+  .antenna-ball,
+  .antenna-pulse,
+  .cheek,
+  .cute-eye,
+  .heart-icon,
+  .beat-svg polyline,
+  .energy-fill,
+  .cute-arm,
+  .cute-shadow {
+    animation: none !important;
+  }
+
+  .cute-robot {
+    transform: translateY(0) !important;
+  }
+}

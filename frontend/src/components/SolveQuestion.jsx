@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useContext, useEffect, useRef, useCallback, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Form, Button, Spinner, Alert, Row, Col } from "react-bootstrap";
 import axiosInstance from "../api/axiosInstance";
@@ -20,6 +20,8 @@ import MarkdownWithMath from "./MarkdownWithMath";
 import CameraCapture from "./CameraCapture";
 import Tutorial from "./Tutorial";
 import { useTutorial } from "../contexts/TutorialContext";
+import Mascot from "./Mascot";
+// import { useMascot } from "../contexts/MascotContext";
 
 
 function SolveQuestion() {
@@ -51,9 +53,13 @@ function SolveQuestion() {
     completedPages,
   } = useTutorial();
 
+  // Mascot context
+  // const { setThinking, setIdle, setEncouraging } = useMascot();
+
   // State for tracking study session
   const [studyTime, setStudyTime] = useState(0);
   const [images, setImages] = useState([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState([]); // Store preview URLs separately
   const [isSolveEnabled, setIsSolveEnabled] = useState(true);
   const [showQuestionListModal, setShowQuestionListModal] = useState(false);
   const [processingButton, setProcessingButton] = useState(null);
@@ -76,6 +82,11 @@ function SolveQuestion() {
     setShareWithChat(true);
     localStorage.setItem("include_question_context", "true");
   }, []);
+
+  // Set mascot to encouraging mode when solving questions
+  // useEffect(() => {
+  //   setEncouraging();
+  // }, [setEncouraging]);
 
   // Apply dark mode on component mount and listen for changes
   useEffect(() => {
@@ -132,18 +143,18 @@ function SolveQuestion() {
 
   // Handle tutorial completion for SolveQuestion
   const handleTutorialComplete = () => {
-    console.log("SolveQuestion tutorial completed");
+    // console.log("SolveQuestion tutorial completed");
     // Tutorial will continue when user navigates to result page
   };
 
   // Debug logging for tutorial
   useEffect(() => {
     const shouldShow = shouldShowTutorialForPage("solveQuestion");
-    console.log("=== SolveQuestion Tutorial Debug ===");
-    console.log("Should show tutorial for solveQuestion:", shouldShow);
-    console.log("Tutorial flow:", tutorialFlow);
-    console.log("Completed pages:", completedPages);
-    console.log("Tutorial steps:", tutorialSteps);
+    // console.log("=== SolveQuestion Tutorial Debug ===");
+    // console.log("Should show tutorial for solveQuestion:", shouldShow);
+    // console.log("Tutorial flow:", tutorialFlow);
+    // console.log("Completed pages:", completedPages);
+    // console.log("Tutorial steps:", tutorialSteps);
   }, [shouldShowTutorialForPage, tutorialFlow, completedPages]);
 
   // Extract data from location state
@@ -160,7 +171,7 @@ function SolveQuestion() {
     context
     
   } = location.state || {};
-  console.log("Location state:", location.state);
+  // console.log("Location state:", location.state);
   const { questionNumber } = location.state || {};
   const questionId = location.state?.questionId || `${index}${Date.now()}`;
   const question_image =
@@ -176,27 +187,41 @@ function SolveQuestion() {
     // id: questionId,
     question_id: question_id || questionId
   });
-  console.log("Current Question State:", currentQuestion);
+  // console.log("Current Question State:", currentQuestion);
   // console.log("questionList", questionList);
 
-  const { setCurrentQuestion: setContextQuestion } = useCurrentQuestion();
+  const { setCurrentQuestion: setContextQuestion, setQuestion } = useCurrentQuestion();
 
-  // Start timer when component mounts
+  // Use ref to track previous location state to prevent redundant updates
+  const prevLocationStateRef = useRef(null);
+
+  // Memoize cleanup function to revoke image URLs
+  const revokeImageUrls = useCallback((urls) => {
+    urls.forEach(url => {
+      try {
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        // Ignore errors for already revoked URLs
+        console.debug('URL already revoked:', url);
+      }
+    });
+  }, []);
+
+  // Stop timer when component unmounts (only run on unmount)
   useEffect(() => {
-    if (currentQuestion.id) {
-      startTimer(currentQuestion.id);
-    }
-    
-    // Stop timer when component unmounts
     return () => {
       const timeSpent = stopTimer();
-      console.log(`Study session ended. Time spent: ${timeSpent}ms`);
+      // console.log(`Study session ended. Time spent: ${timeSpent}ms`);
     };
-  }, [currentQuestion.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on unmount
 
   useEffect(() => {
-    if (location.state) {
-      const newQuestionId = location.state?.question_id || `${index}`
+    // Check if location.state has actually changed to prevent redundant updates
+    if (location.state && location.state !== prevLocationStateRef.current) {
+      prevLocationStateRef.current = location.state;
+
+      const newQuestionId = location.state?.question_id || `${index}`;
 
       const newQuestion = {
         question: location.state.question || "",
@@ -208,22 +233,37 @@ function SolveQuestion() {
         question_id: location.state?.question_id || newQuestionId,
         context: location.state?.context || null
       };
-      console.log("Setting current question:", newQuestion);
+
+      // Prepare metadata for API calls
+      const metadata = {
+        class_id: location.state.class_id,
+        subject_id: location.state.subject_id,
+        topic_ids: location.state.topic_ids,
+        subtopic: location.state.subtopic,
+        worksheet_id: location.state.worksheet_id,
+      };
+
+      // console.log("Setting current question:", newQuestion);
+      // console.log("Setting question metadata:", metadata);
+
       setCurrentQuestion(newQuestion);
-      setContextQuestion(newQuestion); // Update the context with the new question
+      setQuestion(newQuestion, index || 0, questionList || [], metadata); // Update context with metadata
 
       // Stop previous timer and start a new one
       stopTimer();
       startTimer(newQuestionId);
 
       // Reset other state
+      // Revoke existing preview URLs before resetting
+      revokeImageUrls(imagePreviewUrls);
       setImages([]);
+      setImagePreviewUrls([]);
       setError(null);
       setUploadProgress(0);
       setProcessingButton(null);
       setIsContextExpanded(false); // Reset context expansion
     }
-  }, [location.state, index, setContextQuestion,]);
+  }, [location.state, index, setQuestion, questionList, stopTimer, startTimer, revokeImageUrls, imagePreviewUrls]);
 
   // Persist the share-with-chat preference
   useEffect(() => {
@@ -261,7 +301,7 @@ function SolveQuestion() {
   };
 
   // Handle image upload
-  const handleImageChange = (e) => {
+  const handleImageChange = useCallback((e) => {
     const files = Array.from(e.target.files);
 
     // Validate file size before accepting
@@ -274,19 +314,28 @@ function SolveQuestion() {
       return;
     }
 
+    // Create preview URLs for new images
+    const newPreviewUrls = files.map(file => URL.createObjectURL(file));
+
     setImages(prevImages => [...prevImages, ...files]);
+    setImagePreviewUrls(prevUrls => [...prevUrls, ...newPreviewUrls]);
     setIsSolveEnabled(false);
     setError(null); // Clear previous errors
-  };
+  }, []);
 
   // Handle captured image from camera
-  const handleCapturedImage = (capturedImageBlob) => {
+  const handleCapturedImage = useCallback((capturedImageBlob) => {
     // Convert blob to File object
     const file = new File([capturedImageBlob], `captured-solution-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+
     setImages(prevImages => [...prevImages, file]);
+    setImagePreviewUrls(prevUrls => [...prevUrls, previewUrl]);
     setIsSolveEnabled(false);
     setError(null);
-  };
+  }, []);
 
   // Handle upload progress
   const handleUploadProgress = (percent) => {
@@ -338,13 +387,13 @@ function SolveQuestion() {
 
   // Enhanced handleCorrect function
   const handleCorrect = async () => {
-    console.log("Starting handleCorrect function");
+  //  console.log ("Starting handleCorrect function");
     setProcessingButton("correct");
     setError(null);
 
     // Stop the timer and get the time spent
     const timeSpentMs = stopTimer();
-    console.log("timespent in ms",timeSpentMs)
+    // console.log("timespent in ms",timeSpentMs)
     // const timeSpentMinutes = Math.ceil(timeSpentMs / 60000);
     // console.log('time spent in min',time)
 
@@ -362,8 +411,8 @@ function SolveQuestion() {
     formData.append("study_time_seconds", Math.floor((timeSpentMs % 60000) / 1000));
     formData.append("study_time_minutes", timeSpentMinutes);
     formData.append("question_id", currentQuestion.question_id || currentQuestion.id);
-    console.log("time in minutes :",timeSpentMinutes);
-    console.log("time spent in seconds :",Math.floor((timeSpentMs % 60000) / 1000));
+    // console.log("time in minutes :",timeSpentMinutes);
+    // console.log("time spent in seconds :",Math.floor((timeSpentMs % 60000) / 1000));
 
     // Helper: finalize and send the form after appending everything
     const finalizeAndSendForm = async () => {
@@ -439,7 +488,7 @@ function SolveQuestion() {
     if (currentQuestion.image) {
       if (currentQuestion.image.startsWith("data:image")) {
         // Already base64 – send as-is
-        console.log("Detected base64 question image");
+        // console.log("Detected base64 question image");
         formData.append("ques_img", currentQuestion.image);
         finalizeAndSendForm();
       } else if (currentQuestion.image.startsWith("http")) {
@@ -521,7 +570,7 @@ function SolveQuestion() {
         formData.append("ans_img", image);
       });
     }
-    console.log("Form data prepared:", formData);
+    // console.log("Form data prepared:", formData);
     try {
       // Use the custom upload method for actions with file uploads
       let response;
@@ -589,14 +638,24 @@ function SolveQuestion() {
   };
 
   // Cancel image upload
-  const handleCancelImage = (index) => {
-    const updatedImages = images.filter((_, i) => i !== index);
-    setImages(updatedImages);
-    setIsSolveEnabled(updatedImages.length === 0);
-  };
+  const handleCancelImage = useCallback((index) => {
+    setImagePreviewUrls(prevUrls => {
+      // Revoke the URL for the removed image
+      if (prevUrls[index]) {
+        revokeImageUrls([prevUrls[index]]);
+      }
+      return prevUrls.filter((_, i) => i !== index);
+    });
+
+    setImages(prevImages => {
+      const updatedImages = prevImages.filter((_, i) => i !== index);
+      setIsSolveEnabled(updatedImages.length === 0);
+      return updatedImages;
+    });
+  }, [revokeImageUrls]);
 
   // Select question from list
-  const handleQuestionSelect = (
+  const handleQuestionSelect = useCallback((
     selectedQuestion,
     selectedIndex,
     selectedImage,
@@ -609,7 +668,7 @@ function SolveQuestion() {
     // console.log("Selected image:", selectedImage);
     // console.log("Selected index:", selectedIndex);
     // console.log("Selected question ID:", question_id || selectedIndex);
-    console.log("Selected context:", questionContext);
+    // console.log("Selected context:", questionContext);
     // Stop the current timer
     stopTimer();
 
@@ -628,6 +687,11 @@ function SolveQuestion() {
     startTimer(newQuestionId);
 
     // Reset image related state
+    setImagePreviewUrls(prevUrls => {
+      // Revoke existing preview URLs
+      revokeImageUrls(prevUrls);
+      return [];
+    });
     setImages([]);
     setIsSolveEnabled(true);
     setError(null);
@@ -638,7 +702,7 @@ function SolveQuestion() {
 
     // Close modal
     setShowQuestionListModal(false);
-  };
+  }, [stopTimer, startTimer, revokeImageUrls]);
 
   // Handle back button click
   const handleBackClick = () => {
@@ -660,14 +724,11 @@ function SolveQuestion() {
   // Clean up object URLs when component unmounts
   useEffect(() => {
     return () => {
-      images.forEach(img => {
-        if (img instanceof File) {
-          const url = URL.createObjectURL(img);
-          URL.revokeObjectURL(url);
-        }
-      });
+      // Revoke all preview URLs on cleanup when component unmounts
+      revokeImageUrls(imagePreviewUrls);
     };
-  }, [images]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount/unmount
 
   return (
     <div className={`solve-question-wrapper ${isDarkMode ? 'dark-mode' : ''}`}>
@@ -899,7 +960,7 @@ function SolveQuestion() {
               {images.map((image, index) => (
                 <div key={index} className="image-preview-container" style={{ position: 'relative' }}>
                   <img
-                    src={URL.createObjectURL(image)}
+                    src={imagePreviewUrls[index]}
                     alt={`Preview ${index + 1}`}
                     className="image-preview"
                     style={{
@@ -928,6 +989,11 @@ function SolveQuestion() {
                 size="sm"
                 className="mt-2"
                 onClick={() => {
+                  setImagePreviewUrls(prevUrls => {
+                    // Revoke all preview URLs
+                    revokeImageUrls(prevUrls);
+                    return [];
+                  });
                   setImages([]);
                   setIsSolveEnabled(true);
                 }}
@@ -1069,6 +1135,9 @@ function SolveQuestion() {
           onComplete={handleTutorialComplete}
         />
       )}
+
+      {/* Mascot Component */}
+      {/* <Mascot position="bottom-right" mode="3d" /> */}
     </div>
   );
 }

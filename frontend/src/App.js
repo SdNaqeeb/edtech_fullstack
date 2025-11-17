@@ -13,6 +13,7 @@ import FeedbackBox from "./components/FeedbackBox";
 import "./styles/theme.css";
 import { TutorialProvider } from "./contexts/TutorialContext";
 import { TimerProvider } from "./contexts/TimerContext";
+import { MascotProvider } from "./contexts/MascotContext";
 import RouteTracker from "./components/RouteTracker";
 
 // Wrapper component to use location hook
@@ -45,11 +46,18 @@ function App() {
             <LeaderboardProvider>
               <QuestProvider>
                 <TutorialProvider>
-                  <CurrentQuestionProvider>
-                    <Router>
-                      <AppContent />
-                    </Router>
-                  </CurrentQuestionProvider>
+                  {/* <MascotProvider> */}
+                    <CurrentQuestionProvider>
+                      <Router
+                        future={{
+                          v7_startTransition: true,
+                          v7_relativeSplatPath: true,
+                        }}
+                      >
+                        <AppContent />
+                      </Router>
+                    </CurrentQuestionProvider>
+                  {/* </MascotProvider> */}
                 </TutorialProvider>
               </QuestProvider>
             </LeaderboardProvider>

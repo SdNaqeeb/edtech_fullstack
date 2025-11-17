@@ -9,6 +9,8 @@ import Tutorial from './Tutorial';
 import { useTutorial } from '../contexts/TutorialContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import Mascot from './Mascot';
+// import { useMascot } from '../contexts/MascotContext';
 
 const ResultPage = () => {
   const location = useLocation();
@@ -25,6 +27,9 @@ const ResultPage = () => {
     startTutorialFromToggle,
     startTutorialForPage,
   } = useTutorial();
+
+  // Mascot context
+  // const { setEmotionFromScore } = useMascot();
 
   // Dark mode state
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -134,6 +139,16 @@ const ResultPage = () => {
     console.log("ResultPage tutorial completed - marking entire flow as complete");
     completeTutorialFlow();
   };
+
+  // Set mascot emotion based on score
+  // useEffect(() => {
+  //   if (obtained_marks !== undefined && total_marks !== undefined) {
+  //     setEmotionFromScore(obtained_marks, total_marks);
+  //   } else if (score !== undefined) {
+  //     // If score is provided as percentage
+  //     setEmotionFromScore(score, 100);
+  //   }
+  // }, [obtained_marks, total_marks, score, setEmotionFromScore]);
 
   // Apply dark mode on component mount and listen for changes
   useEffect(() => {
@@ -811,6 +826,9 @@ const ResultPage = () => {
           onComplete={handleTutorialComplete}
         />
       )} */}
+
+      {/* Mascot Component */}
+      {/* <Mascot position="bottom-right" mode="3d" /> */}
     </>
   );
 };

@@ -1,6 +1,6 @@
 // src/components/ChatBox.jsx
 import React, { useEffect, useContext, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -16,6 +16,9 @@ import {
   faExclamationTriangle,
   faBook,
   faGraduationCap,
+  faRobot,
+  faLightbulb,
+  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
@@ -28,6 +31,7 @@ import axiosInstance from "../api/axiosInstance";
 import MarkdownViewer from "./MarkdownViewer";
 import { useCurrentQuestion } from "../contexts/CurrentQuestionContext";
 import { useTutorial } from "../contexts/TutorialContext";
+// import { useMascot } from "../contexts/MascotContext";
 
 // ====== API BASE ======
 const API_URL = "https://chatbot.smartlearners.ai";
@@ -60,15 +64,20 @@ const formatMessage = (text) => {
 // ====== Main Component ======
 const ChatBox = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { username } = useContext(AuthContext);
   const { showAlert, AlertContainer } = useAlert();
   const className = localStorage.getItem("className");
-  const { currentQuestion } = useCurrentQuestion();
+  const { currentQuestion, questionMetadata } = useCurrentQuestion();
   const { resetTutorial, startTutorialForPage } = useTutorial();
+  // const { setTeaching, setThinking, setHappy } = useMascot();
   const includeQuestionContext = (() => {
     const stored = localStorage.getItem("include_question_context");
     return stored === null ? true : stored === "true";
   })();
+
+  // Check if we're on the SolveQuestion page
+  const isOnSolveQuestionPage = location.pathname === "/solvequestion";
 
   const [isOpen, setIsOpen] = useState(false);
   const toggleChat = () => setIsOpen((o) => !o);
@@ -111,28 +120,62 @@ const ChatBox = () => {
   const [inputText, setInputText] = useState("");
 
   // ====== Suggestion Questions ======
-  const suggestionQuestions = [
-    {
-      text: "What is my progress?",
-      icon: faChartLine,
-      isTutorial: false,
-    },
-    {
-      text: "What are my weaknesses?",
-      icon: faExclamationTriangle,
-      isTutorial: false,
-    },
-    {
-      text: "Give remedial program for 1 week as per my weaknesses",
-      icon: faBook,
-      isTutorial: false,
-    },
-    {
-      text: "Start Tutorial Walkthrough",
-      icon: faGraduationCap,
-      isTutorial: true,
-    },
-  ];
+  // Different suggestions based on whether we're on SolveQuestion page
+  const getSuggestionQuestions = () => {
+    if (isOnSolveQuestionPage && currentQuestion) {
+      return [
+        {
+          text: "AI-Solution",
+          icon: faRobot,
+          isTutorial: false,
+          isApiAction: true,
+          apiFlag: "solve",
+        },
+        {
+          text: "Concepts-Required and videos",
+          icon: faLightbulb,
+          isTutorial: false,
+          isApiAction: true,
+          apiFlag: "explain",
+        },
+        {
+          text: "Start Tutorial Walkthrough",
+          icon: faGraduationCap,
+          isTutorial: true,
+          isApiAction: false,
+        },
+      ];
+    }
+
+    return [
+      {
+        text: "What is my progress?",
+        icon: faChartLine,
+        isTutorial: false,
+        isApiAction: false,
+      },
+      {
+        text: "What are my weaknesses?",
+        icon: faExclamationTriangle,
+        isTutorial: false,
+        isApiAction: false,
+      },
+      {
+        text: "Give remedial program for 1 week as per my weaknesses",
+        icon: faBook,
+        isTutorial: false,
+        isApiAction: false,
+      },
+      {
+        text: "Start Tutorial Walkthrough",
+        icon: faGraduationCap,
+        isTutorial: true,
+        isApiAction: false,
+      },
+    ];
+  };
+
+  const suggestionQuestions = getSuggestionQuestions();
 
   // ====== Effects ======
   useEffect(() => {
@@ -439,6 +482,155 @@ const res = await api.post("/create_session", formData, {
     }
   };
 
+  // ====== Handler for calling anssubmit API ======
+  const handleApiAction = async (apiFlag, actionName) => {
+    if (!currentQuestion || !questionMetadata) {
+      showAlert("Missing question data. Please refresh the page.", "error");
+      return;
+    }
+
+    // Set mascot to thinking mode while processing
+    // setThinking();
+
+    const id = Date.now();
+
+    // Show user's action in chat
+    setMessages((prev) => [
+      ...prev,
+      {
+        id,
+        text: `Requesting ${actionName}...`,
+        sender: "user",
+        timestamp: new Date(),
+      },
+    ]);
+
+    setIsTyping(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("class_id", questionMetadata.class_id);
+      formData.append("subject_id", questionMetadata.subject_id);
+      formData.append("topic_ids", questionMetadata.topic_ids);
+      formData.append("subtopic", questionMetadata.subtopic || "");
+      formData.append("question_id", currentQuestion.question_id || currentQuestion.id);
+      formData.append(apiFlag, true); // solve, explain, or correct
+
+      console.log(`📤 Calling anssubmit/ API with ${apiFlag}:`, {
+        class_id: questionMetadata.class_id,
+        subject_id: questionMetadata.subject_id,
+        topic_ids: questionMetadata.topic_ids,
+        question_id: currentQuestion.question_id || currentQuestion.id,
+        apiFlag,
+      });
+
+      const response = await axiosInstance.post("/anssubmit/", formData);
+
+      console.log("📥 anssubmit/ API response:", response.data);
+
+      // Extract and format the response based on the action type
+      let responseText = "";
+
+      // Check if data is nested in ai_data object
+      const apiData = response.data.ai_data || response.data;
+
+      if (apiFlag === "solve") {
+        // Handle AI Solution response
+        if (apiData.ai_explaination && Array.isArray(apiData.ai_explaination)) {
+          responseText = apiData.ai_explaination.join("\n\n");
+          console.log("✅ Solve response formatted:", responseText.substring(0, 100) + "...");
+        } else {
+          responseText = apiData.solution || apiData.answer || "Solution generated successfully!";
+          console.log("⚠️ No ai_explaination found, using fallback");
+        }
+        // Set mascot to happy mode after providing solution
+        // setHappy("Here's the solution! Let me know if you need more help!");
+      } else if (apiFlag === "explain") {
+        // Handle Concepts-Required response - check both locations
+        const conceptsData = apiData.concepts || response.data.concepts;
+        if (conceptsData && Array.isArray(conceptsData)) {
+          // Format concepts with proper structure
+          const conceptsFormatted = conceptsData.map((concept, index) => {
+            let formatted = `### ${index + 1}. ${concept.concept}\n\n`;
+
+            if (concept.explanation) {
+              formatted += `**Explanation:**\n${concept.explanation}\n\n`;
+            }
+
+            if (concept.example) {
+              formatted += `**Example:**\n${concept.example}\n\n`;
+            }
+
+            if (concept.application) {
+              formatted += `**Application:**\n${concept.application}\n\n`;
+            }
+
+            return formatted;
+          }).join("\n---\n\n");
+
+          responseText = `## 📚 Key Concepts Required\n\n${conceptsFormatted}`;
+
+          // Add videos if available (check both apiData and response.data)
+          const videosData = apiData.videos || response.data.videos;
+          if (videosData && Array.isArray(videosData) && videosData.length > 0) {
+            responseText += `\n\n## 🎥 Recommended Videos\n\n`;
+            videosData.forEach((videoGroup, groupIndex) => {
+              if (videoGroup.concept_name) {
+                responseText += `\n**${videoGroup.concept_name}:**\n`;
+              }
+              if (videoGroup.videos && Array.isArray(videoGroup.videos)) {
+                videoGroup.videos.forEach((video, videoIndex) => {
+                  responseText += `\n${groupIndex + 1}.${videoIndex + 1}. [${video.title}](${video.url})\n`;
+                  responseText += `   - Channel: ${video.channel}\n`;
+                  responseText += `   - Duration: ${video.duration}\n`;
+                  responseText += `   - Views: ${video.views}\n`;
+                });
+              }
+            });
+          }
+        } else {
+          responseText = "Concepts explained successfully!";
+          console.log("⚠️ No concepts found in response");
+        }
+        // Set mascot to teaching mode after explaining concepts
+        // setTeaching("Let me explain these concepts to help you understand better!");
+      } else if (apiFlag === "correct") {
+        responseText = apiData.correction || apiData.feedback || "Correction completed!";
+        // Set mascot to happy mode after correction
+        // setHappy("I've reviewed your answer! Keep practicing!");
+      }
+
+      // Display AI response in chat
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: id + 1,
+          text: responseText,
+          sender: "ai",
+          timestamp: new Date(),
+        },
+      ]);
+
+      // showAlert(`${actionName} completed successfully!`, "success");
+    } catch (error) {
+      console.error(`❌ Error calling anssubmit/ API with ${apiFlag}:`, error);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: id + 1,
+          text: `❌ Sorry, I couldn't process your ${actionName} request. Please try again.`,
+          sender: "ai",
+          timestamp: new Date(),
+        },
+      ]);
+
+      showAlert(`Failed to get ${actionName}. Please try again.`, "error");
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
   // ====== Message senders ======
   const handleSuggestionClick = async (suggestion) => {
     // Handle tutorial button click
@@ -466,6 +658,12 @@ const res = await api.post("/create_session", formData, {
           startTutorialForPage('studentDash');
         }, 300);
       }, 500);
+      return;
+    }
+
+    // Handle API actions (AI-Solution, Concepts-Required, etc.)
+    if (suggestion.isApiAction) {
+      await handleApiAction(suggestion.apiFlag, suggestion.text);
       return;
     }
 
@@ -729,13 +927,34 @@ const res = await api.post("/create_session", formData, {
                   key={index}
                   className="suggestion-chip"
                   onClick={() => handleSuggestionClick(suggestion)}
-                  disabled={!suggestion.isTutorial && (connectionStatus !== "connected" || isTyping)}
-                  title={suggestion.isTutorial ? "Start guided tutorial" : `Ask: ${suggestion.text}`}
-                  style={suggestion.isTutorial ? {
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    color: 'white',
-                    fontWeight: '600',
-                  } : {}}
+                  disabled={
+                    suggestion.isApiAction
+                      ? isTyping // API actions only need to check if typing
+                      : !suggestion.isTutorial && (connectionStatus !== "connected" || isTyping) // Regular suggestions need connection
+                  }
+                  title={
+                    suggestion.isTutorial
+                      ? "Start guided tutorial"
+                      : suggestion.isApiAction
+                      ? `Get ${suggestion.text} from AI`
+                      : `Ask: ${suggestion.text}`
+                  }
+                  style={
+                    suggestion.isTutorial
+                      ? {
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          color: 'white',
+                          fontWeight: '600',
+                        }
+                      : suggestion.isApiAction
+                      ? {
+                          background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                          color: 'white',
+                          fontWeight: '600',
+                          borderColor: '#3b82f6',
+                        }
+                      : {}
+                  }
                 >
                   <FontAwesomeIcon icon={suggestion.icon} className="suggestion-icon" />
                   <span>{suggestion.text}</span>

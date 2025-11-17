@@ -2069,3 +2069,62 @@ body {
     font-size: 0.85rem;
   }
 }
+
+/* ========================================
+   RESUME LEARNING ANIMATIONS
+======================================== */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+/* Resume Learning Section Styles */
+.resume-learning-section {
+  animation: slideInFromTop 0.6s ease-out;
+  margin-top: 5vh;
+}
+
+.resume-learning-section{
+  h3{
+    color: #e2e8f0;
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode specific styles for Resume Learning */
+.dark-mode .resume-learning-section {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+  border-color: #7c3aed !important;
+}
+
+/* Responsive design for Resume Learning */
+@media (max-width: 768px) {
+  .resume-learning-section {
+    padding: 20px !important;
+  }
+
+  .resume-learning-section h3 {
+    font-size: 18px !important;
+  }
+
+  .resume-learning-section button {
+    width: 100%;
+    justify-content: center !important;
+  }
+}
