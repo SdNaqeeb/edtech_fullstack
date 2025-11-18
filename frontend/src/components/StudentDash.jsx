@@ -617,6 +617,15 @@ useEffect(() => {
 
     setShowQuestionList(false);
 
+    // Get chapter names for the selected chapters
+    const chapterNames = selectedChapters.map(chapterId => {
+      const chapter = chapters.find(ch => ch.topic_code === chapterId);
+      return chapter ? chapter.name : 'Unknown Chapter';
+    });
+
+    // Get subject name
+    const subjectName = subjects.find(s => s.subject_code === selectedSubject)?.subject_name || 'Unknown Subject';
+
     const sessionData = {
       question,
       question_id: question_id,
@@ -624,7 +633,9 @@ useEffect(() => {
       questionList,
       class_id: selectedClass,
       subject_id: selectedSubject,
+      subject_name: subjectName,
       topic_ids: selectedChapters,
+      chapter_names: chapterNames,
       subtopic: questionType === "external" ? questionLevel : "",
       worksheet_id: questionType === "worksheets" ? selectedWorksheet : "",
       image,
@@ -645,6 +656,16 @@ useEffect(() => {
     setShowQuestionList(false);
 
     const firstQuestion = selectedQuestionsData[0];
+
+    // Get chapter names for the selected chapters
+    const chapterNames = selectedChapters.map(chapterId => {
+      const chapter = chapters.find(ch => ch.topic_code === chapterId);
+      return chapter ? chapter.name : 'Unknown Chapter';
+    });
+
+    // Get subject name
+    const subjectName = subjects.find(s => s.subject_code === selectedSubject)?.subject_name || 'Unknown Subject';
+
     const sessionData = {
       question: firstQuestion.question,
       question_id: firstQuestion.question_id,
@@ -652,7 +673,9 @@ useEffect(() => {
       questionList,
       class_id: selectedClass,
       subject_id: selectedSubject,
+      subject_name: subjectName,
       topic_ids: selectedChapters,
+      chapter_names: chapterNames,
       subtopic: questionType === "external" ? questionLevel : "",
       worksheet_id: questionType === "worksheets" ? selectedWorksheet : "",
       image: firstQuestion.image,
@@ -976,25 +999,17 @@ useEffect(() => {
                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                               <FontAwesomeIcon icon={faBookOpen} style={{ marginRight: '8px', width: '16px' }} />
                               <span>
-                                <strong>Subject:</strong> {subjects.find(s => s.subject_code === lastSession.subject_id)?.subject_name || 'Unknown'}
+                                <strong>Subject:</strong> {lastSession.subject_name || 'Unknown'}
                               </span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
                               <FontAwesomeIcon icon={faListAlt} style={{ marginRight: '8px', width: '16px', marginTop: '3px' }} />
                               <span>
                                 <strong>Chapter:</strong>{' '}
-                                {lastSession.topic_ids && lastSession.topic_ids.length > 0 ? (
+                                {lastSession.chapter_names && lastSession.chapter_names.length > 0 ? (
                                   <span>
-                                    {lastSession.topic_ids.map((topicId, index) => {
-                                      const chapter = chapters.find(ch => ch.topic_code === topicId);
-                                      return chapter ? (
-                                        <span key={topicId}>
-                                          {chapter.name}
-                                          {index < lastSession.topic_ids.length - 1 ? ', ' : ''}
-                                        </span>
-                                      ) : null;
-                                    }).filter(Boolean)}
-                                    {lastSession.topic_ids.length > 1 && ` (${lastSession.topic_ids.length} chapters)`}
+                                    {lastSession.chapter_names[0]}
+                                    {lastSession.chapter_names.length > 1 && ` (+${lastSession.chapter_names.length - 1} more)`}
                                   </span>
                                 ) : 'N/A'}
                               </span>
